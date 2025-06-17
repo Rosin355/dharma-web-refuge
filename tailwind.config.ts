@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -61,6 +62,49 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				// Palette colori buddhisti
+				zen: {
+					cream: '#F7F5F0',
+					sand: '#F0EBE3',
+					stone: '#E8E2D5',
+					sage: '#D4D0C4',
+				},
+				saffron: {
+					50: '#FFF8E7',
+					100: '#FFEECC',
+					200: '#FFD699',
+					300: '#FFBD66',
+					400: '#FFA533',
+					500: '#FF8C00', // Colore principale CTA
+					600: '#E67A00',
+					700: '#B35F00',
+					800: '#804500',
+					900: '#4D2A00',
+				},
+				burgundy: {
+					50: '#FDF2F2',
+					100: '#FAE1E1',
+					200: '#F2BABA',
+					300: '#E99393',
+					400: '#E16C6C',
+					500: '#8B0000', // Rosso bordeaux buddhista
+					600: '#7A0000',
+					700: '#690000',
+					800: '#580000',
+					900: '#470000',
+				},
+				golden: {
+					50: '#FFFEF7',
+					100: '#FFFCEB',
+					200: '#FFF7CC',
+					300: '#FFF2AD',
+					400: '#FFED8E',
+					500: '#DAA520', // Oro buddhista
+					600: '#C4941D',
+					700: '#9E761A',
+					800: '#785916',
+					900: '#523C13',
 				}
 			},
 			borderRadius: {
@@ -84,11 +128,31 @@ export default {
 					to: {
 						height: '0'
 					}
+				},
+				'fade-in': {
+					'0%': {
+						opacity: '0',
+						transform: 'translateY(10px)'
+					},
+					'100%': {
+						opacity: '1',
+						transform: 'translateY(0)'
+					}
+				},
+				'float': {
+					'0%, 100%': {
+						transform: 'translateY(0px)'
+					},
+					'50%': {
+						transform: 'translateY(-20px)'
+					}
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'fade-in': 'fade-in 0.6s ease-out',
+				'float': 'float 6s ease-in-out infinite'
 			}
 		}
 	},
