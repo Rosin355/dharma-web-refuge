@@ -1,12 +1,11 @@
-
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { BookOpen, Heart, Lotus, Sun } from 'lucide-react';
+import { BookOpen, Heart, Flower2, Sun } from 'lucide-react';
 
 const Insegnamenti = () => {
   const pilastri = [
     {
-      icon: Lotus,
+      icon: Flower2,
       title: "Meditazione Zen",
       description: "La pratica fondamentale dello zazen (meditazione seduta) per sviluppare consapevolezza e presenza mentale.",
       content: "Lo zazen è il cuore della pratica zen. Attraverso la postura corretta, la respirazione naturale e l'osservazione senza giudizio dei pensieri, coltiviamo uno stato di presenza pura."
