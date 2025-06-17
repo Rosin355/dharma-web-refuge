@@ -1,6 +1,6 @@
 
 import { Link } from 'react-router-dom';
-import { Mail, MapPin, Phone } from 'lucide-react';
+import { Mail, MapPin, Phone, Settings } from 'lucide-react';
 
 const Footer = () => {
   return (
@@ -10,8 +10,12 @@ const Footer = () => {
           {/* Logo e descrizione */}
           <div className="col-span-1 md:col-span-2">
             <div className="flex items-center space-x-2 mb-4">
-              <div className="w-8 h-8 bg-saffron-gradient rounded-full flex items-center justify-center">
-                <span className="text-white font-bold text-sm">☸</span>
+              <div className="w-10 h-10 flex items-center justify-center">
+                <img 
+                  src="/lovable-uploads/ee0a1e23-8f51-4b46-8c99-f0b6fc5493e9.png" 
+                  alt="Comunità Bodhidharma Logo" 
+                  className="w-full h-full object-contain"
+                />
               </div>
               <span className="font-serif text-xl font-semibold">Comunità Bodhidharma</span>
             </div>
@@ -25,6 +29,7 @@ const Footer = () => {
           <div>
             <h3 className="font-serif font-semibold mb-4">Link Utili</h3>
             <ul className="space-y-2 text-sm">
+              <li><Link to="/insegnamenti" className="text-muted-foreground hover:text-saffron-500 transition-colors">Insegnamenti</Link></li>
               <li><Link to="/blog" className="text-muted-foreground hover:text-saffron-500 transition-colors">Blog</Link></li>
               <li><Link to="/eventi" className="text-muted-foreground hover:text-saffron-500 transition-colors">Eventi</Link></li>
               <li><Link to="/cerimonie" className="text-muted-foreground hover:text-saffron-500 transition-colors">Cerimonie</Link></li>
@@ -52,8 +57,15 @@ const Footer = () => {
           </div>
         </div>
 
-        <div className="border-t border-zen-sage mt-8 pt-8 text-center text-sm text-muted-foreground">
+        <div className="border-t border-zen-sage mt-8 pt-8 flex flex-col sm:flex-row justify-between items-center text-sm text-muted-foreground">
           <p>&copy; 2024 Comunità Bodhidharma. Tutti i diritti riservati.</p>
+          <Link 
+            to="/admin" 
+            className="mt-4 sm:mt-0 flex items-center space-x-1 hover:text-saffron-500 transition-colors"
+          >
+            <Settings className="h-4 w-4" />
+            <span>Accesso Operatori</span>
+          </Link>
         </div>
       </div>
     </footer>

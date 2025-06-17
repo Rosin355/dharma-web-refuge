@@ -11,6 +11,7 @@ const Navigation = () => {
 
   const navItems = [
     { name: 'Home', path: '/' },
+    { name: 'Insegnamenti', path: '/insegnamenti' },
     { name: 'Blog', path: '/blog' },
     { name: 'Eventi', path: '/eventi' },
     { name: 'Cerimonie', path: '/cerimonie' },
@@ -26,8 +27,12 @@ const Navigation = () => {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-saffron-gradient rounded-full flex items-center justify-center">
-              <span className="text-white font-bold text-sm">☸</span>
+            <div className="w-10 h-10 flex items-center justify-center">
+              <img 
+                src="/lovable-uploads/ee0a1e23-8f51-4b46-8c99-f0b6fc5493e9.png" 
+                alt="Comunità Bodhidharma Logo" 
+                className="w-full h-full object-contain"
+              />
             </div>
             <span className="font-serif text-xl font-semibold text-foreground">
               Bodhidharma
@@ -35,7 +40,7 @@ const Navigation = () => {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden md:flex items-center space-x-6">
             {navItems.map((item) => (
               <Link
                 key={item.name}
@@ -49,10 +54,12 @@ const Navigation = () => {
                 {item.name}
               </Link>
             ))}
-            <Button className="bg-saffron-500 hover:bg-saffron-600 text-white">
-              <Heart className="mr-2 h-4 w-4" />
-              Dona
-            </Button>
+            <Link to="/dona">
+              <Button className="bg-saffron-500 hover:bg-saffron-600 text-white">
+                <Heart className="mr-2 h-4 w-4" />
+                Dona
+              </Button>
+            </Link>
           </div>
 
           {/* Mobile Navigation */}
@@ -79,10 +86,12 @@ const Navigation = () => {
                       {item.name}
                     </Link>
                   ))}
-                  <Button className="bg-saffron-500 hover:bg-saffron-600 text-white mt-4">
-                    <Heart className="mr-2 h-4 w-4" />
-                    Dona
-                  </Button>
+                  <Link to="/dona" onClick={() => setIsOpen(false)}>
+                    <Button className="bg-saffron-500 hover:bg-saffron-600 text-white mt-4 w-full">
+                      <Heart className="mr-2 h-4 w-4" />
+                      Dona
+                    </Button>
+                  </Link>
                 </div>
               </SheetContent>
             </Sheet>

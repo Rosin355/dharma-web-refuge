@@ -10,7 +10,7 @@ const Home = () => {
       icon: BookOpen,
       title: "Insegnamenti",
       description: "Scopri gli insegnamenti del Buddha e approfondisci la tua pratica spirituale attraverso i nostri articoli e riflessioni.",
-      link: "/blog"
+      link: "/insegnamenti"
     },
     {
       icon: Calendar,
@@ -76,7 +76,7 @@ const Home = () => {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in">
             <Button size="lg" className="bg-saffron-500 hover:bg-saffron-600 text-white px-8 py-3 text-lg">
-              <Link to="/blog">Esplora gli Insegnamenti</Link>
+              <Link to="/insegnamenti">Esplora gli Insegnamenti</Link>
             </Button>
             <Button size="lg" variant="outline" className="bg-white/10 border-white text-white hover:bg-white hover:text-foreground px-8 py-3 text-lg">
               <Link to="/eventi">Partecipa agli Eventi</Link>
