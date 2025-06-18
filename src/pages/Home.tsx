@@ -34,22 +34,22 @@ const Home = () => {
 
   const recentPosts = [
     {
-      title: "La Via del Risveglio: Meditazione Quotidiana",
-      excerpt: "Scopri come integrare la pratica meditativa nella vita di tutti i giorni per trovare pace interiore e consapevolezza.",
-      date: "15 Giugno 2024",
-      image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+      title: "Italia Buddhista - Tavole Rotonde Online",
+      excerpt: "Serie di incontri via Zoom con religiosi di diverse tradizioni buddhiste per approfondire temi fondamentali come la sofferenza, il karma e la natura di Buddha.",
+      date: "Marzo 2021",
+      image: "https://images.unsplash.com/photo-1515378791036-0648a814c963?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
     },
     {
-      title: "Il Sentiero dell'Illuminazione secondo Bodhidharma",
-      excerpt: "Un viaggio attraverso gli insegnamenti del primo patriarca zen e la sua influenza sulla pratica moderna.",
-      date: "12 Giugno 2024",
-      image: "https://images.unsplash.com/photo-1545389336-cf090694435e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+      title: "Ritiro di Vesak 2021",
+      excerpt: "Celebrazione della nascita, illuminazione e parinirvana del Buddha con un ritiro speciale di tre giorni nel nostro centro con meditazioni e cerimonie.",
+      date: "Maggio 2021",
+      image: "https://images.unsplash.com/photo-1518709268805-4e9042af2176?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
     },
     {
-      title: "Compassione e Saggezza: I Pilastri del Buddhismo",
-      excerpt: "Esploriamo i fondamenti della pratica buddhista e come applicarli nella vita contemporanea.",
-      date: "10 Giugno 2024",
-      image: "https://images.unsplash.com/photo-1602192509154-0b900ee1f851?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+      title: "Progetto Scuole: Mindfulness ed Educazione",
+      excerpt: "Il nostro impegno nell'introduzione della mindfulness nelle scuole italiane per supportare studenti e insegnanti nel percorso educativo.",
+      date: "Settembre 2020",
+      image: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
     }
   ];
 
@@ -125,10 +125,10 @@ const Home = () => {
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="font-serif text-4xl font-light mb-4">
-              Ultimi <span className="text-saffron-500">Insegnamenti</span>
+              Ultime <span className="text-saffron-500">Attività</span>
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Riflessioni, insegnamenti e guide pratiche per approfondire la tua comprensione del Dharma
+              Riflessioni, insegnamenti e guide pratiche per approfondire la tua comprensione del Dharma.
             </p>
           </div>
 
@@ -158,7 +158,7 @@ const Home = () => {
           <div className="text-center">
             <Link to="/blog">
               <Button size="lg" className="bg-saffron-500 hover:bg-saffron-600 text-white">
-                Leggi tutti gli articoli
+                Scopri tutti le attività
               </Button>
             </Link>
           </div>
