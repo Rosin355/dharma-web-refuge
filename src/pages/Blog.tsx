@@ -145,7 +145,7 @@ const Blog = () => {
         <div className="container mx-auto px-4">
           {filteredPosts.length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-zen-stone text-lg">Nessun articolo trovato per la ricerca corrente.</p>
+              <p className="text-gray-600 text-lg">Nessun articolo trovato per la ricerca corrente.</p>
             </div>
           ) : (
             <>
@@ -165,7 +165,7 @@ const Blog = () => {
                       </Badge>
                     </div>
                     <CardContent className="p-6">
-                      <div className="flex items-center gap-4 text-sm text-zen-stone mb-3">
+                      <div className="flex items-center gap-4 text-sm text-gray-600 font-medium mb-3">
                         <div className="flex items-center gap-1">
                           <Calendar className="h-4 w-4" />
                           <span>{post.date}</span>
@@ -174,12 +174,12 @@ const Blog = () => {
                           <User className="h-4 w-4" />
                           <span>{post.author}</span>
                         </div>
-                        <span className="text-saffron-600">{post.readTime}</span>
+                        <span className="text-saffron-600 font-semibold">{post.readTime}</span>
                       </div>
                       <h3 className="font-serif text-xl font-semibold mb-3 group-hover:text-saffron-600 transition-colors">
                         {post.title}
                       </h3>
-                      <p className="text-zen-stone mb-4 line-clamp-3">
+                      <p className="text-gray-700 mb-4 line-clamp-3">
                         {post.excerpt}
                       </p>
                       <Link to={`/blog/${post.id}`}>

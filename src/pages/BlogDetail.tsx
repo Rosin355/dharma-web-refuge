@@ -288,16 +288,16 @@ L'attività è completamente gratuita e aperta a tutti, indipendentemente dall'e
           <h1 className="font-serif text-4xl md:text-5xl font-light text-white mb-4">
             {post.title}
           </h1>
-          <div className="flex items-center gap-6 text-zen-cream">
-            <div className="flex items-center gap-2">
+          <div className="flex items-center gap-6 text-white font-medium">
+            <div className="flex items-center gap-2 bg-black/20 px-3 py-1 rounded-full">
               <Calendar className="h-4 w-4" />
               <span>{post.date}</span>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 bg-black/20 px-3 py-1 rounded-full">
               <User className="h-4 w-4" />
               <span>{post.author}</span>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 bg-saffron-600 px-3 py-1 rounded-full">
               <Clock className="h-4 w-4" />
               <span>{post.readTime}</span>
             </div>
