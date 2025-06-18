@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -181,13 +182,15 @@ const Blog = () => {
                       <p className="text-zen-stone mb-4 line-clamp-3">
                         {post.excerpt}
                       </p>
-                      <Button 
-                        variant="outline" 
-                        className="group/btn border-saffron-600 text-saffron-600 hover:bg-saffron-600 hover:text-white"
-                      >
-                        Leggi tutto 
-                        <ExternalLink className="ml-2 h-4 w-4 group-hover/btn:translate-x-1 transition-transform" />
-                      </Button>
+                      <Link to={`/blog/${post.id}`}>
+                        <Button 
+                          variant="outline" 
+                          className="group/btn border-saffron-600 text-saffron-600 hover:bg-saffron-600 hover:text-white"
+                        >
+                          Leggi tutto 
+                          <ExternalLink className="ml-2 h-4 w-4 group-hover/btn:translate-x-1 transition-transform" />
+                        </Button>
+                      </Link>
                     </CardContent>
                   </Card>
                 ))}
