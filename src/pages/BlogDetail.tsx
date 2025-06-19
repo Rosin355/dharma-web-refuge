@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { useParams, Link, Navigate } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+
 import { ArrowLeft, Calendar, User, Clock, Loader2, AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { supabase } from '@/integrations/supabase/client';
@@ -11,6 +11,8 @@ type Post = Database['public']['Tables']['posts']['Row'] & {
   profiles?: {
     full_name: string | null;
   } | null;
+  image_url?: string | null;
+  image_alt?: string | null;
 };
 
 const BlogDetail = () => {
@@ -183,6 +185,17 @@ const BlogDetail = () => {
               Torna al Blog
             </Button>
           </Link>
+
+          {/* Immagine di copertina */}
+          {post.image_url && (
+            <div className="mb-8 rounded-lg overflow-hidden">
+              <img
+                src={post.image_url}
+                alt={post.image_alt || post.title}
+                className="w-full h-64 md:h-80 object-cover"
+              />
+            </div>
+          )}
 
           <h1 className="font-serif text-4xl md:text-5xl font-light text-white mb-4">
             {post.title}

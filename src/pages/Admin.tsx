@@ -4,9 +4,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Settings, Lock, LogOut, Database, Users, FileText } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Settings, Lock, LogOut, Database, Users, FileText, Image, BarChart3 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { testSupabaseConnection } from '@/lib/supabase-utils';
+import PostsManager from '@/components/admin/PostsManager';
+import ImageManager from '@/components/admin/ImageManager';
 
 const Admin = () => {
   const { user, loading, error, signIn, signOut, clearError } = useAuth();
@@ -77,101 +80,215 @@ const Admin = () => {
             </Button>
           </div>
 
-          {/* Connection Test */}
-          <Card className="mb-8 border-zen-sage">
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <Database className="mr-2 h-5 w-5" />
-                Test Connessione Database
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground mb-2">
-                    Verifica la connessione al database Supabase
-                  </p>
-                  {connectionTest && (
-                    <Alert className={connectionTest.success ? 'border-green-200 bg-green-50' : 'border-red-200 bg-red-50'}>
-                      <AlertDescription className={connectionTest.success ? 'text-green-800' : 'text-red-800'}>
-                        {connectionTest.success ? '✅ Connessione riuscita!' : `❌ Errore: ${connectionTest.error}`}
-                      </AlertDescription>
-                    </Alert>
-                  )}
-                </div>
-                <Button onClick={handleTestConnection} variant="outline">
-                  Test Connessione
-                </Button>
+          {/* Admin Tabs */}
+          <Tabs defaultValue="dashboard" className="space-y-6">
+            <TabsList className="grid w-full grid-cols-4 lg:w-auto lg:grid-cols-none lg:flex">
+              <TabsTrigger value="dashboard" className="flex items-center gap-2">
+                <BarChart3 className="h-4 w-4" />
+                Dashboard
+              </TabsTrigger>
+              <TabsTrigger value="posts" className="flex items-center gap-2">
+                <FileText className="h-4 w-4" />
+                Articoli
+              </TabsTrigger>
+              <TabsTrigger value="images" className="flex items-center gap-2">
+                <Image className="h-4 w-4" />
+                Immagini
+              </TabsTrigger>
+              <TabsTrigger value="settings" className="flex items-center gap-2">
+                <Settings className="h-4 w-4" />
+                Impostazioni
+              </TabsTrigger>
+            </TabsList>
+
+            {/* Dashboard Tab */}
+            <TabsContent value="dashboard" className="space-y-6">
+              {/* Connection Test */}
+              <Card className="border-zen-sage">
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <Database className="mr-2 h-5 w-5" />
+                    Test Connessione Database
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-muted-foreground mb-2">
+                        Verifica la connessione al database Supabase
+                      </p>
+                      {connectionTest && (
+                        <Alert className={connectionTest.success ? 'border-green-200 bg-green-50' : 'border-red-200 bg-red-50'}>
+                          <AlertDescription className={connectionTest.success ? 'text-green-800' : 'text-red-800'}>
+                            {connectionTest.success ? '✅ Connessione riuscita!' : `❌ Errore: ${connectionTest.error}`}
+                          </AlertDescription>
+                        </Alert>
+                      )}
+                    </div>
+                    <Button onClick={handleTestConnection} variant="outline">
+                      Test Connessione
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Quick Stats */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <Card className="border-zen-sage hover:shadow-lg transition-shadow">
+                  <CardContent className="p-6">
+                    <div className="flex items-center mb-4">
+                      <FileText className="h-8 w-8 text-saffron-600 mr-3" />
+                      <div>
+                        <h3 className="font-semibold">Gestione Articoli</h3>
+                        <p className="text-sm text-muted-foreground">CRUD completo per blog</p>
+                      </div>
+                    </div>
+                    <p className="text-xs text-gray-500 mb-3">
+                      Crea, modifica ed elimina articoli del blog con interfaccia intuitiva
+                    </p>
+                    <Button 
+                      className="w-full bg-saffron-600 hover:bg-saffron-700" 
+                      onClick={() => {
+                        const tabTrigger = document.querySelector('[value="posts"]') as HTMLElement;
+                        tabTrigger?.click();
+                      }}
+                    >
+                      Gestisci Articoli
+                    </Button>
+                  </CardContent>
+                </Card>
+
+                <Card className="border-zen-sage hover:shadow-lg transition-shadow">
+                  <CardContent className="p-6">
+                    <div className="flex items-center mb-4">
+                      <Image className="h-8 w-8 text-saffron-600 mr-3" />
+                      <div>
+                        <h3 className="font-semibold">Gestione Immagini</h3>
+                        <p className="text-sm text-muted-foreground">Unsplash automatico</p>
+                      </div>
+                    </div>
+                    <p className="text-xs text-gray-500 mb-3">
+                      Assegna automaticamente immagini pertinenti agli articoli tramite Unsplash
+                    </p>
+                    <Button 
+                      className="w-full bg-saffron-600 hover:bg-saffron-700"
+                      onClick={() => {
+                        const tabTrigger = document.querySelector('[value="images"]') as HTMLElement;
+                        tabTrigger?.click();
+                      }}
+                    >
+                      Gestisci Immagini
+                    </Button>
+                  </CardContent>
+                </Card>
+
+                <Card className="border-zen-sage hover:shadow-lg transition-shadow">
+                  <CardContent className="p-6">
+                    <div className="flex items-center mb-4">
+                      <Users className="h-8 w-8 text-saffron-600 mr-3" />
+                      <div>
+                        <h3 className="font-semibold">Statistiche</h3>
+                        <p className="text-sm text-muted-foreground">Analytics del sito</p>
+                      </div>
+                    </div>
+                    <p className="text-xs text-gray-500 mb-3">
+                      Visualizza statistiche di utilizzo e performance del sito web
+                    </p>
+                    <Button className="w-full" variant="outline" disabled>
+                      Prossimamente
+                    </Button>
+                  </CardContent>
+                </Card>
               </div>
-            </CardContent>
-          </Card>
 
-          {/* Admin Features */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Card className="border-zen-sage hover:shadow-lg transition-shadow">
-              <CardContent className="p-6">
-                <div className="flex items-center mb-4">
-                  <FileText className="h-8 w-8 text-saffron-600 mr-3" />
-                  <div>
-                    <h3 className="font-semibold">Gestione Contenuti</h3>
-                    <p className="text-sm text-muted-foreground">Blog, insegnamenti, eventi</p>
+              {/* Info Panel */}
+              <Card className="border-saffron-200 bg-saffron-50">
+                <CardContent className="p-6">
+                  <h3 className="font-semibold text-saffron-800 mb-2">Informazioni Sistema</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <p><strong>User ID:</strong> {user.id}</p>
+                      <p><strong>Email:</strong> {user.email}</p>
+                      <p><strong>Ultimo accesso:</strong> {new Date(user.last_sign_in_at || '').toLocaleString('it-IT')}</p>
+                    </div>
+                    <div>
+                      <p><strong>Stato:</strong> <span className="text-green-600">✓ Autenticato</span></p>
+                      <p><strong>Ruolo:</strong> Amministratore</p>
+                      <p><strong>Versione:</strong> 2.0.0</p>
+                    </div>
                   </div>
-                </div>
-                <Button className="w-full" variant="outline">
-                  Gestisci Contenuti
-                </Button>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </TabsContent>
 
-            <Card className="border-zen-sage hover:shadow-lg transition-shadow">
-              <CardContent className="p-6">
-                <div className="flex items-center mb-4">
-                  <Users className="h-8 w-8 text-saffron-600 mr-3" />
-                  <div>
-                    <h3 className="font-semibold">Gestione Utenti</h3>
-                    <p className="text-sm text-muted-foreground">Amministratori e moderatori</p>
+            {/* Posts Management Tab */}
+            <TabsContent value="posts">
+              <PostsManager />
+            </TabsContent>
+
+            {/* Images Management Tab */}
+            <TabsContent value="images">
+              <ImageManager />
+            </TabsContent>
+
+            {/* Settings Tab */}
+            <TabsContent value="settings" className="space-y-6">
+              <Card className="border-zen-sage">
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <Settings className="mr-2 h-5 w-5" />
+                    Configurazione Sistema
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-4">
+                    <div>
+                      <h4 className="font-medium mb-2">Database</h4>
+                      <p className="text-sm text-gray-600 mb-2">
+                        Configurazione connessione Supabase
+                      </p>
+                      <Button variant="outline" onClick={handleTestConnection}>
+                        <Database className="h-4 w-4 mr-2" />
+                        Test Connessione
+                      </Button>
+                    </div>
+                    
+                    <hr className="border-gray-200" />
+                    
+                    <div>
+                      <h4 className="font-medium mb-2">Immagini</h4>
+                      <p className="text-sm text-gray-600 mb-2">
+                        Le impostazioni per Unsplash sono gestite nella sezione Immagini
+                      </p>
+                      <Button 
+                        variant="outline"
+                        onClick={() => {
+                          const tabTrigger = document.querySelector('[value="images"]') as HTMLElement;
+                          tabTrigger?.click();
+                        }}
+                      >
+                        <Image className="h-4 w-4 mr-2" />
+                        Configura Unsplash
+                      </Button>
+                    </div>
+
+                    <hr className="border-gray-200" />
+
+                    <div>
+                      <h4 className="font-medium mb-2">Account</h4>
+                      <p className="text-sm text-gray-600 mb-2">
+                        Gestione del tuo account amministratore
+                      </p>
+                      <Button variant="outline" onClick={handleLogout}>
+                        <LogOut className="h-4 w-4 mr-2" />
+                        Logout
+                      </Button>
+                    </div>
                   </div>
-                </div>
-                <Button className="w-full" variant="outline">
-                  Gestisci Utenti
-                </Button>
-              </CardContent>
-            </Card>
-
-            <Card className="border-zen-sage hover:shadow-lg transition-shadow">
-              <CardContent className="p-6">
-                <div className="flex items-center mb-4">
-                  <Settings className="h-8 w-8 text-saffron-600 mr-3" />
-                  <div>
-                    <h3 className="font-semibold">Impostazioni</h3>
-                    <p className="text-sm text-muted-foreground">Configurazione sistema</p>
-                  </div>
-                </div>
-                <Button className="w-full" variant="outline">
-                  Impostazioni
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Info Panel */}
-          <Card className="mt-8 border-saffron-200 bg-saffron-50">
-            <CardContent className="p-6">
-              <h3 className="font-semibold text-saffron-800 mb-2">Informazioni Sistema</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                <div>
-                  <p><strong>User ID:</strong> {user.id}</p>
-                  <p><strong>Email:</strong> {user.email}</p>
-                  <p><strong>Ultimo accesso:</strong> {new Date(user.last_sign_in_at || '').toLocaleString('it-IT')}</p>
-                </div>
-                <div>
-                  <p><strong>Stato:</strong> <span className="text-green-600">✓ Autenticato</span></p>
-                  <p><strong>Ruolo:</strong> Amministratore</p>
-                  <p><strong>Versione:</strong> 1.0.0</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
     );
@@ -206,8 +323,8 @@ const Admin = () => {
                   type="email"
                   value={credentials.email}
                   onChange={(e) => setCredentials(prev => ({ ...prev, email: e.target.value }))}
+                  placeholder="admin@dharma-web-refuge.com"
                   required
-                  placeholder="admin@bodhidharma.info"
                 />
               </div>
               <div className="space-y-2">
@@ -217,13 +334,13 @@ const Admin = () => {
                   type="password"
                   value={credentials.password}
                   onChange={(e) => setCredentials(prev => ({ ...prev, password: e.target.value }))}
-                  required
                   placeholder="••••••••"
+                  required
                 />
               </div>
               <Button 
                 type="submit" 
-                className="w-full bg-saffron-500 hover:bg-saffron-600 text-white"
+                className="w-full bg-saffron-600 hover:bg-saffron-700"
                 disabled={loading}
               >
                 {loading ? (
@@ -239,13 +356,6 @@ const Admin = () => {
                 )}
               </Button>
             </form>
-            
-            <div className="mt-6 p-4 bg-saffron-50 rounded-lg border border-saffron-200">
-              <p className="text-sm text-saffron-700 text-center">
-                <strong>Nota:</strong> Per accedere all'area amministrativa, 
-                è necessario essere registrati come amministratori nel sistema.
-              </p>
-            </div>
           </CardContent>
         </Card>
       </div>

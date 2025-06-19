@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+
 import { Input } from '@/components/ui/input';
 import { Search, Calendar, User, ExternalLink, Loader2, AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -13,6 +13,8 @@ type Post = Database['public']['Tables']['posts']['Row'] & {
   profiles?: {
     full_name: string | null;
   } | null;
+  image_url?: string | null;
+  image_alt?: string | null;
 };
 
 const BlogDatabase = () => {
@@ -296,12 +298,20 @@ Ogni mattina alle 6:00 e ogni sera alle 19:00 pratichiamo insieme zazen. Tutti s
                       return (
                         <Card key={post.id} className="group hover:shadow-lg transition-shadow duration-300 overflow-hidden bg-gray-800 border-gray-700">
                           <div className="aspect-video relative overflow-hidden bg-gradient-to-br from-saffron-100 to-zen-sage/20">
-                            <div className="w-full h-full flex items-center justify-center">
-                              <div className="text-center text-zen-stone/60">
-                                <Calendar className="h-12 w-12 mx-auto mb-2" />
-                                <p className="text-sm font-medium">{formattedDate}</p>
+                            {post.image_url ? (
+                              <img
+                                src={post.image_url}
+                                alt={post.image_alt || post.title}
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                              />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center">
+                                <div className="text-center text-zen-stone/60">
+                                  <Calendar className="h-12 w-12 mx-auto mb-2" />
+                                  <p className="text-sm font-medium">{formattedDate}</p>
+                                </div>
                               </div>
-                            </div>
+                            )}
                           </div>
                           <CardContent className="p-6">
                             <div className="flex items-center gap-4 text-sm text-gray-400 font-medium mb-3">
