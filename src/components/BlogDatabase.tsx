@@ -165,36 +165,31 @@ Ogni mattina alle 6:00 e ogni sera alle 19:00 pratichiamo insieme zazen. Tutti s
   };
 
   return (
-    <div className="min-h-screen bg-zen-cream">
+    <div className="min-h-screen bg-gray-900">
       {/* Header */}
-      <section className="bg-gradient-to-r from-zen-stone to-zen-sage py-16">
+      <section className="bg-gray-800 py-16">
         <div className="container mx-auto px-4 text-center">
           <h1 className="font-serif text-5xl font-light mb-4 text-white">
-            Blog & <span className="text-saffron-300">Attività</span>
+            Blog & <span className="text-saffron-400">Attività</span>
           </h1>
-          <p className="text-xl text-zen-cream max-w-2xl mx-auto">
+          <p className="text-xl text-gray-300 max-w-2xl mx-auto">
             Le nostre iniziative, eventi e riflessioni per la diffusione del Dharma
           </p>
-          {!loading && (
-            <div className="mt-4 text-sm text-zen-cream bg-black/20 inline-block px-3 py-1 rounded-full">
-              📊 {posts.length} articoli dal database Supabase
-            </div>
-          )}
         </div>
       </section>
 
       {/* Search and Filters */}
-      <section className="py-8 bg-white border-b">
+      <section className="py-8 bg-gray-800 border-b">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
             <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-zen-stone h-4 w-4" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
               <Input
                 type="text"
                 placeholder="Cerca articoli..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
+                className="pl-10 bg-gray-700 border-gray-600 text-white placeholder-gray-400"
               />
             </div>
             <div className="flex flex-wrap gap-2">
@@ -205,8 +200,8 @@ Ogni mattina alle 6:00 e ogni sera alle 19:00 pratichiamo insieme zazen. Tutti s
                   size="sm"
                   onClick={() => setSelectedCategory(category)}
                   className={selectedCategory === category 
-                    ? "bg-saffron-600 hover:bg-saffron-700" 
-                    : ""
+                    ? "bg-saffron-600 hover:bg-saffron-700 text-white" 
+                    : "border-gray-600 text-gray-300 hover:bg-gray-700"
                   }
                 >
                   {category}
@@ -225,22 +220,22 @@ Ogni mattina alle 6:00 e ogni sera alle 19:00 pratichiamo insieme zazen. Tutti s
           {loading && (
             <div className="flex items-center justify-center py-12">
               <Loader2 className="h-8 w-8 animate-spin text-saffron-600 mr-3" />
-              <span className="text-lg text-gray-600">Caricamento articoli dal database...</span>
+              <span className="text-lg text-gray-400">Caricamento articoli dal database...</span>
             </div>
           )}
 
           {/* Error State */}
           {error && (
-            <Alert className="mb-8 border-red-200 bg-red-50">
-              <AlertCircle className="h-4 w-4 text-red-600" />
-              <AlertDescription className="text-red-700">
+            <Alert className="mb-8 border-red-500/50 bg-red-900/20">
+              <AlertCircle className="h-4 w-4 text-red-400" />
+              <AlertDescription className="text-red-300">
                 <strong>Errore connessione database:</strong> {error}
                 <div className="mt-2 flex gap-2">
                   <Button 
                     onClick={fetchPosts}
                     size="sm"
                     variant="outline"
-                    className="border-red-300 text-red-700 hover:bg-red-100"
+                    className="border-red-500/50 text-red-300 hover:bg-red-900/30"
                   >
                     Riprova connessione
                   </Button>
@@ -259,9 +254,9 @@ Ogni mattina alle 6:00 e ogni sera alle 19:00 pratichiamo insieme zazen. Tutti s
           {/* Empty State */}
           {!loading && !error && posts.length === 0 && (
             <div className="text-center py-12">
-              <Calendar className="h-16 w-16 mx-auto text-gray-400 mb-4" />
-              <h3 className="text-xl font-semibold text-gray-700 mb-2">Nessun articolo nel database</h3>
-              <p className="text-gray-600 mb-6">
+              <Calendar className="h-16 w-16 mx-auto text-gray-500 mb-4" />
+              <h3 className="text-xl font-semibold text-gray-200 mb-2">Nessun articolo nel database</h3>
+              <p className="text-gray-300 mb-6">
                 Il database è vuoto. Vuoi aggiungere alcuni articoli di esempio?
               </p>
               <Button 
@@ -278,14 +273,14 @@ Ogni mattina alle 6:00 e ogni sera alle 19:00 pratichiamo insieme zazen. Tutti s
             <>
               {filteredPosts.length === 0 ? (
                 <div className="text-center py-12">
-                  <p className="text-gray-600 text-lg">Nessun articolo trovato per la ricerca corrente.</p>
+                  <p className="text-gray-300 text-lg">Nessun articolo trovato per la ricerca corrente.</p>
                   <Button 
                     onClick={() => {
                       setSearchTerm('');
                       setSelectedCategory('Tutti');
                     }}
                     variant="outline"
-                    className="mt-4"
+                    className="mt-4 border-gray-600 text-gray-200 hover:bg-gray-700"
                   >
                     Mostra tutti gli articoli
                   </Button>
@@ -299,7 +294,7 @@ Ogni mattina alle 6:00 e ogni sera alle 19:00 pratichiamo insieme zazen. Tutti s
                       const readTime = calculateReadTime(post.content);
                       
                       return (
-                        <Card key={post.id} className="group hover:shadow-lg transition-shadow duration-300 overflow-hidden">
+                        <Card key={post.id} className="group hover:shadow-lg transition-shadow duration-300 overflow-hidden bg-gray-800 border-gray-700">
                           <div className="aspect-video relative overflow-hidden bg-gradient-to-br from-saffron-100 to-zen-sage/20">
                             <div className="w-full h-full flex items-center justify-center">
                               <div className="text-center text-zen-stone/60">
@@ -307,14 +302,9 @@ Ogni mattina alle 6:00 e ogni sera alle 19:00 pratichiamo insieme zazen. Tutti s
                                 <p className="text-sm font-medium">{formattedDate}</p>
                               </div>
                             </div>
-                            <Badge 
-                              className="absolute top-4 left-4 bg-green-600 hover:bg-green-700"
-                            >
-                              Database
-                            </Badge>
                           </div>
                           <CardContent className="p-6">
-                            <div className="flex items-center gap-4 text-sm text-gray-600 font-medium mb-3">
+                            <div className="flex items-center gap-4 text-sm text-gray-400 font-medium mb-3">
                               <div className="flex items-center gap-1">
                                 <Calendar className="h-4 w-4" />
                                 <span>{formattedDate}</span>
@@ -323,18 +313,18 @@ Ogni mattina alle 6:00 e ogni sera alle 19:00 pratichiamo insieme zazen. Tutti s
                                 <User className="h-4 w-4" />
                                 <span>{authorName}</span>
                               </div>
-                              <span className="text-saffron-600 font-semibold">{readTime}</span>
+                              <span className="text-saffron-400 font-semibold">{readTime}</span>
                             </div>
-                            <h3 className="font-serif text-xl font-semibold mb-3 group-hover:text-saffron-600 transition-colors">
+                            <h3 className="font-serif text-xl font-semibold mb-3 group-hover:text-saffron-400 transition-colors text-gray-100">
                               {post.title}
                             </h3>
-                            <p className="text-gray-700 mb-4 line-clamp-3">
+                            <p className="text-gray-400 mb-4 line-clamp-3">
                               {post.excerpt || `${post.content.substring(0, 150)}...`}
                             </p>
                             <Link to={`/blog/${post.id}`}>
                               <Button 
                                 variant="outline" 
-                                className="group/btn border-saffron-600 text-saffron-600 hover:bg-saffron-600 hover:text-white"
+                                className="group/btn border-saffron-600 text-saffron-400 hover:bg-saffron-600 hover:text-white bg-transparent"
                               >
                                 Leggi tutto 
                                 <ExternalLink className="ml-2 h-4 w-4 group-hover/btn:translate-x-1 transition-transform" />

@@ -72,10 +72,10 @@ const BlogDetail = () => {
   // Loading state
   if (loading) {
     return (
-      <div className="min-h-screen bg-zen-cream flex items-center justify-center">
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-saffron-600" />
-          <p className="text-zen-stone">Caricamento articolo...</p>
+          <p className="text-gray-400">Caricamento articolo...</p>
         </div>
       </div>
     );
@@ -84,8 +84,8 @@ const BlogDetail = () => {
   // Error state
   if (error || !post) {
     return (
-      <div className="min-h-screen bg-zen-cream">
-        <section className="bg-gradient-to-r from-zen-stone to-zen-sage py-8">
+      <div className="min-h-screen bg-gray-900">
+        <section className="bg-gray-800 py-8">
           <div className="container mx-auto px-4">
             <Link to="/blog">
               <Button variant="ghost" className="text-white hover:text-saffron-300 mb-4">
@@ -99,9 +99,9 @@ const BlogDetail = () => {
         <section className="py-12">
           <div className="container mx-auto px-4">
             <div className="max-w-2xl mx-auto">
-              <Alert className="border-red-200 bg-red-50">
-                <AlertCircle className="h-4 w-4 text-red-600" />
-                <AlertDescription className="text-red-800">
+              <Alert className="border-red-500/50 bg-red-900/20">
+                <AlertCircle className="h-4 w-4 text-red-400" />
+                <AlertDescription className="text-red-300">
                   {error || 'Articolo non trovato'}
                 </AlertDescription>
               </Alert>
@@ -151,7 +151,7 @@ const BlogDetail = () => {
         // Gestisce i titoli con **
         if (paragraph.startsWith('**') && paragraph.endsWith('**')) {
           const title = paragraph.slice(2, -2);
-          return <h3 key={index} className="font-serif text-xl font-semibold mt-6 mb-3 text-zen-stone">{title}</h3>;
+          return <h3 key={index} className="font-serif text-xl font-semibold mt-6 mb-3 text-gray-100">{title}</h3>;
         }
         
         // Gestisce i paragrafi normali con grassetto inline
@@ -160,7 +160,7 @@ const BlogDetail = () => {
         return (
           <p 
             key={index} 
-            className="text-gray-700 leading-relaxed mb-4"
+            className="text-gray-400 leading-relaxed mb-4"
             dangerouslySetInnerHTML={{ __html: formattedParagraph }}
           />
         );
@@ -172,10 +172,10 @@ const BlogDetail = () => {
   const formattedDate = formatDate(post.published_at);
   const readTime = calculateReadTime(post.content);
 
-  return (
-    <div className="min-h-screen bg-zen-cream">
+      return (
+      <div className="min-h-screen bg-gray-900">
       {/* Header con breadcrumb */}
-      <section className="bg-gradient-to-r from-zen-stone to-zen-sage py-8">
+      <section className="bg-gray-800 py-8">
         <div className="container mx-auto px-4">
           <Link to="/blog">
             <Button variant="ghost" className="text-white hover:text-saffron-300 mb-4">
@@ -183,9 +183,7 @@ const BlogDetail = () => {
               Torna al Blog
             </Button>
           </Link>
-          <Badge className="bg-green-600 hover:bg-green-700 mb-4">
-            Database
-          </Badge>
+
           <h1 className="font-serif text-4xl md:text-5xl font-light text-white mb-4">
             {post.title}
           </h1>
@@ -214,7 +212,6 @@ const BlogDetail = () => {
               <div className="text-center text-zen-stone/60">
                 <Calendar className="h-16 w-16 mx-auto mb-4" />
                 <p className="text-lg font-medium">{formattedDate}</p>
-                <p className="text-sm">Articolo dal database</p>
               </div>
             </div>
           </div>
@@ -225,29 +222,29 @@ const BlogDetail = () => {
       <section className="py-12">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
-            <div className="bg-white rounded-lg shadow-sm p-8 md:p-12">
+            <div className="bg-gray-800 rounded-lg shadow-sm p-8 md:p-12">
               {/* Excerpt */}
               {post.excerpt && (
-                <p className="text-xl text-saffron-600 font-light leading-relaxed mb-8 border-l-4 border-saffron-200 pl-6">
+                <p className="text-xl text-saffron-400 font-light leading-relaxed mb-8 border-l-4 border-saffron-600/50 pl-6">
                   {post.excerpt}
                 </p>
               )}
               
               {/* Contenuto principale */}
-              <div className="prose prose-lg max-w-none">
+              <div className="prose prose-lg max-w-none prose-invert">
                 {formatContent(post.content)}
               </div>
 
               {/* Condivisione e navigazione */}
-              <div className="mt-12 pt-8 border-t border-gray-200">
+              <div className="mt-12 pt-8 border-t border-gray-700">
                 <div className="flex flex-col sm:flex-row gap-4 justify-between items-center">
                   <Link to="/blog">
-                    <Button variant="outline" className="border-saffron-600 text-saffron-600 hover:bg-saffron-600 hover:text-white">
+                    <Button variant="outline" className="border-saffron-600 text-saffron-400 hover:bg-saffron-600 hover:text-white bg-transparent">
                       <ArrowLeft className="mr-2 h-4 w-4" />
                       Tutti gli articoli
                     </Button>
                   </Link>
-                  <div className="text-sm text-gray-500">
+                  <div className="text-sm text-gray-400">
                     Condividi questo articolo con la tua comunità
                   </div>
                 </div>
