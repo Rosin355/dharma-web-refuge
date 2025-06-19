@@ -32,6 +32,7 @@ Vai su `/admin` e accedi con le credenziali di amministratore.
 - Contenuto (obbligatorio)
 - Estratto (opzionale - auto-generato se vuoto)
 - Stato (bozza/pubblicato)
+- **Immagine di copertina** (opzionale - ricerca integrata da Unsplash)
 - Data pubblicazione (automatica)
 
 ### 2. 🖼️ Gestione Immagini Automatiche
@@ -119,8 +120,18 @@ npx tsx scripts/add-image-columns.ts
 1. Vai su `/admin` → Tab "Articoli"
 2. Clicca "Nuovo Articolo"
 3. Compila titolo e contenuto
-4. Scegli stato (bozza/pubblicato)
-5. Salva
+4. **[NUOVO]** Clicca "Cerca Immagine" per aggiungere una copertina
+5. Scegli stato (bozza/pubblicato)
+6. Salva
+
+### Aggiungere Immagine Durante Creazione/Modifica
+
+1. Nel form articolo, sezione "Immagine di copertina"
+2. Clicca "Cerca Immagine" (richiede configurazione Unsplash)
+3. Digita keywords di ricerca (es: "zen", "meditation", "nature")
+4. Seleziona l'immagine desiderata dal grid
+5. Modifica il testo alternativo se necessario
+6. L'immagine sarà salvata insieme all'articolo
 
 ### Aggiungere Immagini Automaticamente
 

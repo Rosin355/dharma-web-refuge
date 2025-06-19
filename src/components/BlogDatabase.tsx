@@ -43,10 +43,17 @@ const BlogDatabase = () => {
       const { data, error: fetchError } = await supabase
         .from('posts')
         .select(`
-          *,
-          profiles:author_id (
-            full_name
-          )
+          id,
+          title,
+          content,
+          excerpt,
+          status,
+          author_id,
+          published_at,
+          created_at,
+          updated_at,
+          image_url,
+          image_alt
         `)
         .eq('status', 'published')
         .order('published_at', { ascending: false });

@@ -41,7 +41,9 @@ import {
   FileText,
   Save,
   X,
-  AlertCircle
+  AlertCircle,
+  Image,
+  Loader2
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import type { Database } from '@/integrations/supabase/types';
@@ -50,6 +52,8 @@ type Post = Database['public']['Tables']['posts']['Row'] & {
   profiles?: {
     full_name: string | null;
   } | null;
+  image_url?: string | null;
+  image_alt?: string | null;
 };
 
 
@@ -75,12 +79,23 @@ const PostsManager = () => {
     content: '',
     excerpt: '',
     status: 'draft' as 'draft' | 'published',
-    author_id: null as string | null
+    author_id: null as string | null,
+    image_url: '' as string,
+    image_alt: '' as string
   });
+  
+  // Image search state
+  const [showImageSearch, setShowImageSearch] = useState(false);
+  const [imageSearchTerm, setImageSearchTerm] = useState('');
+  const [imageResults, setImageResults] = useState<any[]>([]);
+  const [searchingImages, setSearchingImages] = useState(false);
+  const [unsplashKey, setUnsplashKey] = useState('');
 
-  // Load posts
+  // Load posts and settings
   useEffect(() => {
     fetchPosts();
+    const savedKey = localStorage.getItem('unsplash_access_key');
+    if (savedKey) setUnsplashKey(savedKey);
   }, []);
 
   const fetchPosts = async () => {
@@ -128,6 +143,8 @@ const PostsManager = () => {
           excerpt: formData.excerpt || `${formData.content.substring(0, 200)}...`,
           status: formData.status,
           author_id: formData.author_id,
+          image_url: formData.image_url || null,
+          image_alt: formData.image_alt || null,
           published_at: formData.status === 'published' ? new Date().toISOString() : null
         });
 
@@ -155,12 +172,14 @@ const PostsManager = () => {
       setSubmitting(true);
       setError(null);
 
-      const updateData: PostUpdate = {
+      const updateData: any = {
         title: formData.title,
         content: formData.content,
         excerpt: formData.excerpt || `${formData.content.substring(0, 200)}...`,
         status: formData.status,
-        author_id: formData.author_id
+        author_id: formData.author_id,
+        image_url: formData.image_url || null,
+        image_alt: formData.image_alt || null
       };
 
       // Se cambio da draft a published, imposto published_at
@@ -213,6 +232,62 @@ const PostsManager = () => {
     }
   };
 
+  // Image search functions
+  const searchUnsplashImages = async (query: string) => {
+    if (!unsplashKey || !query.trim()) {
+      setError('Inserisci una chiave Unsplash e un termine di ricerca');
+      return;
+    }
+
+    try {
+      setSearchingImages(true);
+      setError(null);
+
+      const response = await fetch(
+        `https://api.unsplash.com/search/photos?query=${encodeURIComponent(query)}&per_page=12&orientation=landscape`,
+        {
+          headers: {
+            'Authorization': `Client-ID ${unsplashKey}`
+          }
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('Errore nella ricerca immagini Unsplash');
+      }
+
+      const data = await response.json();
+      setImageResults(data.results || []);
+
+      if (data.results.length === 0) {
+        setError('Nessuna immagine trovata per questa ricerca');
+      }
+    } catch (err) {
+      console.error('❌ Errore ricerca Unsplash:', err);
+      setError(err instanceof Error ? err.message : 'Errore ricerca immagini');
+    } finally {
+      setSearchingImages(false);
+    }
+  };
+
+  const selectImage = (image: any) => {
+    setFormData(prev => ({
+      ...prev,
+      image_url: image.urls.regular,
+      image_alt: image.alt_description || image.description || `Immagine di ${image.user.name}`
+    }));
+    setShowImageSearch(false);
+    setImageResults([]);
+  };
+
+  const removeImage = () => {
+    setFormData(prev => ({
+      ...prev,
+      image_url: '',
+      image_alt: ''
+    }));
+  };
+
   // Helper functions
   const resetForm = () => {
     setFormData({
@@ -220,9 +295,14 @@ const PostsManager = () => {
       content: '',
       excerpt: '',
       status: 'draft',
-      author_id: null
+      author_id: null,
+      image_url: '',
+      image_alt: ''
     });
     setError(null);
+    setShowImageSearch(false);
+    setImageResults([]);
+    setImageSearchTerm('');
   };
 
   const openEditModal = (post: Post) => {
@@ -232,7 +312,9 @@ const PostsManager = () => {
       content: post.content || '',
       excerpt: post.excerpt || '',
       status: post.status as 'draft' | 'published' || 'draft',
-      author_id: post.author_id
+      author_id: post.author_id,
+      image_url: post.image_url || '',
+      image_alt: post.image_alt || ''
     });
     setError(null);
     setShowEditModal(true);
@@ -509,6 +591,112 @@ const PostsManager = () => {
                 </SelectContent>
               </Select>
             </div>
+
+            {/* Image Selection */}
+            <div className="grid gap-2">
+              <Label className="text-sm font-medium">Immagine di copertina</Label>
+              {formData.image_url ? (
+                <div className="space-y-2">
+                  <div className="relative">
+                    <img
+                      src={formData.image_url}
+                      alt={formData.image_alt}
+                      className="w-full h-32 object-cover rounded border"
+                    />
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="sm"
+                      onClick={removeImage}
+                      className="absolute top-2 right-2"
+                    >
+                      ✕
+                    </Button>
+                  </div>
+                  <Input
+                    placeholder="Testo alternativo (accessibilità)"
+                    value={formData.image_alt}
+                    onChange={(e) => setFormData(prev => ({ ...prev, image_alt: e.target.value }))}
+                    className="text-sm"
+                  />
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setShowImageSearch(true)}
+                    disabled={!unsplashKey}
+                    className="w-full"
+                  >
+                    <Image className="h-4 w-4 mr-2" />
+                    {unsplashKey ? 'Cerca Immagine' : 'Configura Unsplash prima'}
+                  </Button>
+                  {!unsplashKey && (
+                    <p className="text-xs text-gray-500">
+                      Vai nella sezione Immagini per configurare Unsplash
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Image Search Modal */}
+            {showImageSearch && (
+              <div className="space-y-4 border-t pt-4">
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="Cerca immagini (es: zen, meditation, nature)"
+                    value={imageSearchTerm}
+                    onChange={(e) => setImageSearchTerm(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && searchUnsplashImages(imageSearchTerm)}
+                    className="flex-1"
+                  />
+                  <Button
+                    type="button"
+                    onClick={() => searchUnsplashImages(imageSearchTerm)}
+                    disabled={searchingImages || !imageSearchTerm.trim()}
+                    className="bg-saffron-600 hover:bg-saffron-700"
+                  >
+                    {searchingImages ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      setShowImageSearch(false);
+                      setImageResults([]);
+                      setImageSearchTerm('');
+                    }}
+                  >
+                    ✕
+                  </Button>
+                </div>
+
+                {imageResults.length > 0 && (
+                  <div className="grid grid-cols-3 gap-2 max-h-48 overflow-y-auto">
+                    {imageResults.map((image: any) => (
+                      <div
+                        key={image.id}
+                        className="cursor-pointer border rounded overflow-hidden hover:shadow-md transition-shadow"
+                        onClick={() => selectImage(image)}
+                      >
+                        <img
+                          src={image.urls.small}
+                          alt={image.alt_description || 'Immagine Unsplash'}
+                          className="w-full h-20 object-cover"
+                        />
+                        <div className="p-1">
+                          <p className="text-xs text-gray-600 truncate">
+                            by {image.user.name}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           <DialogFooter>
@@ -603,6 +791,112 @@ const PostsManager = () => {
                 </SelectContent>
               </Select>
             </div>
+
+            {/* Image Selection for Edit */}
+            <div className="grid gap-2">
+              <Label className="text-sm font-medium">Immagine di copertina</Label>
+              {formData.image_url ? (
+                <div className="space-y-2">
+                  <div className="relative">
+                    <img
+                      src={formData.image_url}
+                      alt={formData.image_alt}
+                      className="w-full h-32 object-cover rounded border"
+                    />
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="sm"
+                      onClick={removeImage}
+                      className="absolute top-2 right-2"
+                    >
+                      ✕
+                    </Button>
+                  </div>
+                  <Input
+                    placeholder="Testo alternativo (accessibilità)"
+                    value={formData.image_alt}
+                    onChange={(e) => setFormData(prev => ({ ...prev, image_alt: e.target.value }))}
+                    className="text-sm"
+                  />
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setShowImageSearch(true)}
+                    disabled={!unsplashKey}
+                    className="w-full"
+                  >
+                    <Image className="h-4 w-4 mr-2" />
+                    {unsplashKey ? 'Cerca Immagine' : 'Configura Unsplash prima'}
+                  </Button>
+                  {!unsplashKey && (
+                    <p className="text-xs text-gray-500">
+                      Vai nella sezione Immagini per configurare Unsplash
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Image Search Modal for Edit */}
+            {showImageSearch && (
+              <div className="space-y-4 border-t pt-4">
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="Cerca immagini (es: zen, meditation, nature)"
+                    value={imageSearchTerm}
+                    onChange={(e) => setImageSearchTerm(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && searchUnsplashImages(imageSearchTerm)}
+                    className="flex-1"
+                  />
+                  <Button
+                    type="button"
+                    onClick={() => searchUnsplashImages(imageSearchTerm)}
+                    disabled={searchingImages || !imageSearchTerm.trim()}
+                    className="bg-saffron-600 hover:bg-saffron-700"
+                  >
+                    {searchingImages ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      setShowImageSearch(false);
+                      setImageResults([]);
+                      setImageSearchTerm('');
+                    }}
+                  >
+                    ✕
+                  </Button>
+                </div>
+
+                {imageResults.length > 0 && (
+                  <div className="grid grid-cols-3 gap-2 max-h-48 overflow-y-auto">
+                    {imageResults.map((image: any) => (
+                      <div
+                        key={image.id}
+                        className="cursor-pointer border rounded overflow-hidden hover:shadow-md transition-shadow"
+                        onClick={() => selectImage(image)}
+                      >
+                        <img
+                          src={image.urls.small}
+                          alt={image.alt_description || 'Immagine Unsplash'}
+                          className="w-full h-20 object-cover"
+                        />
+                        <div className="p-1">
+                          <p className="text-xs text-gray-600 truncate">
+                            by {image.user.name}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           <DialogFooter>

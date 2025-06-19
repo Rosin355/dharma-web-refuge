@@ -42,13 +42,22 @@ const BlogDetail = () => {
       const { data, error: fetchError } = await supabase
         .from('posts')
         .select(`
-          *,
+          id,
+          title,
+          content,
+          excerpt,
+          status,
+          author_id,
+          published_at,
+          created_at,
+          updated_at,
+          image_url,
+          image_alt,
           profiles:author_id (
             full_name
           )
         `)
         .eq('id', postId)
-        .eq('status', 'published')
         .single();
 
       if (fetchError) {
@@ -61,7 +70,7 @@ const BlogDetail = () => {
       }
 
       console.log('✅ Articolo caricato:', data.title);
-      setPost(data);
+      setPost(data as unknown as Post);
 
     } catch (err) {
       console.error('❌ Errore caricamento articolo:', err);
@@ -192,14 +201,21 @@ const BlogDetail = () => {
               <img
                 src={post.image_url}
                 alt={post.image_alt || post.title}
-                className="w-full h-64 md:h-80 object-cover"
+                className="w-full h-80 md:h-96 object-cover"
               />
             </div>
           )}
 
-          <h1 className="font-serif text-4xl md:text-5xl font-light text-white mb-4">
-            {post.title}
-          </h1>
+          <div className="flex items-center gap-4 mb-4">
+            <h1 className="font-serif text-4xl md:text-5xl font-light text-white">
+              {post.title}
+            </h1>
+            {post.status === 'draft' && (
+              <span className="bg-yellow-600 text-white px-3 py-1 rounded-full text-sm font-medium">
+                BOZZA
+              </span>
+            )}
+          </div>
           <div className="flex flex-wrap items-center gap-4 text-white font-medium">
             <div className="flex items-center gap-2 bg-black/20 px-3 py-1 rounded-full">
               <Calendar className="h-4 w-4" />
@@ -212,20 +228,6 @@ const BlogDetail = () => {
             <div className="flex items-center gap-2 bg-saffron-600 px-3 py-1 rounded-full">
               <Clock className="h-4 w-4" />
               <span>{readTime}</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Immagine principale */}
-      <section className="py-0">
-        <div className="container mx-auto px-4">
-          <div className="aspect-video md:aspect-[21/9] overflow-hidden rounded-lg shadow-lg bg-gradient-to-br from-saffron-100 to-zen-sage/20">
-            <div className="w-full h-full flex items-center justify-center">
-              <div className="text-center text-zen-stone/60">
-                <Calendar className="h-16 w-16 mx-auto mb-4" />
-                <p className="text-lg font-medium">{formattedDate}</p>
-              </div>
             </div>
           </div>
         </div>

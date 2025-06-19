@@ -44,6 +44,7 @@ interface PostWithImage {
   id: string;
   title: string;
   content: string;
+  status: string;
   image_url?: string | null;
   image_alt?: string | null;
   excerpt?: string | null;
@@ -80,8 +81,7 @@ const ImageManager = () => {
       // Prima proviamo senza le colonne immagini per verificare la connessione base
       const { data, error: fetchError } = await supabase
         .from('posts')
-        .select('id, title, content, excerpt, image_url, image_alt')
-        .eq('status', 'published')
+        .select('id, title, content, excerpt, status, image_url, image_alt')
         .order('created_at', { ascending: false });
 
       if (fetchError) {
@@ -526,7 +526,16 @@ const ImageManager = () => {
               {postsWithoutImages.map((post) => (
                 <div key={post.id} className="flex items-center justify-between p-3 bg-red-50 rounded-lg">
                   <div className="flex-1">
-                    <h4 className="font-medium text-gray-900">{post.title}</h4>
+                    <div className="flex items-center gap-2 mb-1">
+                      <h4 className="font-medium text-gray-900">{post.title}</h4>
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        post.status === 'published' 
+                          ? 'bg-green-100 text-green-800' 
+                          : 'bg-yellow-100 text-yellow-800'
+                      }`}>
+                        {post.status === 'published' ? 'PUB' : 'BOZZA'}
+                      </span>
+                    </div>
                     <p className="text-sm text-gray-600 line-clamp-1">
                       {post.excerpt || `${post.content?.substring(0, 100)}...`}
                     </p>
@@ -567,8 +576,17 @@ const ImageManager = () => {
                   className="w-full h-32 object-cover"
                 />
                 <div className="p-3">
-                  <h4 className="font-medium text-gray-900 truncate">{post.title}</h4>
-                  <p className="text-xs text-gray-600 mt-1 line-clamp-2">
+                  <div className="flex items-start justify-between gap-2 mb-1">
+                    <h4 className="font-medium text-gray-900 truncate flex-1">{post.title}</h4>
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium shrink-0 ${
+                      post.status === 'published' 
+                        ? 'bg-green-100 text-green-800' 
+                        : 'bg-yellow-100 text-yellow-800'
+                    }`}>
+                      {post.status === 'published' ? 'PUB' : 'BOZZA'}
+                    </span>
+                  </div>
+                  <p className="text-xs text-gray-600 line-clamp-2">
                     {post.excerpt || `${post.content?.substring(0, 80)}...`}
                   </p>
                   <div className="flex gap-1 mt-2">
