@@ -77,18 +77,33 @@ const ImageManager = () => {
       setLoading(true);
       setError(null);
 
+      // Prima proviamo senza le colonne immagini per verificare la connessione base
       const { data, error: fetchError } = await supabase
         .from('posts')
-        .select('id, title, content, image_url, image_alt, excerpt')
+        .select('id, title, content, excerpt, image_url, image_alt')
         .eq('status', 'published')
         .order('created_at', { ascending: false });
 
-      if (fetchError) throw fetchError;
+      if (fetchError) {
+        // Se l'errore è dovuto alle colonne mancanti, informiamo l'utente
+        if (fetchError.message.includes('column') && fetchError.message.includes('does not exist')) {
+          throw new Error('Le colonne image_url e image_alt non esistono nella tabella posts. Consulta la documentazione per aggiungerle.');
+        }
+        throw fetchError;
+      }
 
-      setPosts(data || []);
+      // Gestiamo il caso in cui le colonne potrebbero essere null/undefined
+      const postsWithImages = (data || []).map(post => ({
+        ...post,
+        image_url: post.image_url || null,
+        image_alt: post.image_alt || null
+      }));
+
+      setPosts(postsWithImages);
     } catch (err) {
       console.error('❌ Errore caricamento posts:', err);
-      setError(err instanceof Error ? err.message : 'Errore caricamento articoli');
+      const errorMessage = err instanceof Error ? err.message : 'Errore caricamento articoli';
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -332,6 +347,19 @@ const ImageManager = () => {
           <AlertCircle className="h-4 w-4 text-red-600" />
           <AlertDescription className="text-red-800">
             {error}
+            {error.includes('colonne image_url e image_alt non esistono') && (
+              <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded">
+                <p className="font-semibold text-blue-800 mb-2">🛠️ Come risolvere:</p>
+                <ol className="text-sm text-blue-700 space-y-1 ml-4">
+                  <li>1. Vai su <a href="https://supabase.com/dashboard" target="_blank" className="underline">Supabase Dashboard</a></li>
+                  <li>2. Seleziona il progetto → Table Editor → posts</li>
+                  <li>3. Clicca "Add column" e aggiungi:</li>
+                  <li className="ml-4">• <code>image_url</code> (tipo: text, nullable: true)</li>
+                  <li className="ml-4">• <code>image_alt</code> (tipo: text, nullable: true)</li>
+                  <li>4. Ricarica questa pagina</li>
+                </ol>
+              </div>
+            )}
           </AlertDescription>
         </Alert>
       )}
