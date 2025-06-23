@@ -82,7 +82,7 @@ async function downloadAndUploadImage(image) {
     const filePath = `temple-images/${image.category}/${image.filename}`;
     
     const { data, error } = await supabase.storage
-      .from('temple-images')
+      .from('images')
       .upload(filePath, uint8Array, {
         contentType: response.headers.get('content-type') || 'image/jpeg',
         upsert: true
@@ -95,7 +95,7 @@ async function downloadAndUploadImage(image) {
     
     // Ottieni URL pubblico
     const { data: urlData } = supabase.storage
-      .from('temple-images')
+      .from('images')
       .getPublicUrl(filePath);
     
     console.log(`✅ Upload completato: ${image.filename}`);
