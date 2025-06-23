@@ -65,6 +65,7 @@ const PostsManager = () => {
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
+  const [selectedOrder, setSelectedOrder] = useState<string>('newest');
   
   // Modal states
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -335,6 +336,22 @@ const PostsManager = () => {
     const matchesStatus = selectedStatus === 'all' || post.status === selectedStatus;
     
     return matchesSearch && matchesStatus;
+  }).sort((a, b) => {
+    const dateA = new Date(a.published_at || a.created_at || '').getTime();
+    const dateB = new Date(b.published_at || b.created_at || '').getTime();
+    
+    switch (selectedOrder) {
+      case 'newest':
+        return dateB - dateA; // Dal più nuovo al più vecchio
+      case 'oldest':
+        return dateA - dateB; // Dal più vecchio al più nuovo
+      case 'title-asc':
+        return (a.title || '').localeCompare(b.title || '');
+      case 'title-desc':
+        return (b.title || '').localeCompare(a.title || '');
+      default:
+        return dateB - dateA;
+    }
   });
 
   const formatDate = (dateString: string | null) => {
@@ -426,6 +443,17 @@ const PostsManager = () => {
                 <SelectItem value="all">Tutti gli stati</SelectItem>
                 <SelectItem value="published">Pubblicati</SelectItem>
                 <SelectItem value="draft">Bozze</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={selectedOrder} onValueChange={setSelectedOrder}>
+              <SelectTrigger className="w-[200px]">
+                <SelectValue placeholder="Ordina per" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="newest">Dal più recente</SelectItem>
+                <SelectItem value="oldest">Dal più vecchio</SelectItem>
+                <SelectItem value="title-asc">Titolo A-Z</SelectItem>
+                <SelectItem value="title-desc">Titolo Z-A</SelectItem>
               </SelectContent>
             </Select>
           </div>
