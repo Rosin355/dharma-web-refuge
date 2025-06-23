@@ -9,133 +9,151 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      posts: {
+      events: {
         Row: {
+          created_at: string | null
+          description: string | null
+          end_date: string | null
           id: string
+          location: string | null
+          max_participants: number | null
+          start_date: string
           title: string
-          content: string
-          excerpt: string | null
-          author_id: string | null
-          status: string
-          published_at: string | null
-          created_at: string
-          updated_at: string
+          type: string | null
+          updated_at: string | null
         }
         Insert: {
+          created_at?: string | null
+          description?: string | null
+          end_date?: string | null
           id?: string
+          location?: string | null
+          max_participants?: number | null
+          start_date: string
           title: string
-          content: string
-          excerpt?: string | null
-          author_id?: string | null
-          status?: string
-          published_at?: string | null
-          created_at?: string
-          updated_at?: string
+          type?: string | null
+          updated_at?: string | null
         }
         Update: {
+          created_at?: string | null
+          description?: string | null
+          end_date?: string | null
           id?: string
+          location?: string | null
+          max_participants?: number | null
+          start_date?: string
           title?: string
-          content?: string
-          excerpt?: string | null
-          author_id?: string | null
-          status?: string
-          published_at?: string | null
-          created_at?: string
-          updated_at?: string
+          type?: string | null
+          updated_at?: string | null
         }
+        Relationships: []
+      }
+      posts: {
+        Row: {
+          author_id: string | null
+          content: string
+          created_at: string | null
+          excerpt: string | null
+          id: string
+          image_alt: string | null
+          image_url: string | null
+          published_at: string | null
+          status: string | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          author_id?: string | null
+          content: string
+          created_at?: string | null
+          excerpt?: string | null
+          id?: string
+          image_alt?: string | null
+          image_url?: string | null
+          published_at?: string | null
+          status?: string | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          author_id?: string | null
+          content?: string
+          created_at?: string | null
+          excerpt?: string | null
+          id?: string
+          image_alt?: string | null
+          image_url?: string | null
+          published_at?: string | null
+          status?: string | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "posts_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
-          id: string
+          created_at: string | null
           email: string
           full_name: string | null
-          role: string
-          created_at: string
-          updated_at: string
+          id: string
+          role: string | null
+          updated_at: string | null
         }
         Insert: {
-          id: string
+          created_at?: string | null
           email: string
           full_name?: string | null
-          role?: string
-          created_at?: string
-          updated_at?: string
+          id: string
+          role?: string | null
+          updated_at?: string | null
         }
         Update: {
-          id?: string
+          created_at?: string | null
           email?: string
           full_name?: string | null
-          role?: string
-          created_at?: string
-          updated_at?: string
-        }
-      }
-      events: {
-        Row: {
-          id: string
-          title: string
-          description: string | null
-          start_date: string
-          end_date: string | null
-          location: string | null
-          type: string | null
-          max_participants: number | null
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
           id?: string
-          title: string
-          description?: string | null
-          start_date: string
-          end_date?: string | null
-          location?: string | null
-          type?: string | null
-          max_participants?: number | null
-          created_at?: string
-          updated_at?: string
+          role?: string | null
+          updated_at?: string | null
         }
-        Update: {
-          id?: string
-          title?: string
-          description?: string | null
-          start_date?: string
-          end_date?: string | null
-          location?: string | null
-          type?: string | null
-          max_participants?: number | null
-          created_at?: string
-          updated_at?: string
-        }
+        Relationships: []
       }
       teachings: {
         Row: {
-          id: string
-          title: string
-          content: string
-          teacher: string | null
           category: string | null
-          created_at: string
-          updated_at: string
+          content: string
+          created_at: string | null
+          id: string
+          teacher: string | null
+          title: string
+          updated_at: string | null
         }
         Insert: {
-          id?: string
-          title: string
-          content: string
-          teacher?: string | null
           category?: string | null
-          created_at?: string
-          updated_at?: string
+          content: string
+          created_at?: string | null
+          id?: string
+          teacher?: string | null
+          title: string
+          updated_at?: string | null
         }
         Update: {
-          id?: string
-          title?: string
-          content?: string
-          teacher?: string | null
           category?: string | null
-          created_at?: string
-          updated_at?: string
+          content?: string
+          created_at?: string | null
+          id?: string
+          teacher?: string | null
+          title?: string
+          updated_at?: string | null
         }
+        Relationships: []
       }
     }
     Views: {
