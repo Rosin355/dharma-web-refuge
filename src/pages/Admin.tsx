@@ -10,6 +10,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { testSupabaseConnection } from '@/lib/supabase-utils';
 import PostsManager from '@/components/admin/PostsManager';
 import ImageManager from '@/components/admin/ImageManager';
+import ContentManager from '@/components/admin/ContentManager';
 
 const Admin = () => {
   const { user, loading, error, signIn, signOut, clearError } = useAuth();
@@ -82,7 +83,7 @@ const Admin = () => {
 
           {/* Admin Tabs */}
           <Tabs defaultValue="dashboard" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-4 lg:w-auto lg:grid-cols-none lg:flex">
+            <TabsList className="grid w-full grid-cols-5 lg:w-auto lg:grid-cols-none lg:flex">
               <TabsTrigger value="dashboard" className="flex items-center gap-2">
                 <BarChart3 className="h-4 w-4" />
                 Dashboard
@@ -90,6 +91,10 @@ const Admin = () => {
               <TabsTrigger value="posts" className="flex items-center gap-2">
                 <FileText className="h-4 w-4" />
                 Articoli
+              </TabsTrigger>
+              <TabsTrigger value="content" className="flex items-center gap-2">
+                <Settings className="h-4 w-4" />
+                CMS
               </TabsTrigger>
               <TabsTrigger value="images" className="flex items-center gap-2">
                 <Image className="h-4 w-4" />
@@ -224,6 +229,11 @@ const Admin = () => {
             {/* Posts Management Tab */}
             <TabsContent value="posts">
               <PostsManager />
+            </TabsContent>
+
+            {/* Content Management Tab */}
+            <TabsContent value="content">
+              <ContentManager />
             </TabsContent>
 
             {/* Images Management Tab */}

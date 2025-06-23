@@ -1,21 +1,22 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Users, Target, Heart, Book, MapPin, Phone, Mail } from 'lucide-react';
 import { useTempleCarouselImages, useMasterImages } from '@/hooks/useTempleImages';
+import { usePageContent } from '@/hooks/usePageContent';
 
 const ChiSiamo = () => {
   const { carouselImages, loading: carouselLoading } = useTempleCarouselImages();
   const { masterImages, loading: masterLoading } = useMasterImages();
+  const { getContent, loading: contentLoading } = usePageContent('chi-siamo');
   return (
     <div className="min-h-screen bg-zen-cream">
       {/* Header */}
       <section className="bg-gradient-to-r from-zen-stone to-zen-sage py-16">
         <div className="container mx-auto px-4 text-center">
           <h1 className="font-serif text-5xl font-light mb-4">
-            Chi <span className="text-saffron-600">Siamo</span>
+            <span className="text-saffron-600">{getContent('header-title', 'Chi Siamo')}</span>
           </h1>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            La Comunità Bodhidharma - Tempio Musang Am (Eremo della Non Forma) 
-            di Lerici, dove risiediamo e impartiamo l'insegnamento buddhista
+            {getContent('header-subtitle', 'La Comunità Bodhidharma - Tempio Musang Am (Eremo della Non Forma) di Lerici, dove risiediamo e impartiamo l\'insegnamento buddhista')}
           </p>
         </div>
       </section>
