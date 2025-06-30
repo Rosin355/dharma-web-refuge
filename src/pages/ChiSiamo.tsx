@@ -1,3 +1,4 @@
+
 import { Card, CardContent } from '@/components/ui/card';
 import { Users, Target, Heart, Book, MapPin, Phone, Mail } from 'lucide-react';
 import { useTempleCarouselImages, useMasterImages } from '@/hooks/useTempleImages';
@@ -7,6 +8,18 @@ const ChiSiamo = () => {
   const { carouselImages, loading: carouselLoading } = useTempleCarouselImages();
   const { masterImages, loading: masterLoading } = useMasterImages();
   const { getContent, loading: contentLoading } = usePageContent('chi-siamo');
+
+  if (contentLoading) {
+    return (
+      <div className="min-h-screen bg-zen-cream flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-saffron-500 mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Caricamento contenuti...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-zen-cream">
       {/* Header */}
@@ -25,7 +38,7 @@ const ChiSiamo = () => {
       <section className="py-16">
         <div className="container mx-auto px-4">
           <h2 className="font-serif text-4xl font-light text-center mb-12">
-            I Nostri <span className="text-saffron-500">Maestri</span>
+            {getContent('maestri-title', 'I Nostri')} <span className="text-saffron-500">Maestri</span>
           </h2>
 
           {/* Taehye sunim */}
@@ -202,7 +215,7 @@ const ChiSiamo = () => {
       <section className="py-16 bg-white">
         <div className="container mx-auto px-4">
           <h2 className="font-serif text-4xl font-light text-center mb-12">
-            La <span className="text-saffron-500">Comunità</span>
+            {getContent('comunita-title', 'La')} <span className="text-saffron-500">Comunità</span>
           </h2>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
@@ -247,16 +260,14 @@ const ChiSiamo = () => {
       <section className="py-16">
         <div className="container mx-auto px-4">
           <h2 className="font-serif text-4xl font-light text-center mb-12">
-            Il <span className="text-saffron-500">Tempio</span>
+            {getContent('tempio-title', 'Il')} <span className="text-saffron-500">Tempio</span>
           </h2>
           <p className="text-center text-muted-foreground mb-8 max-w-2xl mx-auto">
             Tempio Musang Am (Eremo della Non Forma) - Monti San Lorenzo, Lerici (SP)
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {/* Galleria Immagini del Tempio */}
             {carouselLoading ? (
-              // Skeleton loader per 6 immagini
               Array.from({ length: 6 }).map((_, index) => (
                 <div key={index} className="aspect-square overflow-hidden rounded-lg">
                   <div className="w-full h-full bg-gray-200 animate-pulse flex items-center justify-center">
@@ -265,7 +276,6 @@ const ChiSiamo = () => {
                 </div>
               ))
             ) : carouselImages.length > 0 ? (
-              // Immagini dal database
               carouselImages.map((image, index) => (
                 <div key={image.id} className="aspect-square overflow-hidden rounded-lg">
                   <img 
@@ -276,7 +286,6 @@ const ChiSiamo = () => {
                 </div>
               ))
             ) : (
-              // Fallback alle immagini di Unsplash se non ci sono immagini nel database
               [
                 { src: "https://images.unsplash.com/photo-1545389336-cf090694435e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80", alt: "Sala di meditazione" },
                 { src: "https://images.unsplash.com/photo-1602192509154-0b900ee1f851?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80", alt: "Esterno del tempio" },
@@ -303,7 +312,7 @@ const ChiSiamo = () => {
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
             <h2 className="font-serif text-3xl font-light text-center mb-8">
-              Pratica di <span className="text-saffron-600">Dana</span>
+              {getContent('dana-title', 'Pratica di')} <span className="text-saffron-600">Dana</span>
             </h2>
             <p className="text-center text-muted-foreground mb-8">
               Dana significa "generosità, disponibilità"
@@ -356,7 +365,9 @@ const ChiSiamo = () => {
                   <p className="text-muted-foreground mb-2">
                     Dona il tuo 5x1000 all'associazione Karuna Onlus
                   </p>
-                  <p className="font-mono text-lg font-semibold">95120790100</p>
+                  <p className="font-mono text-lg font-semibold">
+                    {getContent('dana-5x1000', '95120790100')}
+                  </p>
                 </CardContent>
               </Card>
             </div>

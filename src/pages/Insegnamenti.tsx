@@ -1,8 +1,23 @@
+
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { BookOpen, Heart, Flower2, Sun } from 'lucide-react';
+import { usePageContent } from '@/hooks/usePageContent';
 
 const Insegnamenti = () => {
+  const { getContent, loading: contentLoading } = usePageContent('insegnamenti');
+
+  if (contentLoading) {
+    return (
+      <div className="min-h-screen bg-zen-cream flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-saffron-500 mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Caricamento contenuti...</p>
+        </div>
+      </div>
+    );
+  }
+
   const pilastri = [
     {
       icon: Flower2,
@@ -57,11 +72,10 @@ const Insegnamenti = () => {
       <section className="bg-gradient-to-r from-zen-stone to-zen-sage py-16">
         <div className="container mx-auto px-4 text-center">
           <h1 className="font-serif text-5xl font-light mb-4">
-            <span className="text-saffron-600">Insegnamenti</span> del Dharma
+            <span className="text-saffron-600">{getContent('header-title', 'Insegnamenti')}</span> {getContent('header-subtitle', 'del Dharma')}
           </h1>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            Scopri la saggezza millenaria del buddhismo zen attraverso gli insegnamenti 
-            dei maestri e la pratica quotidiana del risveglio
+            {getContent('header-description', 'Scopri la saggezza millenaria del buddhismo zen attraverso gli insegnamenti dei maestri e la pratica quotidiana del risveglio')}
           </p>
         </div>
       </section>
@@ -71,7 +85,7 @@ const Insegnamenti = () => {
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="font-serif text-3xl font-light mb-4">
-              I Quattro <span className="text-saffron-500">Pilastri</span> della Pratica
+              {getContent('pilastri-title', 'I Quattro')} <span className="text-saffron-500">{getContent('pilastri-subtitle', 'Pilastri')}</span> della Pratica
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               Le fondamenta su cui costruire il proprio percorso spirituale
@@ -104,7 +118,7 @@ const Insegnamenti = () => {
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="font-serif text-3xl font-light mb-4">
-              Insegnamenti dei <span className="text-saffron-500">Maestri</span>
+              {getContent('maestri-title', 'Insegnamenti dei')} <span className="text-saffron-500">Maestri</span>
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               La saggezza tramandata attraverso le generazioni di praticanti zen
@@ -140,7 +154,7 @@ const Insegnamenti = () => {
       <section className="py-16 saffron-gradient">
         <div className="container mx-auto px-4 text-center">
           <h2 className="font-serif text-3xl font-light text-white mb-4">
-            Approfondisci la Tua Pratica
+            {getContent('cta-title', 'Approfondisci la Tua Pratica')}
           </h2>
           <p className="text-xl text-saffron-100 mb-8 max-w-2xl mx-auto">
             Unisciti a noi per esplorare più profondamente gli insegnamenti del Dharma

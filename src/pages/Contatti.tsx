@@ -4,19 +4,32 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { MapPin, Phone, Mail, Clock } from 'lucide-react';
+import { usePageContent } from '@/hooks/usePageContent';
 
 const Contatti = () => {
+  const { getContent, loading: contentLoading } = usePageContent('contatti');
+
+  if (contentLoading) {
+    return (
+      <div className="min-h-screen bg-zen-cream flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-saffron-500 mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Caricamento contenuti...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-zen-cream">
       {/* Header */}
       <section className="bg-gradient-to-r from-zen-stone to-zen-sage py-16">
         <div className="container mx-auto px-4 text-center">
           <h1 className="font-serif text-5xl font-light mb-4">
-            <span className="text-saffron-600">Contatti</span>
+            <span className="text-saffron-600">{getContent('header-title', 'Contatti')}</span>
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Entra in contatto con la nostra comunità. Siamo qui per guidarti 
-            nel tuo percorso spirituale
+            {getContent('header-subtitle', 'Entra in contatto con la nostra comunità. Siamo qui per guidarti nel tuo percorso spirituale')}
           </p>
         </div>
       </section>
@@ -30,11 +43,15 @@ const Contatti = () => {
                 <div className="w-16 h-16 mx-auto mb-4 bg-saffron-100 rounded-full flex items-center justify-center">
                   <MapPin className="h-8 w-8 text-saffron-600" />
                 </div>
-                <h3 className="font-serif text-xl font-semibold mb-2">Indirizzo</h3>
-                <p className="text-muted-foreground">
-                  Via del Dharma, 108<br />
-                  00100 Roma, Italia
-                </p>
+                <h3 className="font-serif text-xl font-semibold mb-2">
+                  {getContent('info-indirizzo-title', 'Indirizzo')}
+                </h3>
+                <div 
+                  className="text-muted-foreground"
+                  dangerouslySetInnerHTML={{ 
+                    __html: getContent('info-indirizzo-content', 'Via del Dharma, 108<br />00100 Roma, Italia') 
+                  }}
+                />
               </CardContent>
             </Card>
 
@@ -43,11 +60,15 @@ const Contatti = () => {
                 <div className="w-16 h-16 mx-auto mb-4 bg-saffron-100 rounded-full flex items-center justify-center">
                   <Phone className="h-8 w-8 text-saffron-600" />
                 </div>
-                <h3 className="font-serif text-xl font-semibold mb-2">Telefono</h3>
-                <p className="text-muted-foreground">
-                  +39 123 456 789<br />
-                  Lun-Ven: 9:00-18:00
-                </p>
+                <h3 className="font-serif text-xl font-semibold mb-2">
+                  {getContent('info-telefono-title', 'Telefono')}
+                </h3>
+                <div 
+                  className="text-muted-foreground"
+                  dangerouslySetInnerHTML={{ 
+                    __html: getContent('info-telefono-content', '+39 123 456 789<br />Lun-Ven: 9:00-18:00') 
+                  }}
+                />
               </CardContent>
             </Card>
 
@@ -56,11 +77,15 @@ const Contatti = () => {
                 <div className="w-16 h-16 mx-auto mb-4 bg-saffron-100 rounded-full flex items-center justify-center">
                   <Mail className="h-8 w-8 text-saffron-600" />
                 </div>
-                <h3 className="font-serif text-xl font-semibold mb-2">Email</h3>
-                <p className="text-muted-foreground">
-                  info@bodhidharma.info<br />
-                  eventi@bodhidharma.info
-                </p>
+                <h3 className="font-serif text-xl font-semibold mb-2">
+                  {getContent('info-email-title', 'Email')}
+                </h3>
+                <div 
+                  className="text-muted-foreground"
+                  dangerouslySetInnerHTML={{ 
+                    __html: getContent('info-email-content', 'info@bodhidharma.info<br />eventi@bodhidharma.info') 
+                  }}
+                />
               </CardContent>
             </Card>
           </div>
@@ -69,7 +94,9 @@ const Contatti = () => {
             {/* Form di Contatto */}
             <Card className="border-zen-sage">
               <CardHeader>
-                <CardTitle className="font-serif text-2xl">Invia un Messaggio</CardTitle>
+                <CardTitle className="font-serif text-2xl">
+                  {getContent('form-title', 'Invia un Messaggio')}
+                </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -94,7 +121,7 @@ const Contatti = () => {
                 <CardHeader>
                   <CardTitle className="font-serif text-2xl flex items-center">
                     <Clock className="mr-2 h-5 w-5 text-saffron-500" />
-                    Orari delle Attività
+                    {getContent('orari-title', 'Orari delle Attività')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">

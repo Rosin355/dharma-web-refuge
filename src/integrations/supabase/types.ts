@@ -48,6 +48,48 @@ export type Database = {
         }
         Relationships: []
       }
+      page_contents: {
+        Row: {
+          content: string
+          content_type: string | null
+          created_at: string | null
+          display_order: number | null
+          editor_instructions: string | null
+          id: string
+          is_active: boolean | null
+          page_name: string
+          section_key: string
+          section_title: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          content: string
+          content_type?: string | null
+          created_at?: string | null
+          display_order?: number | null
+          editor_instructions?: string | null
+          id?: string
+          is_active?: boolean | null
+          page_name: string
+          section_key: string
+          section_title?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          content?: string
+          content_type?: string | null
+          created_at?: string | null
+          display_order?: number | null
+          editor_instructions?: string | null
+          id?: string
+          is_active?: boolean | null
+          page_name?: string
+          section_key?: string
+          section_title?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       posts: {
         Row: {
           author_id: string | null
@@ -151,6 +193,42 @@ export type Database = {
           id?: string
           teacher?: string | null
           title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      temple_images: {
+        Row: {
+          alt_text: string | null
+          category: string | null
+          created_at: string | null
+          filename: string
+          id: string
+          original_url: string
+          page_section: string | null
+          storage_url: string
+          updated_at: string | null
+        }
+        Insert: {
+          alt_text?: string | null
+          category?: string | null
+          created_at?: string | null
+          filename: string
+          id?: string
+          original_url: string
+          page_section?: string | null
+          storage_url: string
+          updated_at?: string | null
+        }
+        Update: {
+          alt_text?: string | null
+          category?: string | null
+          created_at?: string | null
+          filename?: string
+          id?: string
+          original_url?: string
+          page_section?: string | null
+          storage_url?: string
           updated_at?: string | null
         }
         Relationships: []
