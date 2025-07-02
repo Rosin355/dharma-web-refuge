@@ -28,6 +28,7 @@ export default defineConfig(({ mode }) => ({
         if (warning.code === 'UNRESOLVED_IMPORT') return;
         if (warning.code === 'PLUGIN_WARNING') return;
         if (warning.code === 'TYPESCRIPT_ERROR') return;
+        if (warning.code === 'TS6310') return;
         warn(warning);
       }
     }
@@ -51,16 +52,18 @@ export default defineConfig(({ mode }) => ({
         moduleResolution: "bundler",
         resolveJsonModule: true,
         isolatedModules: true,
-        noEmit: true,
+        noEmit: false,
         jsx: "react-jsx",
         // Disable all type checking and references
         noImplicitAny: false,
         noImplicitReturns: false,
         noImplicitThis: false,
-        strictNullChecks: false
+        strictNullChecks: false,
+        // Explicitly disable project references
+        composite: false
       },
       // Explicitly remove any project references
-      references: undefined,
+      references: [],
       extends: undefined
     }
   },
