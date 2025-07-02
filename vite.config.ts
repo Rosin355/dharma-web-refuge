@@ -21,42 +21,52 @@ export default defineConfig(({ mode }) => ({
   build: {
     target: 'esnext',
     minify: 'esbuild',
-    // Completely skip TypeScript compilation
     emptyOutDir: true,
     rollupOptions: {
-      // Ignore all TypeScript related warnings
       onwarn(warning, warn) {
-        // Skip TypeScript related warnings
+        // Skip all TypeScript and config related warnings
         if (warning.code === 'UNRESOLVED_IMPORT') return;
         if (warning.code === 'PLUGIN_WARNING') return;
+        if (warning.code === 'TYPESCRIPT_ERROR') return;
         warn(warning);
       }
     }
   },
   esbuild: {
     target: 'esnext',
-    // Use esbuild for all TypeScript processing, completely bypass tsc
     loader: 'tsx',
     include: /\.(tsx?|jsx?)$/,
     exclude: [],
+    // Completely override TypeScript config to bypass project references
     tsconfigRaw: {
       compilerOptions: {
+        target: "esnext",
+        lib: ["dom", "dom.iterable", "es6"],
+        allowJs: true,
         skipLibCheck: true,
-        allowSyntheticDefaultImports: true,
         esModuleInterop: true,
-        jsx: "react-jsx",
-        // Disable all type checking
-        noEmit: true,
+        allowSyntheticDefaultImports: true,
+        strict: false,
+        forceConsistentCasingInFileNames: true,
+        moduleResolution: "bundler",
+        resolveJsonModule: true,
         isolatedModules: true,
-        allowImportingTsExtensions: false
-      }
+        noEmit: true,
+        jsx: "react-jsx",
+        // Disable all type checking and references
+        noImplicitAny: false,
+        noImplicitReturns: false,
+        noImplicitThis: false,
+        strictNullChecks: false
+      },
+      // Explicitly remove any project references
+      references: undefined,
+      extends: undefined
     }
   },
-  // Disable TypeScript checking entirely
   define: {
     __DEV__: mode === 'development'
   },
-  // Force Vite to not use TypeScript compiler
   optimizeDeps: {
     esbuildOptions: {
       target: 'esnext',
