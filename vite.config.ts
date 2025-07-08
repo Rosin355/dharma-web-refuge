@@ -1,2 +1,2 @@
-// Dummy file to satisfy tsconfig.node.json
+// TypeScript config file - actual Vite config is in vite.config.js
 export {};
