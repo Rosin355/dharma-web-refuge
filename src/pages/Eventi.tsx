@@ -87,10 +87,10 @@ const Eventi = () => {
       {/* Header */}
       <section className="bg-gradient-to-r from-zen-stone to-zen-sage py-16">
         <div className="container mx-auto px-4 text-center">
-          <h1 className="font-serif text-5xl font-light mb-4">
-            Eventi & <span className="text-saffron-600">Ritiri</span>
+          <h1 className="font-serif text-5xl font-light mb-4 text-white">
+            Eventi & <span className="text-saffron-300">Ritiri</span>
           </h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-xl text-white/80 max-w-2xl mx-auto">
             Partecipa ai nostri eventi per approfondire la pratica e crescere insieme alla comunità
           </p>
         </div>
