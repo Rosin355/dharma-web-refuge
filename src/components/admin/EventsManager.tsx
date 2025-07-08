@@ -55,6 +55,7 @@ const EventsManager = () => {
     events, 
     loading, 
     error, 
+    loadEvents,
     createEvent, 
     updateEvent, 
     deleteEvent,
@@ -98,13 +99,16 @@ const EventsManager = () => {
   const bookingStatusOptions = ['pending', 'confirmed', 'cancelled', 'paid'];
 
   useEffect(() => {
+    // Carica eventi all'avvio
+    loadEvents();
+    
     if (showBookings) {
       loadAllBookings();
     }
     // Carica chiave Unsplash salvata
     const savedKey = localStorage.getItem('unsplash_access_key');
     if (savedKey) setUnsplashKey(savedKey);
-  }, [showBookings, loadAllBookings]);
+  }, [showBookings, loadAllBookings, loadEvents]);
 
   // Funzione per upload file
   const handleFileUpload = async (file: File) => {
