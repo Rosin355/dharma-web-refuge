@@ -21,6 +21,10 @@ export type Database = {
           title: string
           type: string | null
           updated_at: string | null
+          price: string | null
+          image_url: string | null
+          featured: boolean | null
+          status: string | null
         }
         Insert: {
           created_at?: string | null
@@ -33,6 +37,10 @@ export type Database = {
           title: string
           type?: string | null
           updated_at?: string | null
+          price?: string | null
+          image_url?: string | null
+          featured?: boolean | null
+          status?: string | null
         }
         Update: {
           created_at?: string | null
@@ -45,8 +53,59 @@ export type Database = {
           title?: string
           type?: string | null
           updated_at?: string | null
+          price?: string | null
+          image_url?: string | null
+          featured?: boolean | null
+          status?: string | null
         }
         Relationships: []
+      }
+      event_bookings: {
+        Row: {
+          created_at: string | null
+          event_id: string | null
+          id: string
+          message: string | null
+          participants_count: number | null
+          status: string | null
+          updated_at: string | null
+          user_email: string
+          user_name: string
+          user_phone: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          event_id?: string | null
+          id?: string
+          message?: string | null
+          participants_count?: number | null
+          status?: string | null
+          updated_at?: string | null
+          user_email: string
+          user_name: string
+          user_phone?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          event_id?: string | null
+          id?: string
+          message?: string | null
+          participants_count?: number | null
+          status?: string | null
+          updated_at?: string | null
+          user_email?: string
+          user_name?: string
+          user_phone?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_bookings_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          }
+        ]
       }
       page_contents: {
         Row: {

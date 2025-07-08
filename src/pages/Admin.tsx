@@ -5,12 +5,13 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Settings, Lock, LogOut, Database, Users, FileText, Image, BarChart3 } from 'lucide-react';
+import { Settings, Lock, LogOut, Database, Users, FileText, Image, BarChart3, Calendar } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { testSupabaseConnection } from '@/lib/supabase-utils';
 import PostsManager from '@/components/admin/PostsManager';
 import ImageManager from '@/components/admin/ImageManager';
 import ContentManager from '@/components/admin/ContentManager';
+import EventsManager from '@/components/admin/EventsManager';
 
 const Admin = () => {
   const { user, loading, error, signIn, signOut, clearError } = useAuth();
@@ -83,7 +84,7 @@ const Admin = () => {
 
           {/* Admin Tabs */}
           <Tabs defaultValue="dashboard" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-5 lg:w-auto lg:grid-cols-none lg:flex">
+            <TabsList className="grid w-full grid-cols-6 lg:w-auto lg:grid-cols-none lg:flex">
               <TabsTrigger value="dashboard" className="flex items-center gap-2">
                 <BarChart3 className="h-4 w-4" />
                 Dashboard
@@ -91,6 +92,10 @@ const Admin = () => {
               <TabsTrigger value="posts" className="flex items-center gap-2">
                 <FileText className="h-4 w-4" />
                 Articoli
+              </TabsTrigger>
+              <TabsTrigger value="events" className="flex items-center gap-2">
+                <Calendar className="h-4 w-4" />
+                Eventi
               </TabsTrigger>
               <TabsTrigger value="content" className="flex items-center gap-2">
                 <Settings className="h-4 w-4" />
@@ -138,7 +143,7 @@ const Admin = () => {
               </Card>
 
               {/* Quick Stats */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <Card className="border-zen-sage hover:shadow-lg transition-shadow">
                   <CardContent className="p-6">
                     <div className="flex items-center mb-4">
@@ -159,6 +164,30 @@ const Admin = () => {
                       }}
                     >
                       Gestisci Articoli
+                    </Button>
+                  </CardContent>
+                </Card>
+
+                <Card className="border-zen-sage hover:shadow-lg transition-shadow">
+                  <CardContent className="p-6">
+                    <div className="flex items-center mb-4">
+                      <Calendar className="h-8 w-8 text-saffron-600 mr-3" />
+                      <div>
+                        <h3 className="font-semibold">Gestione Eventi</h3>
+                        <p className="text-sm text-muted-foreground">Eventi e prenotazioni</p>
+                      </div>
+                    </div>
+                    <p className="text-xs text-gray-500 mb-3">
+                      Crea eventi, gestisci prenotazioni e monitora partecipazioni
+                    </p>
+                    <Button 
+                      className="w-full bg-saffron-600 hover:bg-saffron-700"
+                      onClick={() => {
+                        const tabTrigger = document.querySelector('[value="events"]') as HTMLElement;
+                        tabTrigger?.click();
+                      }}
+                    >
+                      Gestisci Eventi
                     </Button>
                   </CardContent>
                 </Card>
@@ -229,6 +258,11 @@ const Admin = () => {
             {/* Posts Management Tab */}
             <TabsContent value="posts">
               <PostsManager />
+            </TabsContent>
+
+            {/* Events Management Tab */}
+            <TabsContent value="events">
+              <EventsManager />
             </TabsContent>
 
             {/* Content Management Tab */}

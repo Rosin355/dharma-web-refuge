@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -11,6 +10,7 @@ import Insegnamenti from "./pages/Insegnamenti";
 import Blog from "./pages/Blog";
 import BlogDetail from "./pages/BlogDetail";
 import Eventi from "./pages/Eventi";
+import EventDetail from "./pages/EventDetail";
 import Cerimonie from "./pages/Cerimonie";
 import ChiSiamo from "./pages/ChiSiamo";
 import Contatti from "./pages/Contatti";
@@ -35,6 +35,7 @@ const App = () => (
               <Route path="/blog" element={<Blog />} />
               <Route path="/blog/:id" element={<BlogDetail />} />
               <Route path="/eventi" element={<Eventi />} />
+              <Route path="/eventi/:id" element={<EventDetail />} />
               <Route path="/cerimonie" element={<Cerimonie />} />
               <Route path="/chi-siamo" element={<ChiSiamo />} />
               <Route path="/contatti" element={<Contatti />} />

@@ -1,13 +1,21 @@
-
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import path from "path";
-import { componentTagger } from "lovable-tagger";
+
+// Importazione condizionale per evitare errori se lovable-tagger non è disponibile
+let componentTagger;
+try {
+  componentTagger = require("lovable-tagger").componentTagger;
+} catch (e) {
+  // lovable-tagger non disponibile in ambiente locale
+  componentTagger = null;
+}
 
 export default defineConfig(({ mode }) => ({
   plugins: [
     react(),
-    mode === 'development' && componentTagger(),
+    // Usa componentTagger solo se disponibile e in development
+    mode === 'development' && componentTagger && componentTagger(),
   ].filter(Boolean),
   resolve: {
     alias: {
