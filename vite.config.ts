@@ -3,12 +3,9 @@ import react from "@vitejs/plugin-react";
 import path from "path";
 import { componentTagger } from "lovable-tagger";
 
-export default defineConfig(({ mode }) => ({
+export default defineConfig(({ command, mode }) => ({
   plugins: [
-    react({
-      jsxRuntime: 'automatic',
-      jsxImportSource: 'react'
-    }),
+    react(),
     mode === 'development' && componentTagger(),
   ].filter(Boolean),
   resolve: {
@@ -34,31 +31,6 @@ export default defineConfig(({ mode }) => ({
   optimizeDeps: {
     esbuildOptions: {
       target: 'es2020'
-    }
-  },
-  esbuild: {
-    target: 'es2020',
-    jsx: 'automatic',
-    jsxImportSource: 'react',
-    tsconfigRaw: {
-      compilerOptions: {
-        skipLibCheck: true,
-        noEmit: true,
-        jsx: 'react-jsx',
-        jsxImportSource: 'react',
-        target: 'es2020',
-        lib: ['es2020', 'DOM', 'DOM.Iterable'],
-        allowJs: true,
-        strict: false,
-        noUnusedLocals: false,
-        noUnusedParameters: false,
-        exactOptionalPropertyTypes: false,
-        moduleResolution: 'bundler',
-        allowSyntheticDefaultImports: true,
-        esModuleInterop: true,
-        resolveJsonModule: true,
-        isolatedModules: true
-      }
     }
   },
   css: {
