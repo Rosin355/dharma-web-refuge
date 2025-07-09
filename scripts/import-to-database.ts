@@ -67,10 +67,10 @@ function cleanContent(content: string): string {
   
   return content
     // Rimuovi tag script e style residui
-    .replace(/<script[^>]*>.*?<\/script>/gs, '')
-    .replace(/<style[^>]*>.*?<\/style>/gs, '')
+    .replace(/<script[^>]*>[\s\S]*?<\/script>/g, '')
+    .replace(/<style[^>]*>[\s\S]*?<\/style>/g, '')
     // Rimuovi commenti HTML
-    .replace(/<!--.*?-->/gs, '')
+    .replace(/<!--[\s\S]*?-->/g, '')
     // Rimuovi attributi non necessari dai tag
     .replace(/\s(class|id|style)="[^"]*"/g, '')
     // Pulisci spazi multipli
