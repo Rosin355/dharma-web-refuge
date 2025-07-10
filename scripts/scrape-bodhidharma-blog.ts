@@ -92,11 +92,11 @@ async function extractArticle(url: string): Promise<BlogPost | null> {
     
     // Pulizia del contenuto HTML
     content = content
-      .replace(/<script[^>]*>.*?<\/script>/gs, '')
-      .replace(/<style[^>]*>.*?<\/style>/gs, '')
-      .replace(/<!--.*?-->/gs, '')
-      .replace(/<nav[^>]*>.*?<\/nav>/gs, '')
-      .replace(/<footer[^>]*>.*?<\/footer>/gs, '')
+      .replace(/<script[^>]*>[\s\S]*?<\/script>/g, '')
+      .replace(/<style[^>]*>[\s\S]*?<\/style>/g, '')
+      .replace(/<!--[\s\S]*?-->/g, '')
+      .replace(/<nav[^>]*>[\s\S]*?<\/nav>/g, '')
+      .replace(/<footer[^>]*>[\s\S]*?<\/footer>/g, '')
       .trim();
     
     // Estrazione excerpt (primi 200 caratteri del testo pulito)
@@ -191,7 +191,8 @@ async function findArticleLinks(): Promise<string[]> {
   }
   
   // Rimuovi duplicati e filtra
-  return [...new Set(links)].filter(link => 
+  const uniqueLinks = Array.from(new Set(links));
+  return uniqueLinks.filter(link => 
     link.includes('/musangam/') && 
     !link.includes('?') && 
     link !== `${BASE_URL}/` &&

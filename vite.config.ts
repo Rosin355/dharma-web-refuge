@@ -3,15 +3,14 @@ import react from "@vitejs/plugin-react";
 import path from "path";
 import { componentTagger } from "lovable-tagger";
 
-// CONFIGURAZIONE VITE STANDALONE - BYPASSA COMPLETAMENTE TSCONFIG
-export default defineConfig(({ mode }) => ({
+export default defineConfig(({ command, mode }) => ({
   plugins: [
-    react({ jsxRuntime: 'automatic' }),
+    react(),
     mode === 'development' && componentTagger(),
   ].filter(Boolean),
   resolve: {
     alias: {
-      "@": path.resolve(import.meta.dirname || ".", "src"),
+      "@": path.resolve(__dirname, "src"),
     },
   },
   server: {
@@ -19,30 +18,19 @@ export default defineConfig(({ mode }) => ({
     port: 8080,
   },
   build: {
-    target: 'esnext',
+    target: 'es2020',
     minify: 'esbuild',
     emptyOutDir: true,
-    // FORZA IL BUILD SENZA TYPE CHECKING
+    sourcemap: false,
     rollupOptions: {
       onwarn: () => {
-        // IGNORA TUTTI GLI AVVISI - INCLUSI TS6310
         return;
       }
     }
   },
   optimizeDeps: {
     esbuildOptions: {
-      target: 'esnext'
-    }
-  },
-  esbuild: {
-    target: 'esnext',
-    // DISABILITA COMPLETAMENTE TYPESCRIPT
-    loader: 'tsx',
-    tsconfigRaw: '{}', // TSCONFIG VUOTO
-    logOverride: {
-      'tsconfig-invalid': 'silent',
-      'this-is-undefined-in-esm': 'silent'
+      target: 'es2020'
     }
   },
   css: {
@@ -51,7 +39,6 @@ export default defineConfig(({ mode }) => ({
   define: {
     global: 'globalThis'
   },
-  // OPZIONI PER FORZARE IL BUILD
   logLevel: 'warn',
   clearScreen: false
 }));
