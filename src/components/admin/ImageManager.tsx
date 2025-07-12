@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -70,6 +70,7 @@ const ImageManager = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [uploadingFile, setUploadingFile] = useState(false);
   
   // Blog images state
   const [posts, setPosts] = useState<PostWithImage[]>([]);
@@ -91,6 +92,9 @@ const ImageManager = () => {
   // Selected items for assignment
   const [selectedPost, setSelectedPost] = useState<PostWithImage | null>(null);
   const [selectedImageType, setSelectedImageType] = useState<string>('');
+  
+  // File upload refs
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     fetchPosts();
@@ -164,6 +168,84 @@ const ImageManager = () => {
     localStorage.setItem('auto_assign_enabled', autoAssignEnabled.toString());
     setSuccess('Impostazioni salvate con successo!');
     setTimeout(() => setSuccess(null), 3000);
+  };
+
+  // Funzione per upload di file locali
+  const handleFileUpload = async (file: File, targetType: 'post' | 'master' | 'temple', targetId?: string) => {
+    try {
+      setUploadingFile(true);
+      setError(null);
+
+      // Validazione del file
+      if (!file.type.startsWith('image/')) {
+        throw new Error('Il file deve essere un\'immagine');
+      }
+
+      if (file.size > 5 * 1024 * 1024) { // 5MB
+        throw new Error('Il file deve essere inferiore a 5MB');
+      }
+
+      // Genera nome file unico
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+      const filePath = `${targetType}/${fileName}`;
+
+      // Upload a Supabase Storage
+      const { error: uploadError } = await supabase.storage
+        .from('temple-images')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      // Ottieni URL pubblico
+      const { data: { publicUrl } } = supabase.storage
+        .from('temple-images')
+        .getPublicUrl(filePath);
+
+      // Salva in base al tipo
+      if (targetType === 'post' && targetId) {
+        // Aggiorna post con immagine
+        const { error: updateError } = await supabase
+          .from('posts')
+          .update({
+            image_url: publicUrl,
+            image_alt: file.name.split('.')[0].replace(/[_-]/g, ' '),
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', targetId);
+
+        if (updateError) throw updateError;
+        await fetchPosts();
+      } else if (targetType === 'master' || targetType === 'temple') {
+        // Salva in temple_images
+        const { error: insertError } = await supabase
+          .from('temple_images')
+          .insert({
+            filename: fileName,
+            storage_url: publicUrl,
+            original_url: publicUrl,
+            alt_text: file.name.split('.')[0].replace(/[_-]/g, ' '),
+            category: targetType === 'master' ? 'maestri' : 'tempio',
+            page_section: targetType === 'master' ? 'chi-siamo' : 'galleria'
+          });
+
+        if (insertError) throw insertError;
+        await fetchTempleImages();
+      }
+
+      setSuccess('Immagine caricata con successo!');
+      setTimeout(() => setSuccess(null), 3000);
+      
+      // Reset form
+      setSelectedPost(null);
+      setSelectedImageType('');
+      
+    } catch (err) {
+      console.error('❌ Errore upload file:', err);
+      setError(err instanceof Error ? err.message : 'Errore upload file');
+    } finally {
+      setUploadingFile(false);
+    }
   };
 
   const searchUnsplashImages = async (query: string) => {
@@ -898,6 +980,18 @@ const ImageManager = () => {
               </Button>
               <Button
                 variant="outline"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploadingFile}
+                className="bg-blue-600 hover:bg-blue-700 text-white"
+              >
+                {uploadingFile ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Upload className="h-4 w-4" />
+                )}
+              </Button>
+              <Button
+                variant="outline"
                 onClick={() => {
                   setSelectedPost(null);
                   setSelectedImageType('');
@@ -907,6 +1001,26 @@ const ImageManager = () => {
                 <X className="h-4 w-4" />
               </Button>
             </div>
+            
+            {/* Hidden file input */}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  if (selectedPost) {
+                    handleFileUpload(file, 'post', selectedPost.id);
+                  } else if (selectedImageType) {
+                    const targetType = ['taehye', 'taeri', 'kusalananda'].includes(selectedImageType) ? 'master' : 'temple';
+                    handleFileUpload(file, targetType);
+                  }
+                }
+                e.target.value = '';
+              }}
+              style={{ display: 'none' }}
+            />
 
             {searchResults.length > 0 && (
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
