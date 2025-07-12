@@ -137,6 +137,8 @@ const ImageManager = () => {
 
   const fetchTempleImages = async () => {
     try {
+      console.log('🔄 Caricamento immagini tempio...');
+      
       const { data, error: fetchError } = await supabase
         .from('temple_images')
         .select('*')
@@ -144,6 +146,16 @@ const ImageManager = () => {
 
       if (fetchError) throw fetchError;
 
+      console.log(`✅ Caricate ${data?.length || 0} immagini tempio`);
+      console.log('📊 Breakdown per categoria:');
+      
+      const breakdown = (data || []).reduce((acc: any, img: any) => {
+        acc[img.category] = (acc[img.category] || 0) + 1;
+        return acc;
+      }, {});
+      
+      console.log(breakdown);
+      
       setTempleImages(data || []);
     } catch (err) {
       console.error('❌ Errore caricamento immagini tempio:', err);
@@ -241,12 +253,31 @@ const ImageManager = () => {
         console.log('✅ Post aggiornato, refresh lista...');
         await fetchPosts();
       } else if (targetType === 'master' || targetType === 'temple') {
+        // Determina l'alt_text corretto per i maestri
+        let altText = file.name.split('.')[0].replace(/[_-]/g, ' ');
+        if (targetType === 'master') {
+          // Usa il nome del maestro basato sul selectedImageType
+          switch (selectedImageType) {
+            case 'taehye':
+              altText = 'Taehye sunim';
+              break;
+            case 'taeri':
+              altText = 'Taeri sunim';
+              break;
+            case 'kusalananda':
+              altText = 'Ven. Kusalananda';
+              break;
+            default:
+              altText = 'Maestro buddhista';
+          }
+        }
+        
         // Salva in temple_images
         const imageData = {
           filename: fileName,
           storage_url: publicUrl,
           original_url: publicUrl,
-          alt_text: file.name.split('.')[0].replace(/[_-]/g, ' '),
+          alt_text: altText,
           category: targetType === 'master' ? 'maestri' : 'tempio',
           page_section: targetType === 'master' ? 'chi-siamo' : 'galleria'
         };
@@ -265,7 +296,12 @@ const ImageManager = () => {
 
         console.log('✅ Record inserito nel database:', insertData);
         console.log('🔄 Refresh immagini tempio...');
+        
+        // Forza il refresh dell'interfaccia
         await fetchTempleImages();
+        
+        // Forza il re-render del componente
+        setTempleImages(prev => [...prev]);
       }
 
       setSuccess('Immagine caricata con successo!');
@@ -453,6 +489,7 @@ const ImageManager = () => {
     try {
       setAssigning(true);
       setError(null);
+      setSuccess(null);
 
       console.log('🔍 Verifico se l\'immagine esiste nel database...');
       
@@ -473,8 +510,32 @@ const ImageManager = () => {
       }
 
       console.log('✅ Immagine trovata:', existingImage);
-      console.log('🗑️ Procedo con l\'eliminazione...');
 
+      // Se l'immagine è nello storage (non un URL esterno), prova a rimuoverla
+      if (existingImage.storage_url && existingImage.storage_url.includes('supabase.co/storage')) {
+        console.log('🗑️ Rimozione del file dallo storage...');
+        
+        // Estrai il path dal URL
+        const urlParts = existingImage.storage_url.split('/');
+        const pathIndex = urlParts.findIndex(part => part === 'temple-images');
+        if (pathIndex !== -1 && pathIndex < urlParts.length - 1) {
+          const filePath = urlParts.slice(pathIndex + 1).join('/');
+          console.log('📁 Path file da rimuovere:', filePath);
+          
+          const { error: storageError } = await supabase.storage
+            .from('temple-images')
+            .remove([filePath]);
+          
+          if (storageError) {
+            console.warn('⚠️  Errore rimozione storage (continuo con database):', storageError);
+          } else {
+            console.log('✅ File rimosso dallo storage');
+          }
+        }
+      }
+
+      console.log('🗑️ Rimozione dal database...');
+      
       const { error: deleteError } = await supabase
         .from('temple_images')
         .delete()
@@ -488,7 +549,9 @@ const ImageManager = () => {
       console.log('✅ Immagine eliminata dal database');
       console.log('🔄 Refresh lista immagini...');
       
+      // Forza il refresh dell'interfaccia
       await fetchTempleImages();
+      
       setSuccess('Immagine rimossa con successo');
       setTimeout(() => setSuccess(null), 3000);
       
@@ -788,10 +851,10 @@ const ImageManager = () => {
                     <h3 className="font-medium text-gray-900">Taehye sunim</h3>
                     <p className="text-xs text-gray-600">大慧스님 / Mahapañña</p>
                   </div>
-                  {masterImages.find(img => img.alt_text?.toLowerCase().includes('taehye')) ? (
+                  {masterImages.find(img => img.alt_text?.toLowerCase().includes('taehye') || img.alt_text?.toLowerCase().includes('taehey')) ? (
                     <div className="space-y-2">
                       <img
-                        src={masterImages.find(img => img.alt_text?.toLowerCase().includes('taehye'))?.storage_url}
+                        src={masterImages.find(img => img.alt_text?.toLowerCase().includes('taehye') || img.alt_text?.toLowerCase().includes('taehey'))?.storage_url}
                         alt="Taehye sunim"
                         className="w-full h-32 object-cover rounded"
                       />
@@ -811,7 +874,7 @@ const ImageManager = () => {
                         <Button
                           size="sm"
                           variant="destructive"
-                          onClick={() => removeTempleImage(masterImages.find(img => img.alt_text?.toLowerCase().includes('taehye'))?.id || '')}
+                          onClick={() => removeTempleImage(masterImages.find(img => img.alt_text?.toLowerCase().includes('taehye') || img.alt_text?.toLowerCase().includes('taehey'))?.id || '')}
                           className="text-xs"
                         >
                           <X className="h-3 w-3" />
@@ -823,19 +886,34 @@ const ImageManager = () => {
                       <div className="w-full h-32 bg-gray-100 rounded flex items-center justify-center mb-2">
                         <span className="text-gray-400">Nessuna immagine</span>
                       </div>
-                      <Button
-                        size="sm"
-                        onClick={() => {
-                          setSelectedPost(null);
-                          setSelectedImageType('taehye');
-                          setSearchTerm('zen monk meditation master');
-                          setSearchResults([]);
-                        }}
-                        className="bg-saffron-600 hover:bg-saffron-700 text-xs"
-                      >
-                        <Search className="h-3 w-3 mr-1" />
-                        Aggiungi
-                      </Button>
+                      <div className="flex gap-1">
+                        <Button
+                          size="sm"
+                          onClick={() => {
+                            setSelectedPost(null);
+                            setSelectedImageType('taehye');
+                            setSearchTerm('zen monk meditation master');
+                            setSearchResults([]);
+                          }}
+                          className="flex-1 bg-saffron-600 hover:bg-saffron-700 text-xs"
+                        >
+                          <Search className="h-3 w-3 mr-1" />
+                          Aggiungi
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => {
+                            setSelectedPost(null);
+                            setSelectedImageType('taehye');
+                            fileInputRef.current?.click();
+                          }}
+                          disabled={uploadingFile}
+                          className="bg-blue-600 hover:bg-blue-700 text-white text-xs"
+                        >
+                          <Upload className="h-3 w-3" />
+                        </Button>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -846,10 +924,10 @@ const ImageManager = () => {
                     <h3 className="font-medium text-gray-900">Taeri sunim</h3>
                     <p className="text-xs text-gray-600">太利스님 / Kumara</p>
                   </div>
-                  {masterImages.find(img => img.alt_text?.toLowerCase().includes('taeri')) ? (
+                  {masterImages.find(img => img.alt_text?.toLowerCase().includes('taeri') || img.alt_text?.toLowerCase().includes('taeri sunim')) ? (
                     <div className="space-y-2">
                       <img
-                        src={masterImages.find(img => img.alt_text?.toLowerCase().includes('taeri'))?.storage_url}
+                        src={masterImages.find(img => img.alt_text?.toLowerCase().includes('taeri') || img.alt_text?.toLowerCase().includes('taeri sunim'))?.storage_url}
                         alt="Taeri sunim"
                         className="w-full h-32 object-cover rounded"
                       />
@@ -869,7 +947,7 @@ const ImageManager = () => {
                         <Button
                           size="sm"
                           variant="destructive"
-                          onClick={() => removeTempleImage(masterImages.find(img => img.alt_text?.toLowerCase().includes('taeri'))?.id || '')}
+                          onClick={() => removeTempleImage(masterImages.find(img => img.alt_text?.toLowerCase().includes('taeri') || img.alt_text?.toLowerCase().includes('taeri sunim'))?.id || '')}
                           className="text-xs"
                         >
                           <X className="h-3 w-3" />
@@ -881,19 +959,34 @@ const ImageManager = () => {
                       <div className="w-full h-32 bg-gray-100 rounded flex items-center justify-center mb-2">
                         <span className="text-gray-400">Nessuna immagine</span>
                       </div>
-                      <Button
-                        size="sm"
-                        onClick={() => {
-                          setSelectedPost(null);
-                          setSelectedImageType('taeri');
-                          setSearchTerm('zen monk meditation master');
-                          setSearchResults([]);
-                        }}
-                        className="bg-saffron-600 hover:bg-saffron-700 text-xs"
-                      >
-                        <Search className="h-3 w-3 mr-1" />
-                        Aggiungi
-                      </Button>
+                      <div className="flex gap-1">
+                        <Button
+                          size="sm"
+                          onClick={() => {
+                            setSelectedPost(null);
+                            setSelectedImageType('taeri');
+                            setSearchTerm('zen monk meditation master');
+                            setSearchResults([]);
+                          }}
+                          className="flex-1 bg-saffron-600 hover:bg-saffron-700 text-xs"
+                        >
+                          <Search className="h-3 w-3 mr-1" />
+                          Aggiungi
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => {
+                            setSelectedPost(null);
+                            setSelectedImageType('taeri');
+                            fileInputRef.current?.click();
+                          }}
+                          disabled={uploadingFile}
+                          className="bg-blue-600 hover:bg-blue-700 text-white text-xs"
+                        >
+                          <Upload className="h-3 w-3" />
+                        </Button>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -904,10 +997,10 @@ const ImageManager = () => {
                     <h3 className="font-medium text-gray-900">Ven. Kusalananda</h3>
                     <p className="text-xs text-gray-600">Monaco e Musicista</p>
                   </div>
-                  {masterImages.find(img => img.alt_text?.toLowerCase().includes('kusalananda')) ? (
+                  {masterImages.find(img => img.alt_text?.toLowerCase().includes('kusalananda') || img.alt_text?.toLowerCase().includes('ven. kusalananda')) ? (
                     <div className="space-y-2">
                       <img
-                        src={masterImages.find(img => img.alt_text?.toLowerCase().includes('kusalananda'))?.storage_url}
+                        src={masterImages.find(img => img.alt_text?.toLowerCase().includes('kusalananda') || img.alt_text?.toLowerCase().includes('ven. kusalananda'))?.storage_url}
                         alt="Ven. Kusalananda"
                         className="w-full h-32 object-cover rounded"
                       />
@@ -927,7 +1020,7 @@ const ImageManager = () => {
                         <Button
                           size="sm"
                           variant="destructive"
-                          onClick={() => removeTempleImage(masterImages.find(img => img.alt_text?.toLowerCase().includes('kusalananda'))?.id || '')}
+                          onClick={() => removeTempleImage(masterImages.find(img => img.alt_text?.toLowerCase().includes('kusalananda') || img.alt_text?.toLowerCase().includes('ven. kusalananda'))?.id || '')}
                           className="text-xs"
                         >
                           <X className="h-3 w-3" />
@@ -939,19 +1032,34 @@ const ImageManager = () => {
                       <div className="w-full h-32 bg-gray-100 rounded flex items-center justify-center mb-2">
                         <span className="text-gray-400">Nessuna immagine</span>
                       </div>
-                      <Button
-                        size="sm"
-                        onClick={() => {
-                          setSelectedPost(null);
-                          setSelectedImageType('kusalananda');
-                          setSearchTerm('zen monk meditation master');
-                          setSearchResults([]);
-                        }}
-                        className="bg-saffron-600 hover:bg-saffron-700 text-xs"
-                      >
-                        <Search className="h-3 w-3 mr-1" />
-                        Aggiungi
-                      </Button>
+                      <div className="flex gap-1">
+                        <Button
+                          size="sm"
+                          onClick={() => {
+                            setSelectedPost(null);
+                            setSelectedImageType('kusalananda');
+                            setSearchTerm('zen monk meditation master');
+                            setSearchResults([]);
+                          }}
+                          className="flex-1 bg-saffron-600 hover:bg-saffron-700 text-xs"
+                        >
+                          <Search className="h-3 w-3 mr-1" />
+                          Aggiungi
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => {
+                            setSelectedPost(null);
+                            setSelectedImageType('kusalananda');
+                            fileInputRef.current?.click();
+                          }}
+                          disabled={uploadingFile}
+                          className="bg-blue-600 hover:bg-blue-700 text-white text-xs"
+                        >
+                          <Upload className="h-3 w-3" />
+                        </Button>
+                      </div>
                     </div>
                   )}
                 </div>
