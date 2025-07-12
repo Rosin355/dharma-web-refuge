@@ -176,6 +176,14 @@ const ImageManager = () => {
       setUploadingFile(true);
       setError(null);
 
+      console.log('📤 Inizio upload file:', {
+        name: file.name,
+        size: file.size,
+        type: file.type,
+        targetType,
+        targetId
+      });
+
       // Validazione del file
       if (!file.type.startsWith('image/')) {
         throw new Error('Il file deve essere un\'immagine');
@@ -190,20 +198,31 @@ const ImageManager = () => {
       const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
       const filePath = `${targetType}/${fileName}`;
 
+      console.log('📁 Path di upload:', filePath);
+
       // Upload a Supabase Storage
-      const { error: uploadError } = await supabase.storage
+      console.log('⬆️  Tentativo upload su bucket "temple-images"...');
+      const { data: uploadData, error: uploadError } = await supabase.storage
         .from('temple-images')
         .upload(filePath, file);
 
-      if (uploadError) throw uploadError;
+      if (uploadError) {
+        console.error('❌ Errore upload storage:', uploadError);
+        throw new Error(`Errore Storage: ${uploadError.message}`);
+      }
+
+      console.log('✅ Upload storage completato:', uploadData);
 
       // Ottieni URL pubblico
       const { data: { publicUrl } } = supabase.storage
         .from('temple-images')
         .getPublicUrl(filePath);
 
+      console.log('🔗 URL pubblico generato:', publicUrl);
+
       // Salva in base al tipo
       if (targetType === 'post' && targetId) {
+        console.log('💾 Aggiornamento post nel database...');
         // Aggiorna post con immagine
         const { error: updateError } = await supabase
           .from('posts')
@@ -214,22 +233,38 @@ const ImageManager = () => {
           })
           .eq('id', targetId);
 
-        if (updateError) throw updateError;
+        if (updateError) {
+          console.error('❌ Errore aggiornamento post:', updateError);
+          throw updateError;
+        }
+        
+        console.log('✅ Post aggiornato, refresh lista...');
         await fetchPosts();
       } else if (targetType === 'master' || targetType === 'temple') {
         // Salva in temple_images
-        const { error: insertError } = await supabase
-          .from('temple_images')
-          .insert({
-            filename: fileName,
-            storage_url: publicUrl,
-            original_url: publicUrl,
-            alt_text: file.name.split('.')[0].replace(/[_-]/g, ' '),
-            category: targetType === 'master' ? 'maestri' : 'tempio',
-            page_section: targetType === 'master' ? 'chi-siamo' : 'galleria'
-          });
+        const imageData = {
+          filename: fileName,
+          storage_url: publicUrl,
+          original_url: publicUrl,
+          alt_text: file.name.split('.')[0].replace(/[_-]/g, ' '),
+          category: targetType === 'master' ? 'maestri' : 'tempio',
+          page_section: targetType === 'master' ? 'chi-siamo' : 'galleria'
+        };
 
-        if (insertError) throw insertError;
+        console.log('💾 Inserimento in temple_images:', imageData);
+
+        const { data: insertData, error: insertError } = await supabase
+          .from('temple_images')
+          .insert(imageData)
+          .select();
+
+        if (insertError) {
+          console.error('❌ Errore inserimento database:', insertError);
+          throw new Error(`Errore Database: ${insertError.message}`);
+        }
+
+        console.log('✅ Record inserito nel database:', insertData);
+        console.log('🔄 Refresh immagini tempio...');
         await fetchTempleImages();
       }
 
@@ -239,6 +274,8 @@ const ImageManager = () => {
       // Reset form
       setSelectedPost(null);
       setSelectedImageType('');
+      
+      console.log('🎉 Upload completato con successo!');
       
     } catch (err) {
       console.error('❌ Errore upload file:', err);
@@ -399,20 +436,63 @@ const ImageManager = () => {
   };
 
   const removeTempleImage = async (imageId: string) => {
+    console.log('🗑️ Tentativo rimozione immagine, ID ricevuto:', imageId);
+    
+    if (!imageId || imageId.trim() === '') {
+      console.error('❌ ID immagine vuoto o non valido');
+      setError('ID immagine non valido');
+      return;
+    }
+
+    // Conferma dall'utente
+    if (!window.confirm('Sei sicuro di voler eliminare questa immagine?')) {
+      console.log('⏭️  Rimozione annullata dall\'utente');
+      return;
+    }
+
     try {
       setAssigning(true);
       setError(null);
+
+      console.log('🔍 Verifico se l\'immagine esiste nel database...');
+      
+      // Prima verifica se l'immagine esiste
+      const { data: existingImage, error: fetchError } = await supabase
+        .from('temple_images')
+        .select('*')
+        .eq('id', imageId)
+        .single();
+
+      if (fetchError) {
+        console.error('❌ Errore durante la verifica:', fetchError);
+        throw new Error(`Immagine non trovata: ${fetchError.message}`);
+      }
+
+      if (!existingImage) {
+        throw new Error('Immagine non trovata nel database');
+      }
+
+      console.log('✅ Immagine trovata:', existingImage);
+      console.log('🗑️ Procedo con l\'eliminazione...');
 
       const { error: deleteError } = await supabase
         .from('temple_images')
         .delete()
         .eq('id', imageId);
 
-      if (deleteError) throw deleteError;
+      if (deleteError) {
+        console.error('❌ Errore SQL durante eliminazione:', deleteError);
+        throw new Error(`Errore eliminazione: ${deleteError.message}`);
+      }
 
+      console.log('✅ Immagine eliminata dal database');
+      console.log('🔄 Refresh lista immagini...');
+      
       await fetchTempleImages();
       setSuccess('Immagine rimossa con successo');
       setTimeout(() => setSuccess(null), 3000);
+      
+      console.log('🎉 Rimozione completata con successo!');
     } catch (err) {
       console.error('❌ Errore rimozione immagine tempio:', err);
       setError(err instanceof Error ? err.message : 'Errore rimozione immagine');
