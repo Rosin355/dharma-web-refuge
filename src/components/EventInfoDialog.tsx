@@ -5,7 +5,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, Clock, MapPin, Users, ExternalLink } from 'lucide-react';
+import { Calendar, Clock, MapPin, Users, ExternalLink, Video, UserCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type { Database } from '@/integrations/supabase/types';
 
@@ -132,18 +132,59 @@ export const EventInfoDialog = ({ event, open, onOpenChange }: EventInfoDialogPr
               </div>
             )}
 
-            {event.meeting_url && (
-              <div className="pt-2">
-                <Button
-                  variant="outline"
-                  className="w-full"
-                  onClick={() => window.open(event.meeting_url!, '_blank')}
-                >
-                  <ExternalLink className="h-4 w-4 mr-2" />
-                  Link Meeting Online
-                </Button>
-              </div>
-            )}
+            {/* Modalità di partecipazione */}
+            <div className="border-t pt-4 space-y-3">
+              <h4 className="font-semibold text-lg">Modalità di Partecipazione</h4>
+              
+              {event.attendance_type === 'online' && event.meeting_url && (
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+                    <Video className="h-5 w-5 text-saffron-500" />
+                    <span className="font-medium">Evento Online</span>
+                  </div>
+                  <Button
+                    variant="outline"
+                    className="w-full border-saffron-200 hover:bg-saffron-50"
+                    onClick={() => window.open(event.meeting_url!, '_blank')}
+                  >
+                    <ExternalLink className="h-4 w-4 mr-2" />
+                    Accedi al Meeting Online
+                  </Button>
+                </div>
+              )}
+
+              {event.attendance_type === 'in_person' && event.location && (
+                <div className="flex items-center space-x-2 text-sm">
+                  <UserCheck className="h-5 w-5 text-saffron-500" />
+                  <span className="font-medium">Solo in Presenza</span>
+                </div>
+              )}
+
+              {event.attendance_type === 'hybrid' && (
+                <div className="space-y-3">
+                  <div className="flex items-center space-x-2 text-sm">
+                    <UserCheck className="h-5 w-5 text-saffron-500" />
+                    <span className="font-medium">Evento Ibrido - Partecipazione in presenza e online</span>
+                  </div>
+                  {event.location && (
+                    <div className="p-3 bg-saffron-50 rounded-lg">
+                      <p className="text-sm font-medium mb-1">In Presenza:</p>
+                      <p className="text-sm text-muted-foreground">{event.location}</p>
+                    </div>
+                  )}
+                  {event.meeting_url && (
+                    <Button
+                      variant="outline"
+                      className="w-full border-saffron-200 hover:bg-saffron-50"
+                      onClick={() => window.open(event.meeting_url!, '_blank')}
+                    >
+                      <Video className="h-4 w-4 mr-2" />
+                      Oppure Partecipa Online
+                    </Button>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </DialogContent>

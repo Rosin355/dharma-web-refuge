@@ -60,6 +60,7 @@ export type Database = {
       }
       events: {
         Row: {
+          attendance_type: string | null
           created_at: string | null
           description: string | null
           end_date: string | null
@@ -77,6 +78,7 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          attendance_type?: string | null
           created_at?: string | null
           description?: string | null
           end_date?: string | null
@@ -94,6 +96,7 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          attendance_type?: string | null
           created_at?: string | null
           description?: string | null
           end_date?: string | null

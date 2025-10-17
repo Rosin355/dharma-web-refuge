@@ -87,6 +87,7 @@ const EventsManager = () => {
     image_url: '',
     status: 'draft' as 'draft' | 'published',
     featured: false,
+    attendance_type: 'in_person' as 'in_person' | 'online' | 'hybrid',
   });
 
   // Image search
@@ -110,6 +111,7 @@ const EventsManager = () => {
       image_url: '',
       status: 'draft',
       featured: false,
+      attendance_type: 'in_person',
     });
     setShowImageSearch(false);
     setImageResults([]);
@@ -139,6 +141,7 @@ const EventsManager = () => {
         image_url: formData.image_url || null,
         status: formData.status,
         featured: formData.featured,
+        attendance_type: formData.attendance_type,
       });
 
       toast({
@@ -176,6 +179,7 @@ const EventsManager = () => {
           image_url: formData.image_url || null,
           status: formData.status,
           featured: formData.featured,
+          attendance_type: formData.attendance_type,
         },
       });
 
@@ -281,6 +285,7 @@ const EventsManager = () => {
       image_url: event.image_url || '',
       status: (event.status as 'draft' | 'published') || 'draft',
       featured: event.featured || false,
+      attendance_type: (event.attendance_type as 'in_person' | 'online' | 'hybrid') || 'in_person',
     });
     setShowEditModal(true);
   };
@@ -464,16 +469,37 @@ const EventsManager = () => {
       </div>
 
       <div>
-        <Label htmlFor="meeting_url">Link Meeting (opzionale)</Label>
-        <Input
-          id="meeting_url"
-          value={formData.meeting_url}
-          onChange={(e) =>
-            setFormData({ ...formData, meeting_url: e.target.value })
+        <Label htmlFor="attendance_type">Modalità di Partecipazione *</Label>
+        <Select
+          value={formData.attendance_type}
+          onValueChange={(value: 'in_person' | 'online' | 'hybrid') =>
+            setFormData({ ...formData, attendance_type: value })
           }
-          placeholder="https://meet.example.com"
-        />
+        >
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="in_person">Solo in Presenza</SelectItem>
+            <SelectItem value="online">Solo Online</SelectItem>
+            <SelectItem value="hybrid">Ibrido (Presenza + Online)</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
+
+      {(formData.attendance_type === 'online' || formData.attendance_type === 'hybrid') && (
+        <div>
+          <Label htmlFor="meeting_url">Link Meeting Online *</Label>
+          <Input
+            id="meeting_url"
+            value={formData.meeting_url}
+            onChange={(e) =>
+              setFormData({ ...formData, meeting_url: e.target.value })
+            }
+            placeholder="https://meet.example.com"
+          />
+        </div>
+      )}
 
       <div>
         <Label>Immagine</Label>
