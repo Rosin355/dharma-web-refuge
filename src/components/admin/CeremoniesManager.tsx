@@ -318,7 +318,7 @@ const CeremoniesManager = () => {
         <Input
           id="title"
           value={formData.title}
-          onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+          onChange={(e) => setFormData((prev) => ({ ...prev, title: e.target.value }))}
           placeholder="Nome cerimonia"
         />
       </div>
@@ -329,7 +329,7 @@ const CeremoniesManager = () => {
           id="description"
           value={formData.description}
           onChange={(e) =>
-            setFormData({ ...formData, description: e.target.value })
+            setFormData((prev) => ({ ...prev, description: e.target.value }))
           }
           placeholder="Descrizione dettagliata della cerimonia"
           rows={4}
@@ -343,7 +343,7 @@ const CeremoniesManager = () => {
             id="schedule"
             value={formData.schedule}
             onChange={(e) =>
-              setFormData({ ...formData, schedule: e.target.value })
+              setFormData((prev) => ({ ...prev, schedule: e.target.value }))
             }
             placeholder="Es. Ogni domenica, Luna piena"
           />
@@ -355,7 +355,7 @@ const CeremoniesManager = () => {
             id="time"
             value={formData.time}
             onChange={(e) =>
-              setFormData({ ...formData, time: e.target.value })
+              setFormData((prev) => ({ ...prev, time: e.target.value }))
             }
             placeholder="Es. 15:00 - 17:00"
           />
@@ -369,7 +369,7 @@ const CeremoniesManager = () => {
             id="location"
             value={formData.location}
             onChange={(e) =>
-              setFormData({ ...formData, location: e.target.value })
+              setFormData((prev) => ({ ...prev, location: e.target.value }))
             }
             placeholder="Es. Sala del tè"
           />
@@ -379,7 +379,7 @@ const CeremoniesManager = () => {
           <Input
             id="type"
             value={formData.type}
-            onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+            onChange={(e) => setFormData((prev) => ({ ...prev, type: e.target.value }))}
             placeholder="Es. Meditazione, Rituale"
           />
         </div>
@@ -391,7 +391,7 @@ const CeremoniesManager = () => {
           <Input
             id="price"
             value={formData.price}
-            onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+            onChange={(e) => setFormData((prev) => ({ ...prev, price: e.target.value }))}
             placeholder="Es. Offerta libera"
           />
         </div>
@@ -402,7 +402,7 @@ const CeremoniesManager = () => {
             type="number"
             value={formData.max_participants}
             onChange={(e) =>
-              setFormData({ ...formData, max_participants: e.target.value })
+              setFormData((prev) => ({ ...prev, max_participants: e.target.value }))
             }
             placeholder="20"
           />
@@ -414,7 +414,7 @@ const CeremoniesManager = () => {
         <Select
           value={formData.attendance_type}
           onValueChange={(value: 'in_person' | 'online' | 'hybrid') =>
-            setFormData({ ...formData, attendance_type: value })
+            setFormData((prev) => ({ ...prev, attendance_type: value }))
           }
         >
           <SelectTrigger>
@@ -435,7 +435,7 @@ const CeremoniesManager = () => {
             id="meeting_url"
             value={formData.meeting_url}
             onChange={(e) =>
-              setFormData({ ...formData, meeting_url: e.target.value })
+              setFormData((prev) => ({ ...prev, meeting_url: e.target.value }))
             }
             placeholder="https://meet.example.com"
           />
@@ -448,7 +448,7 @@ const CeremoniesManager = () => {
           <Input
             value={formData.image_url}
             onChange={(e) =>
-              setFormData({ ...formData, image_url: e.target.value })
+              setFormData((prev) => ({ ...prev, image_url: e.target.value }))
             }
             placeholder="URL immagine"
           />
