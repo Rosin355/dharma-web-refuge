@@ -5,13 +5,14 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Settings, Lock, LogOut, Database, Users, FileText, Image, BarChart3, Calendar } from 'lucide-react';
+import { Settings, Lock, LogOut, Database, Users, FileText, Image, BarChart3, Calendar, Sparkles } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { testSupabaseConnection } from '@/lib/supabase-utils';
 import PostsManager from '@/components/admin/PostsManager';
 import ImageManager from '@/components/admin/ImageManager';
 import ContentManager from '@/components/admin/ContentManager';
 import EventsManager from '@/components/admin/EventsManager';
+import CeremoniesManager from '@/components/admin/CeremoniesManager';
 
 const Admin = () => {
   const { user, loading, error, signIn, signOut, clearError } = useAuth();
@@ -84,7 +85,7 @@ const Admin = () => {
 
           {/* Admin Tabs */}
           <Tabs defaultValue="dashboard" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-6 lg:w-auto lg:grid-cols-none lg:flex">
+            <TabsList className="grid w-full grid-cols-7 lg:w-auto lg:grid-cols-none lg:flex">
               <TabsTrigger value="dashboard" className="flex items-center gap-2">
                 <BarChart3 className="h-4 w-4" />
                 Dashboard
@@ -96,6 +97,10 @@ const Admin = () => {
               <TabsTrigger value="events" className="flex items-center gap-2">
                 <Calendar className="h-4 w-4" />
                 Eventi
+              </TabsTrigger>
+              <TabsTrigger value="ceremonies" className="flex items-center gap-2">
+                <Sparkles className="h-4 w-4" />
+                Cerimonie
               </TabsTrigger>
               <TabsTrigger value="content" className="flex items-center gap-2">
                 <Settings className="h-4 w-4" />
@@ -239,6 +244,11 @@ const Admin = () => {
             {/* Events Management Tab */}
             <TabsContent value="events">
               <EventsManager />
+            </TabsContent>
+
+            {/* Ceremonies Management Tab */}
+            <TabsContent value="ceremonies">
+              <CeremoniesManager />
             </TabsContent>
 
             {/* Content Management Tab */}

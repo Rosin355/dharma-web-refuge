@@ -14,6 +14,107 @@ export type Database = {
   }
   public: {
     Tables: {
+      ceremonies: {
+        Row: {
+          attendance_type: string | null
+          created_at: string | null
+          description: string | null
+          featured: boolean | null
+          id: string
+          image_url: string | null
+          location: string | null
+          max_participants: number | null
+          meeting_url: string | null
+          price: string | null
+          schedule: string | null
+          status: string | null
+          time: string | null
+          title: string
+          type: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          attendance_type?: string | null
+          created_at?: string | null
+          description?: string | null
+          featured?: boolean | null
+          id?: string
+          image_url?: string | null
+          location?: string | null
+          max_participants?: number | null
+          meeting_url?: string | null
+          price?: string | null
+          schedule?: string | null
+          status?: string | null
+          time?: string | null
+          title: string
+          type?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          attendance_type?: string | null
+          created_at?: string | null
+          description?: string | null
+          featured?: boolean | null
+          id?: string
+          image_url?: string | null
+          location?: string | null
+          max_participants?: number | null
+          meeting_url?: string | null
+          price?: string | null
+          schedule?: string | null
+          status?: string | null
+          time?: string | null
+          title?: string
+          type?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      ceremony_registrations: {
+        Row: {
+          ceremony_id: string
+          created_at: string | null
+          email: string
+          full_name: string
+          id: string
+          notes: string | null
+          phone: string | null
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          ceremony_id: string
+          created_at?: string | null
+          email: string
+          full_name: string
+          id?: string
+          notes?: string | null
+          phone?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          ceremony_id?: string
+          created_at?: string | null
+          email?: string
+          full_name?: string
+          id?: string
+          notes?: string | null
+          phone?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ceremony_registrations_ceremony_id_fkey"
+            columns: ["ceremony_id"]
+            isOneToOne: false
+            referencedRelation: "ceremonies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       event_registrations: {
         Row: {
           created_at: string | null
