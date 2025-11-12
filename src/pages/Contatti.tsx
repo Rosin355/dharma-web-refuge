@@ -38,12 +38,14 @@ const Contatti = () => {
       <section className="py-12 bg-background">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
-            <div 
-              className="text-lg leading-relaxed text-muted-foreground space-y-4"
-              dangerouslySetInnerHTML={{ 
-                __html: getContent('intro-text', 'Benvenuti nella pagina dei contatti del nostro tempio. Siamo qui per guidarti nel tuo percorso spirituale.') 
-              }}
-            />
+          <div className="text-lg leading-relaxed text-muted-foreground space-y-4">
+              <p>
+                Entra in contatto con la nostra comunità. Siamo qui per guidarti nel tuo percorso spirituale.
+              </p>
+              <p>
+                Per informazioni sulla comunità Bodhidharma, gruppi di pratica o suggerimenti per il sito, non esitare a contattarci.
+              </p>
+            </div>
           </div>
         </div>
       </section>
@@ -91,12 +93,27 @@ const Contatti = () => {
                 <h3 className="font-serif text-xl font-semibold mb-4 text-foreground">
                   Telefono
                 </h3>
-                <div 
-                  className="text-muted-foreground space-y-2"
-                  dangerouslySetInnerHTML={{ 
-                    __html: getContent('info-telefono-content', '<p><strong>Enku:</strong> +39 334 871 3515</p><p><strong>Orari:</strong> 14:00-20:00</p>') 
-                  }}
-                />
+                <div className="text-left space-y-3">
+                  <div>
+                    <p className="font-medium text-foreground">Tel. Tempio</p>
+                    <a href="tel:+390187988611" className="text-saffron-600 hover:text-saffron-700 transition-colors">
+                      0187 988611
+                    </a>
+                  </div>
+                  <div>
+                    <p className="font-medium text-foreground">Ven. Tae Hye Sunim (Mahapanna)</p>
+                    <a href="tel:+393397262753" className="text-saffron-600 hover:text-saffron-700 transition-colors">
+                      339 72 62 753
+                    </a>
+                  </div>
+                  <div>
+                    <p className="font-medium text-foreground">Monaco Kusalananda (Bhante)</p>
+                    <a href="tel:+393927498954" className="text-saffron-600 hover:text-saffron-700 transition-colors">
+                      392 7498954
+                    </a>
+                    <p className="text-xs text-muted-foreground mt-1">Disponibile anche via WhatsApp</p>
+                  </div>
+                </div>
               </CardContent>
             </Card>
 
@@ -109,12 +126,26 @@ const Contatti = () => {
                 <h3 className="font-serif text-xl font-semibold mb-4 text-foreground">
                   Email
                 </h3>
-                <div 
-                  className="text-muted-foreground space-y-2"
-                  dangerouslySetInnerHTML={{ 
-                    __html: getContent('info-email-content', '<a href="mailto:info@bodhidharma.info" class="hover:text-saffron-600">info@bodhidharma.info</a>') 
-                  }}
-                />
+                <div className="text-left space-y-3">
+                  <div>
+                    <p className="font-medium text-foreground">Email Principale</p>
+                    <a href="mailto:bodhidharmait@gmail.com" className="text-saffron-600 hover:text-saffron-700 transition-colors break-all text-sm">
+                      bodhidharmait@gmail.com
+                    </a>
+                  </div>
+                  <div>
+                    <p className="font-medium text-foreground">Ven. Tae Hye Sunim</p>
+                    <a href="mailto:taehyesunim@gmail.com" className="text-saffron-600 hover:text-saffron-700 transition-colors break-all text-sm">
+                      taehyesunim@gmail.com
+                    </a>
+                  </div>
+                  <div>
+                    <p className="font-medium text-foreground">Monaco Kusalananda</p>
+                    <a href="mailto:alberto.alcozer@gmail.com" className="text-saffron-600 hover:text-saffron-700 transition-colors break-all text-sm">
+                      alberto.alcozer@gmail.com
+                    </a>
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </div>
@@ -129,19 +160,63 @@ const Contatti = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div 
-                  className="space-y-4 text-muted-foreground"
-                  dangerouslySetInnerHTML={{ 
-                    __html: getContent('orari-content', `
-                      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div><strong>Giovedì:</strong> 19:00-21:00 - Zazen e cerimonia</div>
-                        <div><strong>Domenica:</strong> 9:30-12:00 - Zazen e cerimonia</div>
-                        <div><strong>Altri giorni:</strong> Su appuntamento</div>
-                        <div><strong>Ritiri:</strong> Consultare calendario eventi</div>
-                      </div>
-                    `) 
-                  }}
-                />
+                <div className="space-y-6">
+                  <div className="p-4 bg-zen-cream rounded-lg">
+                    <h4 className="font-serif font-semibold text-lg mb-2 flex items-center gap-2">
+                      📅 Giovedì
+                    </h4>
+                    <p className="text-muted-foreground font-medium">17:00 - 18:30</p>
+                    <p className="text-sm mt-1 text-muted-foreground">Zazen e cerimonia</p>
+                  </div>
+
+                  <div className="p-4 bg-zen-cream rounded-lg">
+                    <h4 className="font-serif font-semibold text-lg mb-2 flex items-center gap-2">
+                      📅 Domenica
+                    </h4>
+                    <p className="text-muted-foreground font-medium">16:00 - 17:30</p>
+                    <p className="text-sm mt-1 text-muted-foreground">Zazen e cerimonia</p>
+                    <p className="text-xs text-muted-foreground mt-2 italic">
+                      Durante i week-end di ritiro: 15:00 - 16:30
+                    </p>
+                  </div>
+
+                  <div className="p-4 bg-zen-cream rounded-lg">
+                    <h4 className="font-serif font-semibold text-lg mb-2 flex items-center gap-2">
+                      📅 Altri giorni
+                    </h4>
+                    <div className="space-y-2 text-sm">
+                      <p className="text-muted-foreground">
+                        <span className="font-medium">Mattino:</span> ore 7:00
+                      </p>
+                      <p className="text-muted-foreground">
+                        <span className="font-medium">Sera:</span> ore 18:30
+                      </p>
+                      <p className="text-xs text-amber-700 font-medium mt-3 p-2 bg-amber-50 rounded">
+                        ⚠️ Chiamare o messaggiare prima per confermare
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="p-4 bg-saffron-50 border border-saffron-200 rounded-lg">
+                    <h5 className="font-medium mb-3 text-saffron-900">Contatti per confermare:</h5>
+                    <div className="space-y-2 text-sm text-muted-foreground">
+                      <p>📞 339 7262753 (Ven. Tae Hye Sunim)</p>
+                      <p>📞 392 7498954 (Monaco Kusalananda, anche WhatsApp)</p>
+                    </div>
+                  </div>
+
+                  <div className="p-4 bg-zen-sage/20 border border-zen-sage rounded-lg">
+                    <p className="text-sm font-medium text-zen-stone mb-2">
+                      Durante le sessioni sono disponibili:
+                    </p>
+                    <ul className="text-sm space-y-1 text-muted-foreground">
+                      <li>• Insegnamenti personalizzati</li>
+                      <li>• Supporto per principianti</li>
+                      <li>• Letture e discussioni</li>
+                      <li>• Domande e risposte</li>
+                    </ul>
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </div>
