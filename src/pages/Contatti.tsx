@@ -286,22 +286,13 @@ const Contatti = () => {
                 </p>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                <div className="flex justify-center">
                   <a 
                     href="mailto:bodhidharmait@gmail.com?subject=Richiesta%20informazioni%20-%20Tempio%20Bodhidharma&body=Gentili%20monaci%2C%0A%0AScrivo%20per%20richiedere%20informazioni%20riguardo...%0A%0ACordiali%20saluti"
                     className="inline-flex items-center justify-center bg-saffron-500 hover:bg-saffron-600 text-white px-8 py-4 rounded-lg font-medium text-lg transition-colors shadow-md hover:shadow-lg"
                   >
                     <Mail className="mr-2 h-5 w-5" />
                     Scrivi un'Email
-                  </a>
-                  <a 
-                    href="https://wa.me/393927498954?text=Ciao%2C%20vorrei%20informazioni%20sul%20Tempio%20Bodhidharma"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center bg-green-600 hover:bg-green-700 text-white px-8 py-4 rounded-lg font-medium text-lg transition-colors shadow-md hover:shadow-lg"
-                  >
-                    <MessageCircle className="mr-2 h-5 w-5" />
-                    WhatsApp (Bhante)
                   </a>
                 </div>
                 <div className="text-center text-sm text-muted-foreground border-t border-zen-sage/30 pt-4">
