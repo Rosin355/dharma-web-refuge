@@ -246,31 +246,36 @@ const Contatti = () => {
             </Card>
           </div>
 
-          {/* Form di Contatto */}
+          {/* Contattaci via Email */}
           <div className="max-w-2xl mx-auto">
             <Card className="border-zen-sage bg-background">
               <CardHeader>
                 <CardTitle className="font-serif text-2xl text-center text-saffron-600">
-                  Invia un Messaggio
+                  Scrivici un'Email
                 </CardTitle>
                 <p className="text-center text-muted-foreground text-sm mt-2">
-                  Compila il form e ti risponderemo al più presto
+                  Clicca il bottone per aprire il tuo client email con i dati già precompilati
                 </p>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <Input placeholder="Nome" className="border-zen-sage" />
-                  <Input placeholder="Cognome" className="border-zen-sage" />
+              <CardContent className="space-y-6">
+                <div className="text-center">
+                  <a 
+                    href="mailto:bodhidharmait@gmail.com?subject=Richiesta%20informazioni%20-%20Tempio%20Bodhidharma&body=Gentili%20monaci%2C%0A%0AScrivo%20per%20richiedere%20informazioni%20riguardo...%0A%0ACordiali%20saluti"
+                    className="inline-flex items-center justify-center bg-saffron-500 hover:bg-saffron-600 text-white px-8 py-4 rounded-lg font-medium text-lg transition-colors shadow-md hover:shadow-lg"
+                  >
+                    <Mail className="mr-2 h-5 w-5" />
+                    Scrivi un'Email
+                  </a>
                 </div>
-                <Input type="email" placeholder="Email" className="border-zen-sage" />
-                <Input placeholder="Oggetto" className="border-zen-sage" />
-                <Textarea 
-                  placeholder="Il tuo messaggio..." 
-                  className="min-h-[150px] border-zen-sage"
-                />
-                <Button className="w-full bg-saffron-500 hover:bg-saffron-600 text-white font-medium">
-                  Invia Messaggio
-                </Button>
+                <div className="text-center text-sm text-muted-foreground border-t border-zen-sage/30 pt-4">
+                  <p>Oppure copia l'indirizzo email principale:</p>
+                  <a 
+                    href="mailto:bodhidharmait@gmail.com" 
+                    className="text-saffron-600 hover:text-saffron-700 font-medium"
+                  >
+                    bodhidharmait@gmail.com
+                  </a>
+                </div>
               </CardContent>
             </Card>
           </div>
