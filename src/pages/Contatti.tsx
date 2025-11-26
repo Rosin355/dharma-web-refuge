@@ -1,9 +1,6 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { MapPin, Phone, Mail, Clock } from 'lucide-react';
+import { MapPin, Phone, Mail, Clock, MessageCircle } from 'lucide-react';
 import { usePageContent } from '@/hooks/usePageContent';
 
 const Contatti = () => {
@@ -246,7 +243,38 @@ const Contatti = () => {
             </Card>
           </div>
 
-          {/* Contattaci via Email */}
+          {/* Visitare il Tempio */}
+          <div className="max-w-4xl mx-auto mb-16">
+            <Card className="border-zen-sage bg-background">
+              <CardHeader>
+                <CardTitle className="font-serif text-2xl text-center text-saffron-600">
+                  Visitare il Tempio
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <p className="text-muted-foreground leading-relaxed">
+                  Abbiamo sempre piacere di ospitare nuovi praticanti. Il tempio è però di modeste dimensioni e le condizioni di vita sono altrettanto semplici. Per questi motivi raccomandiamo di comunicare l'arrivo con ragionevole anticipo (particolarmente in caso di permanenza prolungata).
+                </p>
+                <div className="p-4 bg-saffron-50 border border-saffron-200 rounded-lg">
+                  <h5 className="font-medium mb-3 text-saffron-900">Cosa portare:</h5>
+                  <ul className="text-sm text-muted-foreground space-y-2">
+                    <li>• Abiti comodi per sedere (pantaloni lunghi e calze sono richiesti per la sala di meditazione)</li>
+                    <li>• Abiti per lavoretti durante la meditazione del lavoro</li>
+                    <li>• Lenzuola o sacco a pelo</li>
+                    <li>• Accessori per l'igiene personale</li>
+                    <li>• Torcia elettrica (il tempio è in collina senza illuminazione notturna sulla strada d'accesso)</li>
+                  </ul>
+                </div>
+                <div className="p-4 bg-zen-sage/20 border border-zen-sage rounded-lg">
+                  <p className="text-sm font-medium text-zen-stone">
+                    💡 Consiglio: Se prevedete di spostarvi nelle prime ore della mattina o dopo il tramonto, la torcia elettrica è essenziale.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Contattaci via Email e WhatsApp */}
           <div className="max-w-2xl mx-auto">
             <Card className="border-zen-sage bg-background">
               <CardHeader>
@@ -258,13 +286,22 @@ const Contatti = () => {
                 </p>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div className="text-center">
+                <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
                   <a 
                     href="mailto:bodhidharmait@gmail.com?subject=Richiesta%20informazioni%20-%20Tempio%20Bodhidharma&body=Gentili%20monaci%2C%0A%0AScrivo%20per%20richiedere%20informazioni%20riguardo...%0A%0ACordiali%20saluti"
                     className="inline-flex items-center justify-center bg-saffron-500 hover:bg-saffron-600 text-white px-8 py-4 rounded-lg font-medium text-lg transition-colors shadow-md hover:shadow-lg"
                   >
                     <Mail className="mr-2 h-5 w-5" />
                     Scrivi un'Email
+                  </a>
+                  <a 
+                    href="https://wa.me/393927498954?text=Ciao%2C%20vorrei%20informazioni%20sul%20Tempio%20Bodhidharma"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center bg-green-600 hover:bg-green-700 text-white px-8 py-4 rounded-lg font-medium text-lg transition-colors shadow-md hover:shadow-lg"
+                  >
+                    <MessageCircle className="mr-2 h-5 w-5" />
+                    WhatsApp (Bhante)
                   </a>
                 </div>
                 <div className="text-center text-sm text-muted-foreground border-t border-zen-sage/30 pt-4">
