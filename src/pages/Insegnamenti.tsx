@@ -85,7 +85,7 @@ const Insegnamenti = () => {
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="font-serif text-3xl font-light mb-4">
-              {getContent('pilastri-title', 'I Quattro')} <span className="text-saffron-500">{getContent('pilastri-subtitle', 'Pilastri')}</span> della Pratica
+              {getContent('pilastri-title', 'I Quattro')} <span className="text-saffron-500">{getContent('pilastri-subtitle', 'Pilastri della Pratica')}</span>
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               Le fondamenta su cui costruire il proprio percorso spirituale
