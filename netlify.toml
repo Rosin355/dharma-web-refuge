@@ -1,3 +1,7 @@
+# Netlify Project ID: e766f064-9174-47e8-80d3-3a8c08542c9a
+# Verificare la sincronizzazione nella dashboard Netlify:
+# https://app.netlify.com/sites/[SITE_NAME]/deploys
+
 [build]
   command = "npm run build"
   publish = "dist"
