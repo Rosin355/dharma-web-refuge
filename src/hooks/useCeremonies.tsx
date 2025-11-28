@@ -2,20 +2,20 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import type { Database } from '@/integrations/supabase/types';
 
-type Event = Database['public']['Tables']['events']['Row'];
-type EventInsert = Database['public']['Tables']['events']['Insert'];
-type EventUpdate = Database['public']['Tables']['events']['Update'];
+type Ceremony = Database['public']['Tables']['ceremonies']['Row'];
+type CeremonyInsert = Database['public']['Tables']['ceremonies']['Insert'];
+type CeremonyUpdate = Database['public']['Tables']['ceremonies']['Update'];
 
-export const useEvents = (statusFilter?: string) => {
+export const useCeremonies = (statusFilter?: string) => {
   const queryClient = useQueryClient();
 
-  const { data: events = [], isLoading, error, refetch } = useQuery({
-    queryKey: ['events', statusFilter],
+  const { data: ceremonies = [], isLoading, error, refetch } = useQuery({
+    queryKey: ['ceremonies', statusFilter],
     queryFn: async () => {
       let query = supabase
-        .from('events')
+        .from('ceremonies')
         .select('*')
-        .order('start_date', { ascending: true });
+        .order('created_at', { ascending: false });
 
       if (statusFilter && statusFilter !== 'all') {
         query = query.eq('status', statusFilter);
@@ -23,29 +23,29 @@ export const useEvents = (statusFilter?: string) => {
 
       const { data, error } = await query;
       if (error) throw error;
-      return data as Event[];
+      return data as Ceremony[];
     },
   });
 
-  const createEvent = useMutation({
-    mutationFn: async (newEvent: EventInsert) => {
+  const createCeremony = useMutation({
+    mutationFn: async (newCeremony: CeremonyInsert) => {
       const { data, error } = await supabase
-        .from('events')
-        .insert(newEvent)
+        .from('ceremonies')
+        .insert(newCeremony)
         .select()
         .single();
       if (error) throw error;
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['events'] });
+      queryClient.invalidateQueries({ queryKey: ['ceremonies'] });
     },
   });
 
-  const updateEvent = useMutation({
-    mutationFn: async ({ id, updates }: { id: string; updates: EventUpdate }) => {
+  const updateCeremony = useMutation({
+    mutationFn: async ({ id, updates }: { id: string; updates: CeremonyUpdate }) => {
       const { data, error } = await supabase
-        .from('events')
+        .from('ceremonies')
         .update(updates)
         .eq('id', id)
         .select()
@@ -54,63 +54,63 @@ export const useEvents = (statusFilter?: string) => {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['events'] });
+      queryClient.invalidateQueries({ queryKey: ['ceremonies'] });
     },
   });
 
-  const deleteEvent = useMutation({
+  const deleteCeremony = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from('events').delete().eq('id', id);
+      const { error } = await supabase.from('ceremonies').delete().eq('id', id);
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['events'] });
+      queryClient.invalidateQueries({ queryKey: ['ceremonies'] });
     },
   });
 
   return {
-    events,
+    ceremonies,
     isLoading,
     error,
     refetch,
-    createEvent,
-    updateEvent,
-    deleteEvent,
+    createCeremony,
+    updateCeremony,
+    deleteCeremony,
   };
 };
 
-export const useEventRegistrations = (eventId?: string) => {
+export const useCeremonyRegistrations = (ceremonyId?: string) => {
   const queryClient = useQueryClient();
 
   const { data: registrations = [], isLoading } = useQuery({
-    queryKey: ['event-registrations', eventId],
+    queryKey: ['ceremony-registrations', ceremonyId],
     queryFn: async () => {
       let query = supabase
-        .from('event_registrations')
+        .from('ceremony_registrations')
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (eventId) {
-        query = query.eq('event_id', eventId);
+      if (ceremonyId) {
+        query = query.eq('ceremony_id', ceremonyId);
       }
 
       const { data, error } = await query;
       if (error) throw error;
       return data;
     },
-    enabled: !!eventId,
+    enabled: !!ceremonyId,
   });
 
   const createRegistration = useMutation({
     mutationFn: async (registration: {
-      event_id: string;
+      ceremony_id: string;
       full_name: string;
       email: string;
       phone?: string;
       notes?: string;
     }) => {
       const { data, error } = await supabase
-        .from('event_registrations')
+        .from('ceremony_registrations')
         .insert(registration)
         .select()
         .single();
@@ -118,7 +118,7 @@ export const useEventRegistrations = (eventId?: string) => {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['event-registrations'] });
+      queryClient.invalidateQueries({ queryKey: ['ceremony-registrations'] });
     },
   });
 

@@ -34,32 +34,22 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
-import { Calendar } from '@/components/ui/calendar';
-import { cn } from '@/lib/utils';
-import {
   Plus,
   Edit,
   Trash2,
   MoreHorizontal,
   Search,
-  Calendar as CalendarIcon,
   Loader2,
   Image as ImageIcon,
 } from 'lucide-react';
-import { useEvents } from '@/hooks/useEvents';
+import { useCeremonies } from '@/hooks/useCeremonies';
 import { toast } from '@/hooks/use-toast';
-import { format } from 'date-fns';
-import { it } from 'date-fns/locale';
 import type { Database } from '@/integrations/supabase/types';
 
-type Event = Database['public']['Tables']['events']['Row'];
+type Ceremony = Database['public']['Tables']['ceremonies']['Row'];
 
-const EventsManager = () => {
-  const { events, isLoading, createEvent, updateEvent, deleteEvent } = useEvents();
+const CeremoniesManager = () => {
+  const { ceremonies, isLoading, createCeremony, updateCeremony, deleteCeremony } = useCeremonies();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
 
@@ -67,14 +57,14 @@ const EventsManager = () => {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  const [selectedCeremony, setSelectedCeremony] = useState<Ceremony | null>(null);
 
   // Form state
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    start_date: new Date(),
-    end_date: new Date(),
+    schedule: '',
+    time: '',
     location: '',
     type: '',
     price: '',
@@ -96,8 +86,8 @@ const EventsManager = () => {
     setFormData({
       title: '',
       description: '',
-      start_date: new Date(),
-      end_date: new Date(),
+      schedule: '',
+      time: '',
       location: '',
       type: '',
       price: '',
@@ -123,11 +113,11 @@ const EventsManager = () => {
         return;
       }
 
-      await createEvent.mutateAsync({
+      await createCeremony.mutateAsync({
         title: formData.title,
         description: formData.description,
-        start_date: formData.start_date.toISOString(),
-        end_date: formData.end_date.toISOString(),
+        schedule: formData.schedule || null,
+        time: formData.time || null,
         location: formData.location || null,
         type: formData.type || null,
         price: formData.price || null,
@@ -141,7 +131,7 @@ const EventsManager = () => {
 
       toast({
         title: 'Successo',
-        description: 'Evento creato con successo',
+        description: 'Cerimonia creata con successo',
       });
 
       setShowCreateModal(false);
@@ -149,7 +139,7 @@ const EventsManager = () => {
     } catch (error) {
       toast({
         title: 'Errore',
-        description: 'Errore durante la creazione dell\'evento',
+        description: 'Errore durante la creazione della cerimonia',
         variant: 'destructive',
       });
     }
@@ -157,15 +147,15 @@ const EventsManager = () => {
 
   const handleUpdate = async () => {
     try {
-      if (!selectedEvent) return;
+      if (!selectedCeremony) return;
 
-      await updateEvent.mutateAsync({
-        id: selectedEvent.id,
+      await updateCeremony.mutateAsync({
+        id: selectedCeremony.id,
         updates: {
           title: formData.title,
           description: formData.description,
-          start_date: formData.start_date.toISOString(),
-          end_date: formData.end_date.toISOString(),
+          schedule: formData.schedule || null,
+          time: formData.time || null,
           location: formData.location || null,
           type: formData.type || null,
           price: formData.price || null,
@@ -180,16 +170,16 @@ const EventsManager = () => {
 
       toast({
         title: 'Successo',
-        description: 'Evento aggiornato con successo',
+        description: 'Cerimonia aggiornata con successo',
       });
 
       setShowEditModal(false);
       resetForm();
-      setSelectedEvent(null);
+      setSelectedCeremony(null);
     } catch (error) {
       toast({
         title: 'Errore',
-        description: 'Errore durante l\'aggiornamento dell\'evento',
+        description: 'Errore durante l\'aggiornamento della cerimonia',
         variant: 'destructive',
       });
     }
@@ -197,21 +187,21 @@ const EventsManager = () => {
 
   const handleDelete = async () => {
     try {
-      if (!selectedEvent) return;
+      if (!selectedCeremony) return;
 
-      await deleteEvent.mutateAsync(selectedEvent.id);
+      await deleteCeremony.mutateAsync(selectedCeremony.id);
 
       toast({
         title: 'Successo',
-        description: 'Evento eliminato con successo',
+        description: 'Cerimonia eliminata con successo',
       });
 
       setShowDeleteModal(false);
-      setSelectedEvent(null);
+      setSelectedCeremony(null);
     } catch (error) {
       toast({
         title: 'Errore',
-        description: 'Errore durante l\'eliminazione dell\'evento',
+        description: 'Errore durante l\'eliminazione della cerimonia',
         variant: 'destructive',
       });
     }
@@ -265,44 +255,34 @@ const EventsManager = () => {
     setImageResults([]);
   };
 
-  const openEditModal = (event: Event) => {
-    setSelectedEvent(event);
+  const openEditModal = (ceremony: Ceremony) => {
+    setSelectedCeremony(ceremony);
     setFormData({
-      title: event.title,
-      description: event.description || '',
-      start_date: new Date(event.start_date),
-      end_date: new Date(event.end_date || event.start_date),
-      location: event.location || '',
-      type: event.type || '',
-      price: event.price || '',
-      max_participants: event.max_participants?.toString() || '',
-      meeting_url: event.meeting_url || '',
-      image_url: event.image_url || '',
-      status: (event.status as 'draft' | 'published') || 'draft',
-      featured: event.featured || false,
-      attendance_type: (event.attendance_type as 'in_person' | 'online' | 'hybrid') || 'in_person',
+      title: ceremony.title,
+      description: ceremony.description || '',
+      schedule: ceremony.schedule || '',
+      time: ceremony.time || '',
+      location: ceremony.location || '',
+      type: ceremony.type || '',
+      price: ceremony.price || '',
+      max_participants: ceremony.max_participants?.toString() || '',
+      meeting_url: ceremony.meeting_url || '',
+      image_url: ceremony.image_url || '',
+      status: (ceremony.status as 'draft' | 'published') || 'draft',
+      featured: ceremony.featured || false,
+      attendance_type: (ceremony.attendance_type as 'in_person' | 'online' | 'hybrid') || 'in_person',
     });
     setShowEditModal(true);
   };
 
-  const filteredEvents = events.filter((event) => {
-    const matchesSearch = event.title
+  const filteredCeremonies = ceremonies.filter((ceremony) => {
+    const matchesSearch = ceremony.title
       ?.toLowerCase()
       .includes(searchTerm.toLowerCase());
     const matchesStatus =
-      selectedStatus === 'all' || event.status === selectedStatus;
+      selectedStatus === 'all' || ceremony.status === selectedStatus;
     return matchesSearch && matchesStatus;
   });
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('it-IT', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -338,8 +318,8 @@ const EventsManager = () => {
         <Input
           id="title"
           value={formData.title}
-          onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-          placeholder="Nome evento"
+          onChange={(e) => setFormData((prev) => ({ ...prev, title: e.target.value }))}
+          placeholder="Nome cerimonia"
         />
       </div>
 
@@ -349,70 +329,36 @@ const EventsManager = () => {
           id="description"
           value={formData.description}
           onChange={(e) =>
-            setFormData({ ...formData, description: e.target.value })
+            setFormData((prev) => ({ ...prev, description: e.target.value }))
           }
-          placeholder="Descrizione dettagliata dell'evento"
+          placeholder="Descrizione dettagliata della cerimonia"
           rows={4}
         />
       </div>
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <Label>Data Inizio *</Label>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className={cn(
-                  'w-full justify-start text-left font-normal',
-                  !formData.start_date && 'text-muted-foreground'
-                )}
-              >
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {format(formData.start_date, 'PPP', { locale: it })}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
-              <Calendar
-                mode="single"
-                selected={formData.start_date}
-                onSelect={(date) =>
-                  date && setFormData({ ...formData, start_date: date })
-                }
-                initialFocus
-                className="pointer-events-auto"
-              />
-            </PopoverContent>
-          </Popover>
+          <Label htmlFor="schedule">Frequenza</Label>
+          <Input
+            id="schedule"
+            value={formData.schedule}
+            onChange={(e) =>
+              setFormData((prev) => ({ ...prev, schedule: e.target.value }))
+            }
+            placeholder="Es. Ogni domenica, Luna piena"
+          />
         </div>
 
         <div>
-          <Label>Data Fine</Label>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className={cn(
-                  'w-full justify-start text-left font-normal',
-                  !formData.end_date && 'text-muted-foreground'
-                )}
-              >
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {format(formData.end_date, 'PPP', { locale: it })}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
-              <Calendar
-                mode="single"
-                selected={formData.end_date}
-                onSelect={(date) =>
-                  date && setFormData({ ...formData, end_date: date })
-                }
-                initialFocus
-                className="pointer-events-auto"
-              />
-            </PopoverContent>
-          </Popover>
+          <Label htmlFor="time">Orario</Label>
+          <Input
+            id="time"
+            value={formData.time}
+            onChange={(e) =>
+              setFormData((prev) => ({ ...prev, time: e.target.value }))
+            }
+            placeholder="Es. 15:00 - 17:00"
+          />
         </div>
       </div>
 
@@ -423,9 +369,9 @@ const EventsManager = () => {
             id="location"
             value={formData.location}
             onChange={(e) =>
-              setFormData({ ...formData, location: e.target.value })
+              setFormData((prev) => ({ ...prev, location: e.target.value }))
             }
-            placeholder="Es. Centro Bodhidharma"
+            placeholder="Es. Sala del tè"
           />
         </div>
         <div>
@@ -433,8 +379,8 @@ const EventsManager = () => {
           <Input
             id="type"
             value={formData.type}
-            onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-            placeholder="Es. Ritiri, Meditazione"
+            onChange={(e) => setFormData((prev) => ({ ...prev, type: e.target.value }))}
+            placeholder="Es. Meditazione, Rituale"
           />
         </div>
       </div>
@@ -445,8 +391,8 @@ const EventsManager = () => {
           <Input
             id="price"
             value={formData.price}
-            onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-            placeholder="Es. €150 o Offerta libera"
+            onChange={(e) => setFormData((prev) => ({ ...prev, price: e.target.value }))}
+            placeholder="Es. Offerta libera"
           />
         </div>
         <div>
@@ -456,7 +402,7 @@ const EventsManager = () => {
             type="number"
             value={formData.max_participants}
             onChange={(e) =>
-              setFormData({ ...formData, max_participants: e.target.value })
+              setFormData((prev) => ({ ...prev, max_participants: e.target.value }))
             }
             placeholder="20"
           />
@@ -468,7 +414,7 @@ const EventsManager = () => {
         <Select
           value={formData.attendance_type}
           onValueChange={(value: 'in_person' | 'online' | 'hybrid') =>
-            setFormData({ ...formData, attendance_type: value })
+            setFormData((prev) => ({ ...prev, attendance_type: value }))
           }
         >
           <SelectTrigger>
@@ -489,7 +435,7 @@ const EventsManager = () => {
             id="meeting_url"
             value={formData.meeting_url}
             onChange={(e) =>
-              setFormData({ ...formData, meeting_url: e.target.value })
+              setFormData((prev) => ({ ...prev, meeting_url: e.target.value }))
             }
             placeholder="https://meet.example.com"
           />
@@ -502,7 +448,7 @@ const EventsManager = () => {
           <Input
             value={formData.image_url}
             onChange={(e) =>
-              setFormData({ ...formData, image_url: e.target.value })
+              setFormData((prev) => ({ ...prev, image_url: e.target.value }))
             }
             placeholder="URL immagine"
           />
@@ -591,9 +537,9 @@ const EventsManager = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-semibold">Gestione Eventi</h2>
+          <h2 className="text-2xl font-semibold">Gestione Cerimonie</h2>
           <p className="text-sm text-muted-foreground">
-            {events.length} eventi totali, {filteredEvents.length} visualizzati
+            {ceremonies.length} cerimonie totali, {filteredCeremonies.length} visualizzate
           </p>
         </div>
         <Button
@@ -604,7 +550,7 @@ const EventsManager = () => {
           className="bg-saffron-600 hover:bg-saffron-700"
         >
           <Plus className="h-4 w-4 mr-2" />
-          Nuovo Evento
+          Nuova Cerimonia
         </Button>
       </div>
 
@@ -614,7 +560,7 @@ const EventsManager = () => {
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
               <Input
-                placeholder="Cerca eventi..."
+                placeholder="Cerca cerimonie..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
@@ -640,35 +586,35 @@ const EventsManager = () => {
             <TableHeader>
               <TableRow>
                 <TableHead>Titolo</TableHead>
-                <TableHead>Data</TableHead>
+                <TableHead>Frequenza</TableHead>
                 <TableHead>Tipo</TableHead>
                 <TableHead>Stato</TableHead>
                 <TableHead className="w-[100px]">Azioni</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredEvents.length === 0 ? (
+              {filteredCeremonies.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={5} className="text-center py-8">
-                    Nessun evento trovato
+                    Nessuna cerimonia trovata
                   </TableCell>
                 </TableRow>
               ) : (
-                filteredEvents.map((event) => (
-                  <TableRow key={event.id}>
+                filteredCeremonies.map((ceremony) => (
+                  <TableRow key={ceremony.id}>
                     <TableCell>
                       <div>
-                        <div className="font-medium">{event.title}</div>
-                        {event.featured && (
+                        <div className="font-medium">{ceremony.title}</div>
+                        {ceremony.featured && (
                           <Badge className="mt-1 bg-saffron-500 text-white text-xs">
                             In Evidenza
                           </Badge>
                         )}
                       </div>
                     </TableCell>
-                    <TableCell>{formatDate(event.start_date)}</TableCell>
-                    <TableCell>{event.type || '-'}</TableCell>
-                    <TableCell>{getStatusBadge(event.status || 'draft')}</TableCell>
+                    <TableCell>{ceremony.schedule || '-'}</TableCell>
+                    <TableCell>{ceremony.type || '-'}</TableCell>
+                    <TableCell>{getStatusBadge(ceremony.status || 'draft')}</TableCell>
                     <TableCell>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -677,13 +623,13 @@ const EventsManager = () => {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => openEditModal(event)}>
+                          <DropdownMenuItem onClick={() => openEditModal(ceremony)}>
                             <Edit className="h-4 w-4 mr-2" />
                             Modifica
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={() => {
-                              setSelectedEvent(event);
+                              setSelectedCeremony(ceremony);
                               setShowDeleteModal(true);
                             }}
                             className="text-red-600"
@@ -706,7 +652,7 @@ const EventsManager = () => {
       <Dialog open={showCreateModal} onOpenChange={setShowCreateModal}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Crea Nuovo Evento</DialogTitle>
+            <DialogTitle>Crea Nuova Cerimonia</DialogTitle>
           </DialogHeader>
           <FormFields />
           <DialogFooter>
@@ -715,13 +661,13 @@ const EventsManager = () => {
             </Button>
             <Button
               onClick={handleCreate}
-              disabled={createEvent.isPending}
+              disabled={createCeremony.isPending}
               className="bg-saffron-600 hover:bg-saffron-700"
             >
-              {createEvent.isPending ? (
+              {createCeremony.isPending ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
-                'Crea Evento'
+                'Crea Cerimonia'
               )}
             </Button>
           </DialogFooter>
@@ -732,7 +678,7 @@ const EventsManager = () => {
       <Dialog open={showEditModal} onOpenChange={setShowEditModal}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Modifica Evento</DialogTitle>
+            <DialogTitle>Modifica Cerimonia</DialogTitle>
           </DialogHeader>
           <FormFields />
           <DialogFooter>
@@ -741,10 +687,10 @@ const EventsManager = () => {
             </Button>
             <Button
               onClick={handleUpdate}
-              disabled={updateEvent.isPending}
+              disabled={updateCeremony.isPending}
               className="bg-saffron-600 hover:bg-saffron-700"
             >
-              {updateEvent.isPending ? (
+              {updateCeremony.isPending ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
                 'Salva Modifiche'
@@ -760,17 +706,17 @@ const EventsManager = () => {
           <DialogHeader>
             <DialogTitle>Conferma Eliminazione</DialogTitle>
           </DialogHeader>
-          <p>Sei sicuro di voler eliminare questo evento? L'azione è irreversibile.</p>
+          <p>Sei sicuro di voler eliminare questa cerimonia? L'azione è irreversibile.</p>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowDeleteModal(false)}>
               Annulla
             </Button>
             <Button
               onClick={handleDelete}
-              disabled={deleteEvent.isPending}
+              disabled={deleteCeremony.isPending}
               variant="destructive"
             >
-              {deleteEvent.isPending ? (
+              {deleteCeremony.isPending ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
                 'Elimina'
@@ -783,4 +729,4 @@ const EventsManager = () => {
   );
 };
 
-export default EventsManager;
+export default CeremoniesManager;

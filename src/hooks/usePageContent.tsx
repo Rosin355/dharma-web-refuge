@@ -34,7 +34,22 @@ export const usePageContent = (pageName: string) => {
 
       if (fetchError) throw fetchError;
 
-      setContents(data || []);
+      // Map data to ensure correct types
+      const mappedData: PageContent[] = (data || []).map((item) => ({
+        id: item.id,
+        page_name: item.page_name,
+        section_key: item.section_key,
+        section_title: item.section_title,
+        content_type: item.content_type || 'text',
+        content: item.content,
+        editor_instructions: item.editor_instructions,
+        display_order: item.display_order || 0,
+        is_active: item.is_active ?? true,
+        created_at: item.created_at || '',
+        updated_at: item.updated_at || ''
+      }));
+
+      setContents(mappedData);
     } catch (err) {
       console.error('Errore caricamento contenuti:', err);
       setError(err instanceof Error ? err.message : 'Errore caricamento contenuti');

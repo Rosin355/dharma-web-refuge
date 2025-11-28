@@ -57,8 +57,6 @@ type Post = Database['public']['Tables']['posts']['Row'] & {
 };
 
 
-type PostUpdate = Database['public']['Tables']['posts']['Update'];
-
 const PostsManager = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);

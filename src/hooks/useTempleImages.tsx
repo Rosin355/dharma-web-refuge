@@ -5,9 +5,9 @@ interface TempleImage {
   id: string;
   filename: string;
   storage_url: string;
-  alt_text: string;
-  category: string;
-  page_section: string;
+  alt_text: string | null;
+  category: string | null;
+  page_section: string | null;
 }
 
 interface UseTempleImagesReturn {
