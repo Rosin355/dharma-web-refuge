@@ -11,7 +11,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import {
   Dialog,
@@ -48,9 +47,6 @@ import {
   MoreHorizontal,
   Search,
   Calendar as CalendarIcon,
-  Save,
-  X,
-  AlertCircle,
   Loader2,
   Image as ImageIcon,
 } from 'lucide-react';
@@ -95,7 +91,6 @@ const EventsManager = () => {
   const [imageSearchTerm, setImageSearchTerm] = useState('');
   const [imageResults, setImageResults] = useState<any[]>([]);
   const [searchingImages, setSearchingImages] = useState(false);
-  const [unsplashKey, setUnsplashKey] = useState('');
 
   const resetForm = () => {
     setFormData({
