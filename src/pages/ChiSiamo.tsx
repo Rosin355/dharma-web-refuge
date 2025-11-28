@@ -1,6 +1,6 @@
 
 import { Card, CardContent } from '@/components/ui/card';
-import { Users, Target, Heart, Book, MapPin, Phone, Mail } from 'lucide-react';
+import { MapPin } from 'lucide-react';
 import { useTempleCarouselImages, useMasterImages } from '@/hooks/useTempleImages';
 import { usePageContent } from '@/hooks/usePageContent';
 

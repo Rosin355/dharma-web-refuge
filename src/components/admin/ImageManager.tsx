@@ -93,10 +93,14 @@ const ImageManager = () => {
       }
 
       // Gestiamo il caso in cui le colonne potrebbero essere null/undefined
-      const postsWithImages = (data || []).map(post => ({
-        ...post,
+      const postsWithImages: PostWithImage[] = (data || []).map(post => ({
+        id: post.id,
+        title: post.title,
+        content: post.content,
+        status: post.status || 'draft',
         image_url: post.image_url || null,
-        image_alt: post.image_alt || null
+        image_alt: post.image_alt || null,
+        excerpt: post.excerpt || null
       }));
 
       setPosts(postsWithImages);
