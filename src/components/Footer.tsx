@@ -11,7 +11,7 @@ const Footer = () => {
             <div className="flex items-center space-x-2 mb-4">
               <div className="w-10 h-10 flex items-center justify-center">
                 <img
-                  src="/lovable-uploads/ee0a1e23-8f51-4b46-8c99-f0b6fc5493e9.png"
+                  src="/logo.svg"
                   alt="Comunità Bodhidharma Logo"
                   className="w-full h-full object-contain"
                 />

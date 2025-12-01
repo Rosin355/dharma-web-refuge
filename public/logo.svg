@@ -1,0 +1,34 @@
+<svg viewBox="0 0 200 80" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <!-- Figura stilizzata in alto a sinistra -->
+  <g opacity="0.9">
+    <!-- Testa/volto -->
+    <ellipse cx="15" cy="12" rx="4" ry="5" fill="#000"/>
+    <!-- Corpo/veste -->
+    <path d="M12 18 Q10 20 8 22 Q6 24 8 26 Q10 28 12 30" stroke-width="1.5"/>
+  </g>
+  
+  <!-- Massa scura orizzontale centrale -->
+  <path d="M5 25 Q8 28 15 30 Q25 32 35 33 Q50 34 70 33 Q90 32 110 30 Q130 28 150 25" 
+        stroke-width="8" fill="#000" opacity="0.95"/>
+  
+  <!-- Due tratti curvi in basso a sinistra -->
+  <path d="M10 35 Q5 45 8 55" stroke-width="6" fill="none"/>
+  <path d="M18 38 Q12 50 15 62" stroke-width="5" fill="none"/>
+  
+  <!-- Elementi centrali distaccati -->
+  <ellipse cx="85" cy="42" rx="3" ry="4" fill="#000"/>
+  <ellipse cx="95" cy="45" rx="2.5" ry="3.5" fill="#000"/>
+  <!-- Piccolo tratto verticale con barra orizzontale -->
+  <line x1="90" y1="38" x2="90" y2="42" stroke-width="1"/>
+  <line x1="88" y1="38" x2="92" y2="38" stroke-width="1"/>
+  
+  <!-- Coda che si assottiglia verso destra -->
+  <path d="M150 25 Q160 30 170 35 Q175 40 180 45 Q185 50 188 55 Q190 58 192 60" 
+        stroke-width="3" fill="none" opacity="0.9"/>
+  <path d="M155 27 Q165 32 175 37 Q180 42 185 47 Q188 52 190 57" 
+        stroke-width="2" fill="none" opacity="0.7"/>
+  
+  <!-- Evidenziazione gialla sottile sulla coda -->
+  <path d="M185 48 Q187 52 189 55" stroke="#FFD700" stroke-width="1" opacity="0.6" stroke-linecap="round"/>
+</svg>
+
