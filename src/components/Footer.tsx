@@ -9,11 +9,11 @@ const Footer = () => {
           {/* Logo e descrizione */}
           <div className="col-span-1 md:col-span-2">
             <div className="flex items-center space-x-2 mb-4">
-              <div className="w-10 h-10 flex items-center justify-center">
+              <div className="h-10 w-auto flex items-center justify-center overflow-hidden">
                 <img
                   src="/logo.svg"
                   alt="Comunità Bodhidharma Logo"
-                  className="w-full h-full object-contain"
+                  className="h-full w-auto object-contain"
                 />
               </div>
               <span className="font-serif text-xl font-semibold">Comunità Bodhidharma</span>

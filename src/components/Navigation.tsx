@@ -34,8 +34,8 @@ const Navigation = () => {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
-            <div className="w-10 h-10 flex items-center justify-center">
-              <img src="/logo.svg" alt="Comunità Bodhidharma Logo" className="w-full h-full object-contain" />
+            <div className="h-10 w-auto flex items-center justify-center overflow-hidden">
+              <img src="/logo.svg" alt="Comunità Bodhidharma Logo" className="h-full w-auto object-contain" />
             </div>
             
           </Link>
