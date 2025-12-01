@@ -38,7 +38,7 @@ const ChiSiamo = () => {
       <section className="py-16">
         <div className="container mx-auto px-4">
           <h2 className="font-serif text-4xl font-light text-center mb-12">
-            {getContent('maestri-title', 'I Nostri')} <span className="text-saffron-500">Maestri</span>
+            {getContent('maestri-title', 'I Nostri').replace(' Maestri', '')} <span className="text-saffron-500">Maestri</span>
           </h2>
 
           {/* Taehye sunim */}
@@ -215,7 +215,7 @@ const ChiSiamo = () => {
       <section className="py-16 bg-white">
         <div className="container mx-auto px-4">
           <h2 className="font-serif text-4xl font-light text-center mb-12">
-            {getContent('comunita-title', 'La')} <span className="text-saffron-500">Comunità</span>
+            {getContent('comunita-title', 'La').replace(' Comunità', '')} <span className="text-saffron-500">Comunità</span>
           </h2>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
@@ -260,7 +260,7 @@ const ChiSiamo = () => {
       <section className="py-16">
         <div className="container mx-auto px-4">
           <h2 className="font-serif text-4xl font-light text-center mb-12">
-            {getContent('tempio-title', 'Il')} <span className="text-saffron-500">Tempio</span>
+            {getContent('tempio-title', 'Il').replace(' Tempio', '')} <span className="text-saffron-500">Tempio</span>
           </h2>
           <p className="text-center text-muted-foreground mb-8 max-w-2xl mx-auto">
             Tempio Musang Am (Eremo della Non Forma) - Monti San Lorenzo, Lerici (SP)
@@ -354,20 +354,6 @@ const ChiSiamo = () => {
                     <li>• Lavori di giardinaggio</li>
                     <li>• Lavori di sartoria</li>
                   </ul>
-                </CardContent>
-              </Card>
-            </div>
-
-            <div className="text-center mt-8">
-              <Card className="inline-block">
-                <CardContent className="p-6">
-                  <h3 className="font-serif text-xl font-semibold mb-2">5x1000</h3>
-                  <p className="text-muted-foreground mb-2">
-                    Dona il tuo 5x1000 all'associazione Karuna Onlus
-                  </p>
-                  <p className="font-mono text-lg font-semibold">
-                    {getContent('dana-5x1000', '95120790100')}
-                  </p>
                 </CardContent>
               </Card>
             </div>

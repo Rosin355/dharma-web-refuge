@@ -1,8 +1,23 @@
 
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { BookOpen, Heart, Flower2, Sun } from 'lucide-react';
+import { BookOpen, Heart, Sun } from 'lucide-react';
 import { usePageContent } from '@/hooks/usePageContent';
+
+// Componente per il simbolo OM (ॐ)
+const OmIcon = ({ className }: { className?: string }) => (
+  <svg
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    className={className}
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    {/* Simbolo OM stilizzato - forma di loto/fiore */}
+    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" />
+    <path d="M12 6c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm0 10c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z" />
+    <circle cx="12" cy="12" r="2" />
+  </svg>
+);
 
 const Insegnamenti = () => {
   const { getContent, loading: contentLoading } = usePageContent('insegnamenti');
@@ -20,10 +35,10 @@ const Insegnamenti = () => {
 
   const pilastri = [
     {
-      icon: Flower2,
-      title: "Meditazione Zen",
-      description: "La pratica fondamentale dello zazen (meditazione seduta) per sviluppare consapevolezza e presenza mentale.",
-      content: "Lo zazen è il cuore della pratica zen. Attraverso la postura corretta, la respirazione naturale e l'osservazione senza giudizio dei pensieri, coltiviamo uno stato di presenza pura."
+      icon: OmIcon,
+      title: "Meditazione Dhyana",
+      description: "Dhyana significa \"meditazione\" in sanscrito; in cinese \"chan\", in coreano \"seon\", in vietnamita \"thien\" e in giapponese \"zen\".",
+      content: "Meditazione dhyana significa osservare la realtà così com'è, ossia \"ciò che è qui ed ora\", quiddità, con mente aperta, senza pregiudizi, senza condizionamenti, né fantasie. È realizzare in ogni momento che tutti i fenomeni sono interdipendenti, impermanenti ed essenzialmente vuoti."
     },
     {
       icon: Heart,

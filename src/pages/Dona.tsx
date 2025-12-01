@@ -105,34 +105,6 @@ const Dona = () => {
                 </div>
               </CardContent>
             </Card>
-
-            {/* PostPay */}
-            <Card className="border-zen-sage bg-background">
-              <CardHeader>
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-saffron-100 rounded-full flex items-center justify-center">
-                    <CreditCard className="h-6 w-6 text-saffron-600" />
-                  </div>
-                  <CardTitle className="font-serif text-2xl">Ricarica PostPay</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="p-4 bg-zen-cream rounded-lg space-y-3">
-                  <div>
-                    <p className="text-sm text-muted-foreground">Numero Carta</p>
-                    <p className="font-mono font-semibold text-saffron-600 text-lg">5333 1712 3667 7759</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Intestatario</p>
-                    <p className="font-medium text-foreground">Alberto Alcozer</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Codice Fiscale</p>
-                    <p className="font-mono font-medium text-foreground">LCZLRT64M09D969U</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
           </div>
         </div>
       </section>
