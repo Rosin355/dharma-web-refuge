@@ -41,9 +41,13 @@ import {
   Search,
   Loader2,
   Image as ImageIcon,
+  Upload,
+  Music,
+  FileText,
 } from 'lucide-react';
 import { useCeremonies } from '@/hooks/useCeremonies';
 import { toast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 import type { Database } from '@/integrations/supabase/types';
 
 type Ceremony = Database['public']['Tables']['ceremonies']['Row'];
@@ -71,6 +75,8 @@ const CeremoniesManager = () => {
     max_participants: '',
     meeting_url: '',
     image_url: '',
+    audio_file_url: '',
+    pdf_file_url: '',
     status: 'draft' as 'draft' | 'published',
     featured: false,
     attendance_type: 'in_person' as 'in_person' | 'online' | 'hybrid',
@@ -94,6 +100,8 @@ const CeremoniesManager = () => {
       max_participants: '',
       meeting_url: '',
       image_url: '',
+      audio_file_url: '',
+      pdf_file_url: '',
       status: 'draft',
       featured: false,
       attendance_type: 'in_person',
@@ -124,6 +132,8 @@ const CeremoniesManager = () => {
         max_participants: formData.max_participants ? parseInt(formData.max_participants) : null,
         meeting_url: formData.meeting_url || null,
         image_url: formData.image_url || null,
+        audio_file_url: formData.audio_file_url || null,
+        pdf_file_url: formData.pdf_file_url || null,
         status: formData.status,
         featured: formData.featured,
         attendance_type: formData.attendance_type,
@@ -162,6 +172,8 @@ const CeremoniesManager = () => {
           max_participants: formData.max_participants ? parseInt(formData.max_participants) : null,
           meeting_url: formData.meeting_url || null,
           image_url: formData.image_url || null,
+          audio_file_url: formData.audio_file_url || null,
+          pdf_file_url: formData.pdf_file_url || null,
           status: formData.status,
           featured: formData.featured,
           attendance_type: formData.attendance_type,
@@ -255,6 +267,79 @@ const CeremoniesManager = () => {
     setImageResults([]);
   };
 
+  const handleFileUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+    fileType: 'audio' | 'pdf'
+  ) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Verifica il tipo di file
+    if (fileType === 'audio' && !file.type.startsWith('audio/')) {
+      toast({
+        title: 'Errore',
+        description: 'Il file selezionato non è un file audio',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    if (fileType === 'pdf') {
+      const validTypes = ['.pdf', '.doc', '.docx', '.txt'];
+      const fileExt = '.' + file.name.split('.').pop()?.toLowerCase();
+      if (!validTypes.includes(fileExt)) {
+        toast({
+          title: 'Errore',
+          description: 'Seleziona un file PDF, DOC, DOCX o TXT',
+          variant: 'destructive',
+        });
+        return;
+      }
+    }
+
+    try {
+      setSearchingImages(true);
+
+      const fileExt = file.name.split('.').pop();
+      const fileName = `ceremony-${Date.now()}.${fileExt}`;
+      const filePath = `ceremonies/${fileType}-files/${fileName}`;
+
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('images')
+        .upload(filePath, file, {
+          contentType: file.type,
+          upsert: false
+        });
+
+      if (uploadError) throw uploadError;
+
+      const { data: urlData } = supabase.storage
+        .from('images')
+        .getPublicUrl(filePath);
+
+      const fieldName = fileType === 'audio' ? 'audio_file_url' : 'pdf_file_url';
+      setFormData((prev) => ({
+        ...prev,
+        [fieldName]: urlData.publicUrl,
+      }));
+
+      toast({
+        title: 'Successo',
+        description: 'File caricato con successo',
+      });
+    } catch (err) {
+      console.error('❌ Errore upload file:', err);
+      toast({
+        title: 'Errore',
+        description: err instanceof Error ? err.message : 'Errore durante il caricamento del file',
+        variant: 'destructive',
+      });
+    } finally {
+      setSearchingImages(false);
+      event.target.value = '';
+    }
+  };
+
   const openEditModal = (ceremony: Ceremony) => {
     setSelectedCeremony(ceremony);
     setFormData({
@@ -268,6 +353,8 @@ const CeremoniesManager = () => {
       max_participants: ceremony.max_participants?.toString() || '',
       meeting_url: ceremony.meeting_url || '',
       image_url: ceremony.image_url || '',
+      audio_file_url: (ceremony as any).audio_file_url || '',
+      pdf_file_url: (ceremony as any).pdf_file_url || '',
       status: (ceremony.status as 'draft' | 'published') || 'draft',
       featured: ceremony.featured || false,
       attendance_type: (ceremony.attendance_type as 'in_person' | 'online' | 'hybrid') || 'in_person',
@@ -499,13 +586,106 @@ const CeremoniesManager = () => {
         </div>
       )}
 
+      <div className="space-y-4 border-t pt-4">
+        <div>
+          <Label>File Audio</Label>
+          <div className="flex gap-2 items-center">
+            <Input
+              value={formData.audio_file_url}
+              onChange={(e) =>
+                setFormData((prev) => ({ ...prev, audio_file_url: e.target.value }))
+              }
+              placeholder="URL file audio"
+            />
+            <label>
+              <input
+                type="file"
+                accept="audio/*"
+                className="hidden"
+                onChange={(e) => handleFileUpload(e, 'audio')}
+                disabled={searchingImages}
+              />
+              <Button
+                type="button"
+                variant="outline"
+                asChild
+                disabled={searchingImages}
+              >
+                <span>
+                  {searchingImages ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Music className="h-4 w-4" />
+                  )}
+                </span>
+              </Button>
+            </label>
+          </div>
+          {formData.audio_file_url && (
+            <audio controls className="mt-2 w-full">
+              <source src={formData.audio_file_url} />
+              Il tuo browser non supporta l'elemento audio.
+            </audio>
+          )}
+        </div>
+
+        <div>
+          <Label>File PDF/Testo</Label>
+          <div className="flex gap-2 items-center">
+            <Input
+              value={formData.pdf_file_url}
+              onChange={(e) =>
+                setFormData((prev) => ({ ...prev, pdf_file_url: e.target.value }))
+              }
+              placeholder="URL file PDF o altro file"
+            />
+            <label>
+              <input
+                type="file"
+                accept=".pdf,.doc,.docx,.txt"
+                className="hidden"
+                onChange={(e) => handleFileUpload(e, 'pdf')}
+                disabled={searchingImages}
+              />
+              <Button
+                type="button"
+                variant="outline"
+                asChild
+                disabled={searchingImages}
+              >
+                <span>
+                  {searchingImages ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <FileText className="h-4 w-4" />
+                  )}
+                </span>
+              </Button>
+            </label>
+          </div>
+          {formData.pdf_file_url && (
+            <div className="mt-2">
+              <a
+                href={formData.pdf_file_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-saffron-600 hover:underline flex items-center gap-2"
+              >
+                <FileText className="h-4 w-4" />
+                Visualizza file
+              </a>
+            </div>
+          )}
+        </div>
+      </div>
+
       <div className="grid grid-cols-2 gap-4">
         <div>
           <Label htmlFor="status">Stato</Label>
           <Select
             value={formData.status}
             onValueChange={(value: 'draft' | 'published') =>
-              setFormData({ ...formData, status: value })
+              setFormData((prev) => ({ ...prev, status: value }))
             }
           >
             <SelectTrigger>
@@ -523,7 +703,7 @@ const CeremoniesManager = () => {
             id="featured"
             checked={formData.featured}
             onChange={(e) =>
-              setFormData({ ...formData, featured: e.target.checked })
+              setFormData((prev) => ({ ...prev, featured: e.target.checked }))
             }
             className="rounded"
           />

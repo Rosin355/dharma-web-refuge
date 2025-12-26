@@ -16,9 +16,9 @@ import {
   AlertCircle,
   CheckCircle,
   ExternalLink,
-
   Eye,
-  Loader2
+  Loader2,
+  Upload
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -67,6 +67,7 @@ const ImageManager = () => {
   const [searchResults, setSearchResults] = useState<UnsplashImage[]>([]);
   const [searching, setSearching] = useState(false);
   const [assigning, setAssigning] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     fetchPosts();
@@ -276,6 +277,63 @@ const ImageManager = () => {
 
     // Se non trova keywords specifiche, usa quelle di default
     return foundKeywords.length > 0 ? foundKeywords.slice(0, 3) : ['zen', 'meditation', 'nature'];
+  };
+
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>, post: PostWithImage) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Verifica che sia un'immagine
+    if (!file.type.startsWith('image/')) {
+      setError('Il file selezionato non è un\'immagine');
+      return;
+    }
+
+    try {
+      setUploading(true);
+      setError(null);
+
+      // Upload su Supabase Storage
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${post.id}-${Date.now()}.${fileExt}`;
+      const filePath = `post-images/${fileName}`;
+
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('images')
+        .upload(filePath, file, {
+          contentType: file.type,
+          upsert: false
+        });
+
+      if (uploadError) throw uploadError;
+
+      // Ottieni URL pubblico
+      const { data: urlData } = supabase.storage
+        .from('images')
+        .getPublicUrl(filePath);
+
+      // Aggiorna il post con l'URL dell'immagine
+      const { error: updateError } = await supabase
+        .from('posts')
+        .update({
+          image_url: urlData.publicUrl,
+          image_alt: file.name
+        })
+        .eq('id', post.id);
+
+      if (updateError) throw updateError;
+
+      await fetchPosts();
+      setSuccess(`Immagine caricata e assegnata all'articolo "${post.title}"`);
+      setTimeout(() => setSuccess(null), 3000);
+    } catch (err) {
+      console.error('❌ Errore upload immagine:', err);
+      setError(err instanceof Error ? err.message : 'Errore durante il caricamento dell\'immagine');
+    } finally {
+      setUploading(false);
+      // Reset input
+      event.target.value = '';
+    }
   };
 
   const removeImageFromPost = async (post: PostWithImage) => {
@@ -556,6 +614,31 @@ const ImageManager = () => {
                     <Search className="h-4 w-4 mr-1" />
                     Cerca
                   </Button>
+                  <label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => handleImageUpload(e, post)}
+                      disabled={uploading}
+                    />
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      asChild
+                      disabled={uploading}
+                      className="ml-2"
+                    >
+                      <span>
+                        {uploading ? (
+                          <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                        ) : (
+                          <Upload className="h-4 w-4 mr-1" />
+                        )}
+                        Carica
+                      </span>
+                    </Button>
+                  </label>
                 </div>
               ))}
             </div>

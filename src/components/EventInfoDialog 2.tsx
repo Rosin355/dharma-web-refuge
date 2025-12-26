@@ -5,77 +5,51 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, Clock, MapPin, Users, ExternalLink, Video, UserCheck, Share2 } from 'lucide-react';
+import { Calendar, Clock, MapPin, Users, ExternalLink, Video, UserCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type { Database } from '@/integrations/supabase/types';
 
-type Ceremony = Database['public']['Tables']['ceremonies']['Row'];
+type Event = Database['public']['Tables']['events']['Row'];
 
-interface CeremonyInfoDialogProps {
-  ceremony: Ceremony | null;
+interface EventInfoDialogProps {
+  event: Event | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-export const CeremonyInfoDialog = ({ ceremony, open, onOpenChange }: CeremonyInfoDialogProps) => {
-  if (!ceremony) return null;
+export const EventInfoDialog = ({ event, open, onOpenChange }: EventInfoDialogProps) => {
+  if (!event) return null;
 
-  const handleShare = async () => {
-    const url = `${window.location.origin}/cerimonie/${ceremony.id}`;
-    const shareData = {
-      title: ceremony.title,
-      text: ceremony.description?.substring(0, 200) || '',
-      url: url,
-    };
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('it-IT', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+  };
 
-    try {
-      if (navigator.share && navigator.canShare(shareData)) {
-        await navigator.share(shareData);
-      } else {
-        // Fallback: copia negli appunti
-        await navigator.clipboard.writeText(url);
-        alert('Link copiato negli appunti!');
-      }
-    } catch (err) {
-      // L'utente ha annullato la condivisione o si è verificato un errore
-      if ((err as Error).name !== 'AbortError') {
-        console.error('Errore condivisione:', err);
-        // Fallback: copia negli appunti
-        try {
-          await navigator.clipboard.writeText(url);
-          alert('Link copiato negli appunti!');
-        } catch (clipboardErr) {
-          console.error('Errore copia appunti:', clipboardErr);
-        }
-      }
-    }
+  const formatTime = (dateString: string) => {
+    return new Date(dateString).toLocaleTimeString('it-IT', {
+      hour: '2-digit',
+      minute: '2-digit',
+    });
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <div className="flex items-center justify-between">
-            <DialogTitle className="text-2xl font-serif">
-              {ceremony.title}
-            </DialogTitle>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleShare}
-              className="ml-4"
-            >
-              <Share2 className="h-4 w-4 mr-2" />
-              Condividi
-            </Button>
-          </div>
+          <DialogTitle className="text-2xl font-serif">
+            {event.title}
+          </DialogTitle>
         </DialogHeader>
 
-        {ceremony.image_url && (
+        {event.image_url && (
           <div className="w-full h-64 rounded-lg overflow-hidden">
             <img
-              src={ceremony.image_url}
-              alt={ceremony.title}
+              src={event.image_url}
+              alt={event.title}
               className="w-full h-full object-cover"
             />
           </div>
@@ -83,12 +57,12 @@ export const CeremonyInfoDialog = ({ ceremony, open, onOpenChange }: CeremonyInf
 
         <div className="space-y-6">
           <div className="flex flex-wrap gap-2">
-            {ceremony.type && (
+            {event.type && (
               <Badge variant="secondary" className="bg-saffron-100 text-saffron-700">
-                {ceremony.type}
+                {event.type}
               </Badge>
             )}
-            {ceremony.featured && (
+            {event.featured && (
               <Badge className="bg-saffron-500 text-white">
                 In Evidenza
               </Badge>
@@ -97,57 +71,63 @@ export const CeremonyInfoDialog = ({ ceremony, open, onOpenChange }: CeremonyInf
 
           <div className="prose prose-sm max-w-none">
             <p className="text-muted-foreground whitespace-pre-wrap">
-              {ceremony.description}
+              {event.description}
             </p>
           </div>
 
           <div className="space-y-3 border-t pt-4">
-            {ceremony.schedule && (
-              <div className="flex items-start space-x-3">
-                <Calendar className="h-5 w-5 text-saffron-500 mt-0.5" />
-                <div>
-                  <p className="font-medium">Frequenza</p>
-                  <p className="text-sm text-muted-foreground">{ceremony.schedule}</p>
-                </div>
+            <div className="flex items-start space-x-3">
+              <Calendar className="h-5 w-5 text-saffron-500 mt-0.5" />
+              <div>
+                <p className="font-medium">Data</p>
+                <p className="text-sm text-muted-foreground">
+                  {formatDate(event.start_date)}
+                  {event.end_date && event.end_date !== event.start_date && (
+                    <> - {formatDate(event.end_date)}</>
+                  )}
+                </p>
               </div>
-            )}
+            </div>
 
-            {ceremony.time && (
-              <div className="flex items-start space-x-3">
-                <Clock className="h-5 w-5 text-saffron-500 mt-0.5" />
-                <div>
-                  <p className="font-medium">Orario</p>
-                  <p className="text-sm text-muted-foreground">{ceremony.time}</p>
-                </div>
+            <div className="flex items-start space-x-3">
+              <Clock className="h-5 w-5 text-saffron-500 mt-0.5" />
+              <div>
+                <p className="font-medium">Orario</p>
+                <p className="text-sm text-muted-foreground">
+                  Inizio: {formatTime(event.start_date)}
+                  {event.end_date && (
+                    <> - Fine: {formatTime(event.end_date)}</>
+                  )}
+                </p>
               </div>
-            )}
+            </div>
 
-            {ceremony.location && (
+            {event.location && (
               <div className="flex items-start space-x-3">
                 <MapPin className="h-5 w-5 text-saffron-500 mt-0.5" />
                 <div>
                   <p className="font-medium">Luogo</p>
-                  <p className="text-sm text-muted-foreground">{ceremony.location}</p>
+                  <p className="text-sm text-muted-foreground">{event.location}</p>
                 </div>
               </div>
             )}
 
-            {ceremony.max_participants && (
+            {event.max_participants && (
               <div className="flex items-start space-x-3">
                 <Users className="h-5 w-5 text-saffron-500 mt-0.5" />
                 <div>
                   <p className="font-medium">Partecipanti</p>
                   <p className="text-sm text-muted-foreground">
-                    Massimo {ceremony.max_participants} partecipanti
+                    Massimo {event.max_participants} partecipanti
                   </p>
                 </div>
               </div>
             )}
 
-            {ceremony.price && (
+            {event.price && (
               <div className="flex items-start space-x-3">
                 <span className="text-2xl font-semibold text-saffron-600">
-                  {ceremony.price}
+                  {event.price}
                 </span>
               </div>
             )}
@@ -156,16 +136,16 @@ export const CeremonyInfoDialog = ({ ceremony, open, onOpenChange }: CeremonyInf
             <div className="border-t pt-4 space-y-3">
               <h4 className="font-semibold text-lg">Modalità di Partecipazione</h4>
               
-              {ceremony.attendance_type === 'online' && ceremony.meeting_url && (
+              {event.attendance_type === 'online' && event.meeting_url && (
                 <div className="space-y-2">
                   <div className="flex items-center space-x-2 text-sm text-muted-foreground">
                     <Video className="h-5 w-5 text-saffron-500" />
-                    <span className="font-medium">Cerimonia Online</span>
+                    <span className="font-medium">Evento Online</span>
                   </div>
                   <Button
                     variant="outline"
                     className="w-full border-saffron-200 hover:bg-saffron-50"
-                    onClick={() => window.open(ceremony.meeting_url!, '_blank')}
+                    onClick={() => window.open(event.meeting_url!, '_blank')}
                   >
                     <ExternalLink className="h-4 w-4 mr-2" />
                     Accedi al Meeting Online
@@ -173,30 +153,30 @@ export const CeremonyInfoDialog = ({ ceremony, open, onOpenChange }: CeremonyInf
                 </div>
               )}
 
-              {ceremony.attendance_type === 'in_person' && ceremony.location && (
+              {event.attendance_type === 'in_person' && event.location && (
                 <div className="flex items-center space-x-2 text-sm">
                   <UserCheck className="h-5 w-5 text-saffron-500" />
                   <span className="font-medium">Solo in Presenza</span>
                 </div>
               )}
 
-              {ceremony.attendance_type === 'hybrid' && (
+              {event.attendance_type === 'hybrid' && (
                 <div className="space-y-3">
                   <div className="flex items-center space-x-2 text-sm">
                     <UserCheck className="h-5 w-5 text-saffron-500" />
-                    <span className="font-medium">Cerimonia Ibrida - Partecipazione in presenza e online</span>
+                    <span className="font-medium">Evento Ibrido - Partecipazione in presenza e online</span>
                   </div>
-                  {ceremony.location && (
+                  {event.location && (
                     <div className="p-3 bg-saffron-50 rounded-lg">
                       <p className="text-sm font-medium mb-1">In Presenza:</p>
-                      <p className="text-sm text-muted-foreground">{ceremony.location}</p>
+                      <p className="text-sm text-muted-foreground">{event.location}</p>
                     </div>
                   )}
-                  {ceremony.meeting_url && (
+                  {event.meeting_url && (
                     <Button
                       variant="outline"
                       className="w-full border-saffron-200 hover:bg-saffron-50"
-                      onClick={() => window.open(ceremony.meeting_url!, '_blank')}
+                      onClick={() => window.open(event.meeting_url!, '_blank')}
                     >
                       <Video className="h-4 w-4 mr-2" />
                       Oppure Partecipa Online

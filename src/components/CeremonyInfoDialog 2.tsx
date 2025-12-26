@@ -5,7 +5,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, Clock, MapPin, Users, ExternalLink, Video, UserCheck, Share2 } from 'lucide-react';
+import { Calendar, Clock, MapPin, Users, ExternalLink, Video, UserCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type { Database } from '@/integrations/supabase/types';
 
@@ -20,55 +20,13 @@ interface CeremonyInfoDialogProps {
 export const CeremonyInfoDialog = ({ ceremony, open, onOpenChange }: CeremonyInfoDialogProps) => {
   if (!ceremony) return null;
 
-  const handleShare = async () => {
-    const url = `${window.location.origin}/cerimonie/${ceremony.id}`;
-    const shareData = {
-      title: ceremony.title,
-      text: ceremony.description?.substring(0, 200) || '',
-      url: url,
-    };
-
-    try {
-      if (navigator.share && navigator.canShare(shareData)) {
-        await navigator.share(shareData);
-      } else {
-        // Fallback: copia negli appunti
-        await navigator.clipboard.writeText(url);
-        alert('Link copiato negli appunti!');
-      }
-    } catch (err) {
-      // L'utente ha annullato la condivisione o si è verificato un errore
-      if ((err as Error).name !== 'AbortError') {
-        console.error('Errore condivisione:', err);
-        // Fallback: copia negli appunti
-        try {
-          await navigator.clipboard.writeText(url);
-          alert('Link copiato negli appunti!');
-        } catch (clipboardErr) {
-          console.error('Errore copia appunti:', clipboardErr);
-        }
-      }
-    }
-  };
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <div className="flex items-center justify-between">
-            <DialogTitle className="text-2xl font-serif">
-              {ceremony.title}
-            </DialogTitle>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleShare}
-              className="ml-4"
-            >
-              <Share2 className="h-4 w-4 mr-2" />
-              Condividi
-            </Button>
-          </div>
+          <DialogTitle className="text-2xl font-serif">
+            {ceremony.title}
+          </DialogTitle>
         </DialogHeader>
 
         {ceremony.image_url && (

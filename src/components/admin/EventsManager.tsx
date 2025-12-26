@@ -74,7 +74,9 @@ const EventsManager = () => {
     title: '',
     description: '',
     start_date: new Date(),
+    start_time: '09:00',
     end_date: new Date(),
+    end_time: '18:00',
     location: '',
     type: '',
     price: '',
@@ -97,7 +99,9 @@ const EventsManager = () => {
       title: '',
       description: '',
       start_date: new Date(),
+      start_time: '09:00',
       end_date: new Date(),
+      end_time: '18:00',
       location: '',
       type: '',
       price: '',
@@ -123,11 +127,20 @@ const EventsManager = () => {
         return;
       }
 
+      // Combina data e ora
+      const startDateTime = new Date(formData.start_date);
+      const [startHours, startMinutes] = formData.start_time.split(':');
+      startDateTime.setHours(parseInt(startHours), parseInt(startMinutes), 0, 0);
+
+      const endDateTime = new Date(formData.end_date);
+      const [endHours, endMinutes] = formData.end_time.split(':');
+      endDateTime.setHours(parseInt(endHours), parseInt(endMinutes), 0, 0);
+
       await createEvent.mutateAsync({
         title: formData.title,
         description: formData.description,
-        start_date: formData.start_date.toISOString(),
-        end_date: formData.end_date.toISOString(),
+        start_date: startDateTime.toISOString(),
+        end_date: endDateTime.toISOString(),
         location: formData.location || null,
         type: formData.type || null,
         price: formData.price || null,
@@ -159,13 +172,22 @@ const EventsManager = () => {
     try {
       if (!selectedEvent) return;
 
+      // Combina data e ora
+      const startDateTime = new Date(formData.start_date);
+      const [startHours, startMinutes] = formData.start_time.split(':');
+      startDateTime.setHours(parseInt(startHours), parseInt(startMinutes), 0, 0);
+
+      const endDateTime = new Date(formData.end_date);
+      const [endHours, endMinutes] = formData.end_time.split(':');
+      endDateTime.setHours(parseInt(endHours), parseInt(endMinutes), 0, 0);
+
       await updateEvent.mutateAsync({
         id: selectedEvent.id,
         updates: {
           title: formData.title,
           description: formData.description,
-          start_date: formData.start_date.toISOString(),
-          end_date: formData.end_date.toISOString(),
+          start_date: startDateTime.toISOString(),
+          end_date: endDateTime.toISOString(),
           location: formData.location || null,
           type: formData.type || null,
           price: formData.price || null,
@@ -267,11 +289,21 @@ const EventsManager = () => {
 
   const openEditModal = (event: Event) => {
     setSelectedEvent(event);
+    
+    // Estrai ora e minuti dalle date
+    const startDate = new Date(event.start_date);
+    const endDate = new Date(event.end_date || event.start_date);
+    
+    const startTime = `${String(startDate.getHours()).padStart(2, '0')}:${String(startDate.getMinutes()).padStart(2, '0')}`;
+    const endTime = `${String(endDate.getHours()).padStart(2, '0')}:${String(endDate.getMinutes()).padStart(2, '0')}`;
+
     setFormData({
       title: event.title,
       description: event.description || '',
-      start_date: new Date(event.start_date),
-      end_date: new Date(event.end_date || event.start_date),
+      start_date: new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate()),
+      start_time: startTime,
+      end_date: new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate()),
+      end_time: endTime,
       location: event.location || '',
       type: event.type || '',
       price: event.price || '',
@@ -387,6 +419,18 @@ const EventsManager = () => {
         </div>
 
         <div>
+          <Label htmlFor="start_time">Orario Inizio *</Label>
+          <Input
+            id="start_time"
+            type="time"
+            value={formData.start_time}
+            onChange={(e) => setFormData({ ...formData, start_time: e.target.value })}
+          />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div>
           <Label>Data Fine</Label>
           <Popover>
             <PopoverTrigger asChild>
@@ -414,6 +458,16 @@ const EventsManager = () => {
             </PopoverContent>
           </Popover>
         </div>
+
+        <div>
+          <Label htmlFor="end_time">Orario Fine</Label>
+          <Input
+            id="end_time"
+            type="time"
+            value={formData.end_time}
+            onChange={(e) => setFormData({ ...formData, end_time: e.target.value })}
+          />
+        </div>
       </div>
 
       <div className="grid grid-cols-2 gap-4">
@@ -433,7 +487,7 @@ const EventsManager = () => {
           <Input
             id="type"
             value={formData.type}
-            onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+            onChange={(e) => setFormData((prev) => ({ ...prev, type: e.target.value }))}
             placeholder="Es. Ritiri, Meditazione"
           />
         </div>
