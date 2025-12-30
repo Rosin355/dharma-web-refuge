@@ -43,7 +43,8 @@ import {
   X,
   AlertCircle,
   Image,
-  Loader2
+  Loader2,
+  Upload
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import type { Database } from '@/integrations/supabase/types';
@@ -88,6 +89,7 @@ const PostsManager = () => {
   const [imageSearchTerm, setImageSearchTerm] = useState('');
   const [imageResults, setImageResults] = useState<any[]>([]);
   const [searchingImages, setSearchingImages] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
   const [unsplashKey, setUnsplashKey] = useState('');
 
   // Load posts and settings
@@ -285,6 +287,55 @@ const PostsManager = () => {
       image_url: '',
       image_alt: ''
     }));
+  };
+
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Verifica che sia un'immagine
+    if (!file.type.startsWith('image/')) {
+      setError('Il file selezionato non è un\'immagine');
+      return;
+    }
+
+    try {
+      setUploadingImage(true);
+      setError(null);
+
+      // Upload su Supabase Storage
+      const fileExt = file.name.split('.').pop();
+      const fileName = `post-${Date.now()}.${fileExt}`;
+      const filePath = `post-images/${fileName}`;
+
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('images')
+        .upload(filePath, file, {
+          contentType: file.type,
+          upsert: false
+        });
+
+      if (uploadError) throw uploadError;
+
+      // Ottieni URL pubblico
+      const { data: urlData } = supabase.storage
+        .from('images')
+        .getPublicUrl(filePath);
+
+      // Aggiorna formData con l'URL dell'immagine
+      setFormData(prev => ({
+        ...prev,
+        image_url: urlData.publicUrl,
+        image_alt: file.name
+      }));
+    } catch (err) {
+      console.error('❌ Errore upload immagine:', err);
+      setError(err instanceof Error ? err.message : 'Errore durante il caricamento dell\'immagine');
+    } finally {
+      setUploadingImage(false);
+      // Reset input
+      event.target.value = '';
+    }
   };
 
   // Helper functions
@@ -648,16 +699,43 @@ const PostsManager = () => {
                 </div>
               ) : (
                 <div className="space-y-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setShowImageSearch(true)}
-                    disabled={!unsplashKey}
-                    className="w-full"
-                  >
-                    <Image className="h-4 w-4 mr-2" />
-                    {unsplashKey ? 'Cerca Immagine' : 'Configura Unsplash prima'}
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setShowImageSearch(true)}
+                      disabled={!unsplashKey}
+                      className="flex-1"
+                    >
+                      <Image className="h-4 w-4 mr-2" />
+                      {unsplashKey ? 'Cerca Immagine' : 'Configura Unsplash prima'}
+                    </Button>
+                    <label className="flex-1">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={handleImageUpload}
+                        disabled={uploadingImage}
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="w-full"
+                        disabled={uploadingImage}
+                        asChild
+                      >
+                        <span>
+                          {uploadingImage ? (
+                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          ) : (
+                            <Upload className="h-4 w-4 mr-2" />
+                          )}
+                          {uploadingImage ? 'Caricamento...' : 'Carica da Computer'}
+                        </span>
+                      </Button>
+                    </label>
+                  </div>
                   {!unsplashKey && (
                     <p className="text-xs text-gray-500">
                       Vai nella sezione Immagini per configurare Unsplash
@@ -848,16 +926,43 @@ const PostsManager = () => {
                 </div>
               ) : (
                 <div className="space-y-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setShowImageSearch(true)}
-                    disabled={!unsplashKey}
-                    className="w-full"
-                  >
-                    <Image className="h-4 w-4 mr-2" />
-                    {unsplashKey ? 'Cerca Immagine' : 'Configura Unsplash prima'}
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setShowImageSearch(true)}
+                      disabled={!unsplashKey}
+                      className="flex-1"
+                    >
+                      <Image className="h-4 w-4 mr-2" />
+                      {unsplashKey ? 'Cerca Immagine' : 'Configura Unsplash prima'}
+                    </Button>
+                    <label className="flex-1">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={handleImageUpload}
+                        disabled={uploadingImage}
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="w-full"
+                        disabled={uploadingImage}
+                        asChild
+                      >
+                        <span>
+                          {uploadingImage ? (
+                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          ) : (
+                            <Upload className="h-4 w-4 mr-2" />
+                          )}
+                          {uploadingImage ? 'Caricamento...' : 'Carica da Computer'}
+                        </span>
+                      </Button>
+                    </label>
+                  </div>
                   {!unsplashKey && (
                     <p className="text-xs text-gray-500">
                       Vai nella sezione Immagini per configurare Unsplash

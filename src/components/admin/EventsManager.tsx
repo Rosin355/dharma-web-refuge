@@ -49,11 +49,13 @@ import {
   Calendar as CalendarIcon,
   Loader2,
   Image as ImageIcon,
+  Upload,
 } from 'lucide-react';
 import { useEvents } from '@/hooks/useEvents';
 import { toast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { it } from 'date-fns/locale';
+import { supabase } from '@/integrations/supabase/client';
 import type { Database } from '@/integrations/supabase/types';
 
 type Event = Database['public']['Tables']['events']['Row'];
@@ -93,6 +95,7 @@ const EventsManager = () => {
   const [imageSearchTerm, setImageSearchTerm] = useState('');
   const [imageResults, setImageResults] = useState<any[]>([]);
   const [searchingImages, setSearchingImages] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
 
   const resetForm = () => {
     setFormData({
@@ -285,6 +288,66 @@ const EventsManager = () => {
     }));
     setShowImageSearch(false);
     setImageResults([]);
+  };
+
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Verifica che sia un'immagine
+    if (!file.type.startsWith('image/')) {
+      toast({
+        title: 'Errore',
+        description: 'Il file selezionato non è un\'immagine',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    try {
+      setUploadingImage(true);
+
+      // Upload su Supabase Storage
+      const fileExt = file.name.split('.').pop();
+      const fileName = `event-${Date.now()}.${fileExt}`;
+      const filePath = `event-images/${fileName}`;
+
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('images')
+        .upload(filePath, file, {
+          contentType: file.type,
+          upsert: false
+        });
+
+      if (uploadError) throw uploadError;
+
+      // Ottieni URL pubblico
+      const { data: urlData } = supabase.storage
+        .from('images')
+        .getPublicUrl(filePath);
+
+      // Aggiorna formData con l'URL dell'immagine
+      setFormData((prev) => ({
+        ...prev,
+        image_url: urlData.publicUrl,
+      }));
+
+      toast({
+        title: 'Successo',
+        description: 'Immagine caricata con successo',
+      });
+    } catch (err) {
+      console.error('❌ Errore upload immagine:', err);
+      toast({
+        title: 'Errore',
+        description: err instanceof Error ? err.message : 'Errore durante il caricamento dell\'immagine',
+        variant: 'destructive',
+      });
+    } finally {
+      setUploadingImage(false);
+      // Reset input
+      event.target.value = '';
+    }
   };
 
   const openEditModal = (event: Event) => {
@@ -567,6 +630,29 @@ const EventsManager = () => {
           >
             <ImageIcon className="h-4 w-4" />
           </Button>
+          <label>
+            <input
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleImageUpload}
+              disabled={uploadingImage}
+            />
+            <Button
+              type="button"
+              variant="outline"
+              disabled={uploadingImage}
+              asChild
+            >
+              <span>
+                {uploadingImage ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Upload className="h-4 w-4" />
+                )}
+              </span>
+            </Button>
+          </label>
         </div>
         {formData.image_url && (
           <img
