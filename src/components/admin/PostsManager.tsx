@@ -303,6 +303,12 @@ const PostsManager = () => {
       setUploadingImage(true);
       setError(null);
 
+      // Verifica che l'utente sia autenticato
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      if (authError || !user) {
+        throw new Error('Devi essere autenticato per caricare immagini. Effettua il login nell\'area admin.');
+      }
+
       // Upload su Supabase Storage
       const fileExt = file.name.split('.').pop();
       const fileName = `post-${Date.now()}.${fileExt}`;
@@ -315,7 +321,13 @@ const PostsManager = () => {
           upsert: false
         });
 
-      if (uploadError) throw uploadError;
+      if (uploadError) {
+        // Messaggio di errore più dettagliato
+        if (uploadError.message.includes('row-level security') || uploadError.message.includes('policy')) {
+          throw new Error('Errore permessi: le policy del storage non sono configurate correttamente. Contatta l\'amministratore.');
+        }
+        throw uploadError;
+      }
 
       // Ottieni URL pubblico
       const { data: urlData } = supabase.storage
