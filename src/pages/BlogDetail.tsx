@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 
-import { ArrowLeft, Calendar, User, Clock, Loader2, AlertCircle } from 'lucide-react';
+import { ArrowLeft, Calendar, User, Clock, Loader2, AlertCircle, Share2 } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { supabase } from '@/integrations/supabase/client';
 import type { Database } from '@/integrations/supabase/types';
@@ -178,6 +178,38 @@ const BlogDetail = () => {
       });
   };
 
+  // Funzione per condividere l'articolo
+  const handleShare = async () => {
+    const url = `${window.location.origin}/blog/${post.id}`;
+    const shareData = {
+      title: post.title,
+      text: post.excerpt || post.content.substring(0, 200) || '',
+      url: url,
+    };
+
+    try {
+      if (navigator.share && navigator.canShare(shareData)) {
+        await navigator.share(shareData);
+      } else {
+        // Fallback: copia negli appunti
+        await navigator.clipboard.writeText(url);
+        alert('Link copiato negli appunti!');
+      }
+    } catch (err) {
+      // L'utente ha annullato la condivisione o si è verificato un errore
+      if ((err as Error).name !== 'AbortError') {
+        console.error('Errore condivisione:', err);
+        // Fallback: copia negli appunti
+        try {
+          await navigator.clipboard.writeText(url);
+          alert('Link copiato negli appunti!');
+        } catch (clipboardErr) {
+          console.error('Errore copia appunti:', clipboardErr);
+        }
+      }
+    }
+  };
+
   // Dati del post
   const authorName = post.profiles?.full_name || 'Comunità Bodhidharma';
   const formattedDate = formatDate(post.published_at);
@@ -259,9 +291,14 @@ const BlogDetail = () => {
                       Tutti gli articoli
                     </Button>
                   </Link>
-                  <div className="text-sm text-gray-400">
-                    Condividi questo articolo con la tua comunità
-                  </div>
+                  <Button
+                    variant="outline"
+                    onClick={handleShare}
+                    className="border-saffron-600 text-saffron-400 hover:bg-saffron-600 hover:text-white bg-transparent"
+                  >
+                    <Share2 className="mr-2 h-4 w-4" />
+                    Condividi questo articolo
+                  </Button>
                 </div>
               </div>
             </div>

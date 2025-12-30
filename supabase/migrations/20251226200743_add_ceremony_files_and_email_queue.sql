@@ -43,6 +43,13 @@ USING (
   )
 );
 
+-- Policy per permettere INSERT nella tabella email_queue
+-- Necessaria per permettere alle funzioni SECURITY DEFINER di inserire record
+CREATE POLICY "Functions can insert email queue"
+ON public.email_queue
+FOR INSERT
+WITH CHECK (true);
+
 -- Funzione per inviare notifica email (salva in coda)
 CREATE OR REPLACE FUNCTION send_event_registration_email(
   p_to_email TEXT,
