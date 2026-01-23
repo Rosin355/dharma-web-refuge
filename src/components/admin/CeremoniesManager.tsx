@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -89,18 +89,6 @@ const CeremoniesManager = () => {
   const [searchingImages, setSearchingImages] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
 
-  // Ref per il primo campo del form
-  const titleInputRef = useRef<HTMLInputElement>(null);
-
-  // Gestisce il focus quando il modal si apre
-  useEffect(() => {
-    if (showCreateModal || showEditModal) {
-      // Timeout per assicurarsi che il Dialog sia completamente renderizzato
-      setTimeout(() => {
-        titleInputRef.current?.focus();
-      }, 100);
-    }
-  }, [showCreateModal, showEditModal]);
 
   const resetForm = () => {
     setFormData({
@@ -489,12 +477,10 @@ const CeremoniesManager = () => {
       <div>
         <Label htmlFor="title">Titolo *</Label>
         <Input
-          ref={titleInputRef}
           id="title"
           value={formData.title}
           onChange={(e) => setFormData((prev) => ({ ...prev, title: e.target.value }))}
           placeholder="Nome cerimonia"
-          autoFocus
         />
       </div>
 
@@ -941,15 +927,7 @@ const CeremoniesManager = () => {
 
       {/* Create Modal */}
       <Dialog open={showCreateModal} onOpenChange={setShowCreateModal}>
-        <DialogContent 
-          className="max-w-2xl max-h-[90vh] overflow-y-auto"
-          onOpenAutoFocus={(e) => {
-            e.preventDefault();
-            setTimeout(() => {
-              titleInputRef.current?.focus();
-            }, 100);
-          }}
-        >
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Crea Nuova Cerimonia</DialogTitle>
           </DialogHeader>
@@ -975,15 +953,7 @@ const CeremoniesManager = () => {
 
       {/* Edit Modal */}
       <Dialog open={showEditModal} onOpenChange={setShowEditModal}>
-        <DialogContent 
-          className="max-w-2xl max-h-[90vh] overflow-y-auto"
-          onOpenAutoFocus={(e) => {
-            e.preventDefault();
-            setTimeout(() => {
-              titleInputRef.current?.focus();
-            }, 100);
-          }}
-        >
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Modifica Cerimonia</DialogTitle>
           </DialogHeader>
