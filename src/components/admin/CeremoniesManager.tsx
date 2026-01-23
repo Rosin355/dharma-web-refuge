@@ -473,7 +473,7 @@ const CeremoniesManager = () => {
   }
 
   const FormFields = () => (
-    <div className="space-y-4">
+    <div className="space-y-4" style={{ pointerEvents: 'auto' }}>
       <div>
         <Label htmlFor="title">Titolo *</Label>
         <Input
@@ -927,13 +927,20 @@ const CeremoniesManager = () => {
 
       {/* Create Modal */}
       <Dialog open={showCreateModal} onOpenChange={setShowCreateModal}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent 
+          className="max-w-2xl max-h-[90vh] overflow-y-auto"
+          onInteractOutside={(e) => {
+            // Previeni la chiusura quando si interagisce con gli input
+            const target = e.target as HTMLElement;
+            if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.closest('input, textarea, select, label')) {
+              e.preventDefault();
+            }
+          }}
+        >
           <DialogHeader>
             <DialogTitle>Crea Nuova Cerimonia</DialogTitle>
           </DialogHeader>
-          <div onMouseDown={(e) => e.stopPropagation()} onTouchStart={(e) => e.stopPropagation()}>
-            <FormFields />
-          </div>
+          <FormFields />
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowCreateModal(false)}>
               Annulla
@@ -955,13 +962,20 @@ const CeremoniesManager = () => {
 
       {/* Edit Modal */}
       <Dialog open={showEditModal} onOpenChange={setShowEditModal}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent 
+          className="max-w-2xl max-h-[90vh] overflow-y-auto"
+          onInteractOutside={(e) => {
+            // Previeni la chiusura quando si interagisce con gli input
+            const target = e.target as HTMLElement;
+            if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.closest('input, textarea, select, label')) {
+              e.preventDefault();
+            }
+          }}
+        >
           <DialogHeader>
             <DialogTitle>Modifica Cerimonia</DialogTitle>
           </DialogHeader>
-          <div onMouseDown={(e) => e.stopPropagation()} onTouchStart={(e) => e.stopPropagation()}>
-            <FormFields />
-          </div>
+          <FormFields />
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowEditModal(false)}>
               Annulla
