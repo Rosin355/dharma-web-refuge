@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -88,6 +88,19 @@ const CeremoniesManager = () => {
   const [imageResults, setImageResults] = useState<any[]>([]);
   const [searchingImages, setSearchingImages] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
+
+  // Ref per il primo campo del form
+  const titleInputRef = useRef<HTMLInputElement>(null);
+
+  // Gestisce il focus quando il modal si apre
+  useEffect(() => {
+    if (showCreateModal || showEditModal) {
+      // Timeout per assicurarsi che il Dialog sia completamente renderizzato
+      setTimeout(() => {
+        titleInputRef.current?.focus();
+      }, 100);
+    }
+  }, [showCreateModal, showEditModal]);
 
   const resetForm = () => {
     setFormData({
@@ -426,8 +439,8 @@ const CeremoniesManager = () => {
       max_participants: ceremony.max_participants?.toString() || '',
       meeting_url: ceremony.meeting_url || '',
       image_url: ceremony.image_url || '',
-      audio_file_url: (ceremony as any).audio_file_url || '',
-      pdf_file_url: (ceremony as any).pdf_file_url || '',
+      audio_file_url: ceremony.audio_file_url || '',
+      pdf_file_url: ceremony.pdf_file_url || '',
       status: (ceremony.status as 'draft' | 'published') || 'draft',
       featured: ceremony.featured || false,
       attendance_type: (ceremony.attendance_type as 'in_person' | 'online' | 'hybrid') || 'in_person',
@@ -476,10 +489,12 @@ const CeremoniesManager = () => {
       <div>
         <Label htmlFor="title">Titolo *</Label>
         <Input
+          ref={titleInputRef}
           id="title"
           value={formData.title}
           onChange={(e) => setFormData((prev) => ({ ...prev, title: e.target.value }))}
           placeholder="Nome cerimonia"
+          autoFocus
         />
       </div>
 
@@ -926,7 +941,15 @@ const CeremoniesManager = () => {
 
       {/* Create Modal */}
       <Dialog open={showCreateModal} onOpenChange={setShowCreateModal}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent 
+          className="max-w-2xl max-h-[90vh] overflow-y-auto"
+          onOpenAutoFocus={(e) => {
+            e.preventDefault();
+            setTimeout(() => {
+              titleInputRef.current?.focus();
+            }, 100);
+          }}
+        >
           <DialogHeader>
             <DialogTitle>Crea Nuova Cerimonia</DialogTitle>
           </DialogHeader>
@@ -952,7 +975,15 @@ const CeremoniesManager = () => {
 
       {/* Edit Modal */}
       <Dialog open={showEditModal} onOpenChange={setShowEditModal}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent 
+          className="max-w-2xl max-h-[90vh] overflow-y-auto"
+          onOpenAutoFocus={(e) => {
+            e.preventDefault();
+            setTimeout(() => {
+              titleInputRef.current?.focus();
+            }, 100);
+          }}
+        >
           <DialogHeader>
             <DialogTitle>Modifica Cerimonia</DialogTitle>
           </DialogHeader>

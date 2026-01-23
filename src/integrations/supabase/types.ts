@@ -17,6 +17,7 @@ export type Database = {
       ceremonies: {
         Row: {
           attendance_type: string | null
+          audio_file_url: string | null
           created_at: string | null
           description: string | null
           featured: boolean | null
@@ -25,6 +26,7 @@ export type Database = {
           location: string | null
           max_participants: number | null
           meeting_url: string | null
+          pdf_file_url: string | null
           price: string | null
           schedule: string | null
           status: string | null
@@ -35,6 +37,7 @@ export type Database = {
         }
         Insert: {
           attendance_type?: string | null
+          audio_file_url?: string | null
           created_at?: string | null
           description?: string | null
           featured?: boolean | null
@@ -43,6 +46,7 @@ export type Database = {
           location?: string | null
           max_participants?: number | null
           meeting_url?: string | null
+          pdf_file_url?: string | null
           price?: string | null
           schedule?: string | null
           status?: string | null
@@ -53,6 +57,7 @@ export type Database = {
         }
         Update: {
           attendance_type?: string | null
+          audio_file_url?: string | null
           created_at?: string | null
           description?: string | null
           featured?: boolean | null
@@ -61,6 +66,7 @@ export type Database = {
           location?: string | null
           max_participants?: number | null
           meeting_url?: string | null
+          pdf_file_url?: string | null
           price?: string | null
           schedule?: string | null
           status?: string | null
