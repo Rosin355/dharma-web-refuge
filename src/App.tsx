@@ -11,6 +11,7 @@ import Blog from "./pages/Blog";
 import BlogDetail from "./pages/BlogDetail";
 import Eventi from "./pages/Eventi";
 import Cerimonie from "./pages/Cerimonie";
+import CeremonyForm from "./pages/CeremonyForm";
 import ChiSiamo from "./pages/ChiSiamo";
 import Contatti from "./pages/Contatti";
 import Dona from "./pages/Dona";
@@ -35,6 +36,8 @@ const App = () => (
               <Route path="/blog/:id" element={<BlogDetail />} />
               <Route path="/eventi" element={<Eventi />} />
               <Route path="/cerimonie" element={<Cerimonie />} />
+              <Route path="/admin/ceremonies/new" element={<CeremonyForm />} />
+              <Route path="/admin/ceremonies/:id/edit" element={<CeremonyForm />} />
               <Route path="/chi-siamo" element={<ChiSiamo />} />
               <Route path="/contatti" element={<Contatti />} />
               <Route path="/dona" element={<Dona />} />
