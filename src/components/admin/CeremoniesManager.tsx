@@ -931,7 +931,9 @@ const CeremoniesManager = () => {
           <DialogHeader>
             <DialogTitle>Crea Nuova Cerimonia</DialogTitle>
           </DialogHeader>
-          <FormFields />
+          <div onMouseDown={(e) => e.stopPropagation()} onTouchStart={(e) => e.stopPropagation()}>
+            <FormFields />
+          </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowCreateModal(false)}>
               Annulla
@@ -957,7 +959,9 @@ const CeremoniesManager = () => {
           <DialogHeader>
             <DialogTitle>Modifica Cerimonia</DialogTitle>
           </DialogHeader>
-          <FormFields />
+          <div onMouseDown={(e) => e.stopPropagation()} onTouchStart={(e) => e.stopPropagation()}>
+            <FormFields />
+          </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowEditModal(false)}>
               Annulla
