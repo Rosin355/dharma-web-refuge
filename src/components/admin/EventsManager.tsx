@@ -1,16 +1,8 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import {
   Dialog,
@@ -28,197 +20,41 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
-import { Calendar } from '@/components/ui/calendar';
-import { cn } from '@/lib/utils';
-import {
   Plus,
   Edit,
   Trash2,
   MoreHorizontal,
   Search,
-  Calendar as CalendarIcon,
   Loader2,
-  Image as ImageIcon,
-  Upload,
 } from 'lucide-react';
 import { useEvents } from '@/hooks/useEvents';
 import { toast } from '@/hooks/use-toast';
-import { format } from 'date-fns';
-import { it } from 'date-fns/locale';
-import { supabase } from '@/integrations/supabase/client';
 import type { Database } from '@/integrations/supabase/types';
 
 type Event = Database['public']['Tables']['events']['Row'];
 
 const EventsManager = () => {
-  const { events, isLoading, createEvent, updateEvent, deleteEvent } = useEvents();
+  const navigate = useNavigate();
+  const { events, isLoading, deleteEvent } = useEvents();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
 
   // Modal states
-  const [showCreateModal, setShowCreateModal] = useState(false);
-  const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
-
-  // Form state
-  const [formData, setFormData] = useState({
-    title: '',
-    description: '',
-    start_date: new Date(),
-    start_time: '09:00',
-    end_date: new Date(),
-    end_time: '18:00',
-    location: '',
-    type: '',
-    price: '',
-    max_participants: '',
-    meeting_url: '',
-    image_url: '',
-    status: 'draft' as 'draft' | 'published',
-    featured: false,
-    attendance_type: 'in_person' as 'in_person' | 'online' | 'hybrid',
-  });
-
-  // Image search
-  const [showImageSearch, setShowImageSearch] = useState(false);
-  const [imageSearchTerm, setImageSearchTerm] = useState('');
-  const [imageResults, setImageResults] = useState<any[]>([]);
-  const [searchingImages, setSearchingImages] = useState(false);
-  const [uploadingImage, setUploadingImage] = useState(false);
-
-  const resetForm = () => {
-    setFormData({
-      title: '',
-      description: '',
-      start_date: new Date(),
-      start_time: '09:00',
-      end_date: new Date(),
-      end_time: '18:00',
-      location: '',
-      type: '',
-      price: '',
-      max_participants: '',
-      meeting_url: '',
-      image_url: '',
-      status: 'draft',
-      featured: false,
-      attendance_type: 'in_person',
-    });
-    setShowImageSearch(false);
-    setImageResults([]);
-  };
-
-  const handleCreate = async () => {
-    try {
-      if (!formData.title.trim() || !formData.description.trim()) {
-        toast({
-          title: 'Errore',
-          description: 'Titolo e descrizione sono obbligatori',
-          variant: 'destructive',
-        });
-        return;
-      }
-
-      // Combina data e ora
-      const startDateTime = new Date(formData.start_date);
-      const [startHours, startMinutes] = formData.start_time.split(':');
-      startDateTime.setHours(parseInt(startHours), parseInt(startMinutes), 0, 0);
-
-      const endDateTime = new Date(formData.end_date);
-      const [endHours, endMinutes] = formData.end_time.split(':');
-      endDateTime.setHours(parseInt(endHours), parseInt(endMinutes), 0, 0);
-
-      await createEvent.mutateAsync({
-        title: formData.title,
-        description: formData.description,
-        start_date: startDateTime.toISOString(),
-        end_date: endDateTime.toISOString(),
-        location: formData.location || null,
-        type: formData.type || null,
-        price: formData.price || null,
-        max_participants: formData.max_participants ? parseInt(formData.max_participants) : null,
-        meeting_url: formData.meeting_url || null,
-        image_url: formData.image_url || null,
-        status: formData.status,
-        featured: formData.featured,
-        attendance_type: formData.attendance_type,
-      });
-
-      toast({
-        title: 'Successo',
-        description: 'Evento creato con successo',
-      });
-
-      setShowCreateModal(false);
-      resetForm();
-    } catch (error) {
-      toast({
-        title: 'Errore',
-        description: 'Errore durante la creazione dell\'evento',
-        variant: 'destructive',
-      });
-    }
-  };
-
-  const handleUpdate = async () => {
-    try {
-      if (!selectedEvent) return;
-
-      // Combina data e ora
-      const startDateTime = new Date(formData.start_date);
-      const [startHours, startMinutes] = formData.start_time.split(':');
-      startDateTime.setHours(parseInt(startHours), parseInt(startMinutes), 0, 0);
-
-      const endDateTime = new Date(formData.end_date);
-      const [endHours, endMinutes] = formData.end_time.split(':');
-      endDateTime.setHours(parseInt(endHours), parseInt(endMinutes), 0, 0);
-
-      await updateEvent.mutateAsync({
-        id: selectedEvent.id,
-        updates: {
-          title: formData.title,
-          description: formData.description,
-          start_date: startDateTime.toISOString(),
-          end_date: endDateTime.toISOString(),
-          location: formData.location || null,
-          type: formData.type || null,
-          price: formData.price || null,
-          max_participants: formData.max_participants ? parseInt(formData.max_participants) : null,
-          meeting_url: formData.meeting_url || null,
-          image_url: formData.image_url || null,
-          status: formData.status,
-          featured: formData.featured,
-          attendance_type: formData.attendance_type,
-        },
-      });
-
-      toast({
-        title: 'Successo',
-        description: 'Evento aggiornato con successo',
-      });
-
-      setShowEditModal(false);
-      resetForm();
-      setSelectedEvent(null);
-    } catch (error) {
-      toast({
-        title: 'Errore',
-        description: 'Errore durante l\'aggiornamento dell\'evento',
-        variant: 'destructive',
-      });
-    }
-  };
 
   const handleDelete = async () => {
     try {
@@ -240,156 +76,6 @@ const EventsManager = () => {
         variant: 'destructive',
       });
     }
-  };
-
-  const searchUnsplashImages = async (query: string) => {
-    const savedKey = localStorage.getItem('unsplash_access_key');
-    if (!savedKey || !query.trim()) {
-      toast({
-        title: 'Errore',
-        description: 'Inserisci una chiave Unsplash e un termine di ricerca',
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    try {
-      setSearchingImages(true);
-      const response = await fetch(
-        `https://api.unsplash.com/search/photos?query=${encodeURIComponent(
-          query
-        )}&per_page=12&orientation=landscape`,
-        {
-          headers: {
-            Authorization: `Client-ID ${savedKey}`,
-          },
-        }
-      );
-
-      if (!response.ok) throw new Error('Errore ricerca Unsplash');
-
-      const data = await response.json();
-      setImageResults(data.results || []);
-    } catch (error) {
-      toast({
-        title: 'Errore',
-        description: 'Errore durante la ricerca immagini',
-        variant: 'destructive',
-      });
-    } finally {
-      setSearchingImages(false);
-    }
-  };
-
-  const selectImage = (image: any) => {
-    setFormData((prev) => ({
-      ...prev,
-      image_url: image.urls.regular,
-    }));
-    setShowImageSearch(false);
-    setImageResults([]);
-  };
-
-  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    // Verifica che sia un'immagine
-    if (!file.type.startsWith('image/')) {
-      toast({
-        title: 'Errore',
-        description: 'Il file selezionato non è un\'immagine',
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    try {
-      setUploadingImage(true);
-
-      // Verifica che l'utente sia autenticato
-      const { data: { user }, error: authError } = await supabase.auth.getUser();
-      if (authError || !user) {
-        throw new Error('Devi essere autenticato per caricare immagini. Effettua il login nell\'area admin.');
-      }
-
-      // Upload su Supabase Storage
-      const fileExt = file.name.split('.').pop();
-      const fileName = `event-${Date.now()}.${fileExt}`;
-      const filePath = `event-images/${fileName}`;
-
-      const { data: uploadData, error: uploadError } = await supabase.storage
-        .from('images')
-        .upload(filePath, file, {
-          contentType: file.type,
-          upsert: false
-        });
-
-      if (uploadError) {
-        // Messaggio di errore più dettagliato
-        if (uploadError.message.includes('row-level security') || uploadError.message.includes('policy')) {
-          throw new Error('Errore permessi: le policy del storage non sono configurate correttamente. Contatta l\'amministratore.');
-        }
-        throw uploadError;
-      }
-
-      // Ottieni URL pubblico
-      const { data: urlData } = supabase.storage
-        .from('images')
-        .getPublicUrl(filePath);
-
-      // Aggiorna formData con l'URL dell'immagine
-      setFormData((prev) => ({
-        ...prev,
-        image_url: urlData.publicUrl,
-      }));
-
-      toast({
-        title: 'Successo',
-        description: 'Immagine caricata con successo',
-      });
-    } catch (err) {
-      console.error('❌ Errore upload immagine:', err);
-      toast({
-        title: 'Errore',
-        description: err instanceof Error ? err.message : 'Errore durante il caricamento dell\'immagine',
-        variant: 'destructive',
-      });
-    } finally {
-      setUploadingImage(false);
-      // Reset input
-      event.target.value = '';
-    }
-  };
-
-  const openEditModal = (event: Event) => {
-    setSelectedEvent(event);
-    
-    // Estrai ora e minuti dalle date
-    const startDate = new Date(event.start_date);
-    const endDate = new Date(event.end_date || event.start_date);
-    
-    const startTime = `${String(startDate.getHours()).padStart(2, '0')}:${String(startDate.getMinutes()).padStart(2, '0')}`;
-    const endTime = `${String(endDate.getHours()).padStart(2, '0')}:${String(endDate.getMinutes()).padStart(2, '0')}`;
-
-    setFormData({
-      title: event.title,
-      description: event.description || '',
-      start_date: new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate()),
-      start_time: startTime,
-      end_date: new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate()),
-      end_time: endTime,
-      location: event.location || '',
-      type: event.type || '',
-      price: event.price || '',
-      max_participants: event.max_participants?.toString() || '',
-      meeting_url: event.meeting_url || '',
-      image_url: event.image_url || '',
-      status: (event.status as 'draft' | 'published') || 'draft',
-      featured: event.featured || false,
-      attendance_type: (event.attendance_type as 'in_person' | 'online' | 'hybrid') || 'in_person',
-    });
-    setShowEditModal(true);
   };
 
   const filteredEvents = events.filter((event) => {
@@ -438,307 +124,6 @@ const EventsManager = () => {
     );
   }
 
-  const FormFields = () => (
-    <div className="space-y-4">
-      <div>
-        <Label htmlFor="title">Titolo *</Label>
-        <Input
-          id="title"
-          value={formData.title}
-          onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-          placeholder="Nome evento"
-        />
-      </div>
-
-      <div>
-        <Label htmlFor="description">Descrizione *</Label>
-        <Textarea
-          id="description"
-          value={formData.description}
-          onChange={(e) =>
-            setFormData({ ...formData, description: e.target.value })
-          }
-          placeholder="Descrizione dettagliata dell'evento"
-          rows={4}
-        />
-      </div>
-
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <Label>Data Inizio *</Label>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className={cn(
-                  'w-full justify-start text-left font-normal',
-                  !formData.start_date && 'text-muted-foreground'
-                )}
-              >
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {format(formData.start_date, 'PPP', { locale: it })}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
-              <Calendar
-                mode="single"
-                selected={formData.start_date}
-                onSelect={(date) =>
-                  date && setFormData({ ...formData, start_date: date })
-                }
-                initialFocus
-                className="pointer-events-auto"
-              />
-            </PopoverContent>
-          </Popover>
-        </div>
-
-        <div>
-          <Label htmlFor="start_time">Orario Inizio *</Label>
-          <Input
-            id="start_time"
-            type="time"
-            value={formData.start_time}
-            onChange={(e) => setFormData({ ...formData, start_time: e.target.value })}
-          />
-        </div>
-      </div>
-
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <Label>Data Fine</Label>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className={cn(
-                  'w-full justify-start text-left font-normal',
-                  !formData.end_date && 'text-muted-foreground'
-                )}
-              >
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {format(formData.end_date, 'PPP', { locale: it })}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
-              <Calendar
-                mode="single"
-                selected={formData.end_date}
-                onSelect={(date) =>
-                  date && setFormData({ ...formData, end_date: date })
-                }
-                initialFocus
-                className="pointer-events-auto"
-              />
-            </PopoverContent>
-          </Popover>
-        </div>
-
-        <div>
-          <Label htmlFor="end_time">Orario Fine</Label>
-          <Input
-            id="end_time"
-            type="time"
-            value={formData.end_time}
-            onChange={(e) => setFormData({ ...formData, end_time: e.target.value })}
-          />
-        </div>
-      </div>
-
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <Label htmlFor="location">Luogo</Label>
-          <Input
-            id="location"
-            value={formData.location}
-            onChange={(e) =>
-              setFormData({ ...formData, location: e.target.value })
-            }
-            placeholder="Es. Centro Bodhidharma"
-          />
-        </div>
-        <div>
-          <Label htmlFor="type">Tipo</Label>
-          <Input
-            id="type"
-            value={formData.type}
-            onChange={(e) => setFormData((prev) => ({ ...prev, type: e.target.value }))}
-            placeholder="Es. Ritiri, Meditazione"
-          />
-        </div>
-      </div>
-
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <Label htmlFor="price">Prezzo</Label>
-          <Input
-            id="price"
-            value={formData.price}
-            onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-            placeholder="Es. €150 o Offerta libera"
-          />
-        </div>
-        <div>
-          <Label htmlFor="max_participants">Max Partecipanti</Label>
-          <Input
-            id="max_participants"
-            type="number"
-            value={formData.max_participants}
-            onChange={(e) =>
-              setFormData({ ...formData, max_participants: e.target.value })
-            }
-            placeholder="20"
-          />
-        </div>
-      </div>
-
-      <div>
-        <Label htmlFor="attendance_type">Modalità di Partecipazione *</Label>
-        <Select
-          value={formData.attendance_type}
-          onValueChange={(value: 'in_person' | 'online' | 'hybrid') =>
-            setFormData({ ...formData, attendance_type: value })
-          }
-        >
-          <SelectTrigger>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="in_person">Solo in Presenza</SelectItem>
-            <SelectItem value="online">Solo Online</SelectItem>
-            <SelectItem value="hybrid">Ibrido (Presenza + Online)</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      {(formData.attendance_type === 'online' || formData.attendance_type === 'hybrid') && (
-        <div>
-          <Label htmlFor="meeting_url">Link Meeting Online *</Label>
-          <Input
-            id="meeting_url"
-            value={formData.meeting_url}
-            onChange={(e) =>
-              setFormData({ ...formData, meeting_url: e.target.value })
-            }
-            placeholder="https://meet.example.com"
-          />
-        </div>
-      )}
-
-      <div>
-        <Label>Immagine</Label>
-        <div className="flex gap-2">
-          <Input
-            value={formData.image_url}
-            onChange={(e) =>
-              setFormData({ ...formData, image_url: e.target.value })
-            }
-            placeholder="URL immagine"
-          />
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => setShowImageSearch(!showImageSearch)}
-          >
-            <ImageIcon className="h-4 w-4" />
-          </Button>
-          <label>
-            <input
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={handleImageUpload}
-              disabled={uploadingImage}
-            />
-            <Button
-              type="button"
-              variant="outline"
-              disabled={uploadingImage}
-              asChild
-            >
-              <span>
-                {uploadingImage ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Upload className="h-4 w-4" />
-                )}
-              </span>
-            </Button>
-          </label>
-        </div>
-        {formData.image_url && (
-          <img
-            src={formData.image_url}
-            alt="Preview"
-            className="mt-2 w-full h-32 object-cover rounded"
-          />
-        )}
-      </div>
-
-      {showImageSearch && (
-        <div className="space-y-2 p-4 border rounded-lg">
-          <div className="flex gap-2">
-            <Input
-              value={imageSearchTerm}
-              onChange={(e) => setImageSearchTerm(e.target.value)}
-              placeholder="Cerca immagini su Unsplash..."
-            />
-            <Button
-              type="button"
-              onClick={() => searchUnsplashImages(imageSearchTerm)}
-              disabled={searchingImages}
-            >
-              {searchingImages ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Cerca'}
-            </Button>
-          </div>
-          <div className="grid grid-cols-3 gap-2 max-h-64 overflow-y-auto">
-            {imageResults.map((img) => (
-              <img
-                key={img.id}
-                src={img.urls.small}
-                alt={img.alt_description}
-                className="w-full h-24 object-cover rounded cursor-pointer hover:opacity-80"
-                onClick={() => selectImage(img)}
-              />
-            ))}
-          </div>
-        </div>
-      )}
-
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <Label htmlFor="status">Stato</Label>
-          <Select
-            value={formData.status}
-            onValueChange={(value: 'draft' | 'published') =>
-              setFormData({ ...formData, status: value })
-            }
-          >
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="draft">Bozza</SelectItem>
-              <SelectItem value="published">Pubblicato</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="flex items-center space-x-2 mt-8">
-          <input
-            type="checkbox"
-            id="featured"
-            checked={formData.featured}
-            onChange={(e) =>
-              setFormData({ ...formData, featured: e.target.checked })
-            }
-            className="rounded"
-          />
-          <Label htmlFor="featured">In Evidenza</Label>
-        </div>
-      </div>
-    </div>
-  );
-
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -749,10 +134,7 @@ const EventsManager = () => {
           </p>
         </div>
         <Button
-          onClick={() => {
-            resetForm();
-            setShowCreateModal(true);
-          }}
+          onClick={() => navigate('/admin/events/new')}
           className="bg-saffron-600 hover:bg-saffron-700"
         >
           <Plus className="h-4 w-4 mr-2" />
@@ -829,7 +211,7 @@ const EventsManager = () => {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => openEditModal(event)}>
+                          <DropdownMenuItem onClick={() => navigate(`/admin/events/${event.id}/edit`)}>
                             <Edit className="h-4 w-4 mr-2" />
                             Modifica
                           </DropdownMenuItem>
@@ -853,58 +235,6 @@ const EventsManager = () => {
           </Table>
         </CardContent>
       </Card>
-
-      {/* Create Modal */}
-      <Dialog open={showCreateModal} onOpenChange={setShowCreateModal}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Crea Nuovo Evento</DialogTitle>
-          </DialogHeader>
-          <FormFields />
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowCreateModal(false)}>
-              Annulla
-            </Button>
-            <Button
-              onClick={handleCreate}
-              disabled={createEvent.isPending}
-              className="bg-saffron-600 hover:bg-saffron-700"
-            >
-              {createEvent.isPending ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                'Crea Evento'
-              )}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Edit Modal */}
-      <Dialog open={showEditModal} onOpenChange={setShowEditModal}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Modifica Evento</DialogTitle>
-          </DialogHeader>
-          <FormFields />
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowEditModal(false)}>
-              Annulla
-            </Button>
-            <Button
-              onClick={handleUpdate}
-              disabled={updateEvent.isPending}
-              className="bg-saffron-600 hover:bg-saffron-700"
-            >
-              {updateEvent.isPending ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                'Salva Modifiche'
-              )}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
 
       {/* Delete Modal */}
       <Dialog open={showDeleteModal} onOpenChange={setShowDeleteModal}>
