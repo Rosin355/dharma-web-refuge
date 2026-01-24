@@ -586,12 +586,12 @@ const EventForm = () => {
                     setFormData((prev) => ({ ...prev, status: value }))
                   }
                 >
-                  <SelectTrigger className="bg-white border-zinc-200">
+                  <SelectTrigger>
                     <SelectValue placeholder="Seleziona stato" />
                   </SelectTrigger>
-                  <SelectContent className="bg-white border-zinc-200 z-[100]">
-                    <SelectItem value="draft" className="cursor-pointer hover:bg-zinc-100">Bozza</SelectItem>
-                    <SelectItem value="published" className="cursor-pointer hover:bg-zinc-100">Pubblicato</SelectItem>
+                  <SelectContent>
+                    <SelectItem value="draft">Bozza</SelectItem>
+                    <SelectItem value="published">Pubblicato</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -603,9 +603,9 @@ const EventForm = () => {
                   onChange={(e) =>
                     setFormData((prev) => ({ ...prev, featured: e.target.checked }))
                   }
-                  className="rounded border-zinc-300"
+                  className="rounded"
                 />
-                <Label htmlFor="featured" className="cursor-pointer">In Evidenza</Label>
+                <Label htmlFor="featured">In Evidenza</Label>
               </div>
             </div>
 
