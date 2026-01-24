@@ -358,6 +358,7 @@ const EventForm = () => {
                         date && setFormData({ ...formData, start_date: date })
                       }
                       initialFocus
+                      captionLayout="dropdown"
                     />
                   </PopoverContent>
                 </Popover>
@@ -399,6 +400,7 @@ const EventForm = () => {
                         date && setFormData({ ...formData, end_date: date })
                       }
                       initialFocus
+                      captionLayout="dropdown"
                     />
                   </PopoverContent>
                 </Popover>
