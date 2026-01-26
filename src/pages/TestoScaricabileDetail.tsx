@@ -67,9 +67,7 @@ const TestoScaricabileDetail = () => {
   }
 
   return (
-    <>
-
-      <div className="min-h-screen bg-zen-cream">
+    <div className="min-h-screen bg-zen-cream">
         <div className="container mx-auto px-4 py-8 max-w-4xl">
           {/* Back Button */}
           <Link to="/testi-scaricabili">
@@ -115,6 +113,9 @@ const TestoScaricabileDetail = () => {
                     src={text.cover_image_url}
                     alt={text.title || ''}
                     className="w-full max-w-md mx-auto rounded-lg shadow-lg"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                    }}
                   />
                 </div>
               )}
@@ -122,7 +123,9 @@ const TestoScaricabileDetail = () => {
               {/* Content */}
               {text.content && (
                 <div className="mb-6 prose prose-saffron max-w-none">
-                  <div dangerouslySetInnerHTML={{ __html: text.content }} />
+                  <div 
+                    dangerouslySetInnerHTML={{ __html: text.content || '' }} 
+                  />
                 </div>
               )}
 
@@ -170,8 +173,7 @@ const TestoScaricabileDetail = () => {
             </CardContent>
           </Card>
         </div>
-      </div>
-    </>
+    </div>
   );
 };
 

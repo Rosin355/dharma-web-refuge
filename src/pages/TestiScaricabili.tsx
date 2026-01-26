@@ -14,13 +14,13 @@ const TestiScaricabili = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedLanguage, setSelectedLanguage] = useState<string>('all');
   
-  const { texts, isLoading } = useDownloadableTexts({ published: true });
+  const { texts = [], isLoading, error } = useDownloadableTexts({ published: true });
 
   // Extract unique categories and languages
-  const categories = Array.from(new Set(texts.map(t => t.category).filter(Boolean)));
-  const languages = Array.from(new Set(texts.map(t => t.language || 'it')));
+  const categories = Array.from(new Set((texts || []).map(t => t.category).filter(Boolean)));
+  const languages = Array.from(new Set((texts || []).map(t => t.language || 'it')));
 
-  const filteredTexts = texts.filter((text) => {
+  const filteredTexts = (texts || []).filter((text) => {
     const matchesSearch = 
       text.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       text.description?.toLowerCase().includes(searchTerm.toLowerCase());
@@ -49,14 +49,6 @@ const TestiScaricabili = () => {
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-zen-cream flex items-center justify-center">
-        <Loader2 className="h-12 w-12 animate-spin text-saffron-500" />
-      </div>
-    );
-  }
-
   useEffect(() => {
     document.title = 'Testi Scaricabili - Comunità Bodhidharma';
     const metaDescription = document.querySelector('meta[name="description"]');
@@ -65,10 +57,26 @@ const TestiScaricabili = () => {
     }
   }, []);
 
-  return (
-    <>
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-zen-cream flex items-center justify-center">
+        <Loader2 className="h-12 w-12 animate-spin text-saffron-500" />
+      </div>
+    );
+  }
 
-      <div className="min-h-screen bg-zen-cream">
+  if (error) {
+    return (
+      <div className="min-h-screen bg-zen-cream flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-xl text-muted-foreground">Errore nel caricamento dei testi</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-zen-cream">
         {/* Header */}
         <section className="bg-gradient-to-r from-zen-stone to-zen-sage py-16">
           <div className="container mx-auto px-4 text-center">
@@ -144,6 +152,9 @@ const TestiScaricabili = () => {
                           src={text.cover_image_url}
                           alt={text.title || ''}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none';
+                          }}
                         />
                       </div>
                     )}
@@ -201,8 +212,7 @@ const TestiScaricabili = () => {
             )}
           </div>
         </section>
-      </div>
-    </>
+    </div>
   );
 };
 
