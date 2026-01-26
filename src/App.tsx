@@ -13,6 +13,8 @@ import Eventi from "./pages/Eventi";
 import EventForm from "./pages/EventForm";
 import Cerimonie from "./pages/Cerimonie";
 import CeremonyForm from "./pages/CeremonyForm";
+import TestiScaricabili from "./pages/TestiScaricabili";
+import TestoScaricabileDetail from "./pages/TestoScaricabileDetail";
 import ChiSiamo from "./pages/ChiSiamo";
 import Contatti from "./pages/Contatti";
 import Dona from "./pages/Dona";
@@ -41,6 +43,8 @@ const App = () => (
               <Route path="/cerimonie" element={<Cerimonie />} />
               <Route path="/admin/ceremonies/new" element={<CeremonyForm />} />
               <Route path="/admin/ceremonies/:id/edit" element={<CeremonyForm />} />
+              <Route path="/testi-scaricabili" element={<TestiScaricabili />} />
+              <Route path="/testi-scaricabili/:slug" element={<TestoScaricabileDetail />} />
               <Route path="/chi-siamo" element={<ChiSiamo />} />
               <Route path="/contatti" element={<Contatti />} />
               <Route path="/dona" element={<Dona />} />

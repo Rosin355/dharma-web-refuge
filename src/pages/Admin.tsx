@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Settings, Lock, LogOut, Database, Users, FileText, Image, BarChart3, Calendar, Sparkles, ClipboardList } from 'lucide-react';
+import { Settings, Lock, LogOut, Database, Users, FileText, Image, BarChart3, Calendar, Sparkles, ClipboardList, BookOpen } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { testSupabaseConnection } from '@/lib/supabase-utils';
 import PostsManager from '@/components/admin/PostsManager';
@@ -14,6 +14,7 @@ import ContentManager from '@/components/admin/ContentManager';
 import EventsManager from '@/components/admin/EventsManager';
 import CeremoniesManager from '@/components/admin/CeremoniesManager';
 import RegistrationsManager from '@/components/admin/RegistrationsManager';
+import DownloadableTextsManager from '@/components/admin/DownloadableTextsManager';
 
 const Admin = () => {
   const { user, loading, error, signIn, signOut, clearError } = useAuth();
@@ -86,7 +87,7 @@ const Admin = () => {
 
           {/* Admin Tabs */}
           <Tabs defaultValue="dashboard" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-8 lg:w-auto lg:grid-cols-none lg:flex">
+            <TabsList className="grid w-full grid-cols-9 lg:w-auto lg:grid-cols-none lg:flex">
               <TabsTrigger value="dashboard" className="flex items-center gap-2">
                 <BarChart3 className="h-4 w-4" />
                 Dashboard
@@ -106,6 +107,10 @@ const Admin = () => {
               <TabsTrigger value="registrations" className="flex items-center gap-2">
                 <ClipboardList className="h-4 w-4" />
                 Prenotazioni
+              </TabsTrigger>
+              <TabsTrigger value="downloadable-texts" className="flex items-center gap-2">
+                <BookOpen className="h-4 w-4" />
+                Testi Scaricabili
               </TabsTrigger>
               <TabsTrigger value="content" className="flex items-center gap-2">
                 <Settings className="h-4 w-4" />
@@ -259,6 +264,11 @@ const Admin = () => {
             {/* Registrations Management Tab */}
             <TabsContent value="registrations">
               <RegistrationsManager />
+            </TabsContent>
+
+            {/* Downloadable Texts Management Tab */}
+            <TabsContent value="downloadable-texts">
+              <DownloadableTextsManager />
             </TabsContent>
 
             {/* Content Management Tab */}

@@ -22,6 +22,9 @@ const Navigation = () => {
     name: 'Cerimonie',
     path: '/cerimonie'
   }, {
+    name: 'Testi Scaricabili',
+    path: '/testi-scaricabili'
+  }, {
     name: 'Chi Siamo',
     path: '/chi-siamo'
   }, {
