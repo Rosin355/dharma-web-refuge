@@ -431,12 +431,22 @@ const EventForm = () => {
               </div>
               <div>
                 <Label htmlFor="type">Tipo</Label>
-                <Input
-                  id="type"
-                  value={formData.type}
-                  onChange={(e) => setFormData((prev) => ({ ...prev, type: e.target.value }))}
-                  placeholder="Es. Ritiri, Meditazione"
-                />
+                <Select
+                  value={formData.type || undefined}
+                  onValueChange={(value) =>
+                    setFormData((prev) => ({ ...prev, type: value }))
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Seleziona tipo evento" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Ritiri">Ritiri</SelectItem>
+                    <SelectItem value="Conferenze">Conferenze</SelectItem>
+                    <SelectItem value="Meditazione">Meditazione</SelectItem>
+                    <SelectItem value="Workshop">Workshop</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
 
