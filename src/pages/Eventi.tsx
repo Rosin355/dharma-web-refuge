@@ -1,5 +1,6 @@
 
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -196,14 +197,16 @@ const Eventi = () => {
       <section className="py-16 saffron-gradient">
         <div className="container mx-auto px-4 text-center">
           <h2 className="font-serif text-3xl font-light text-white mb-4">
-            Non Trovare l'Evento che Cerchi?
+            Non Trovi l'Evento che Cerchi?
           </h2>
           <p className="text-saffron-100 mb-6 max-w-2xl mx-auto">
-            Contattaci per informazioni su eventi privati, ritiri personalizzati o sessioni individuali
+            Contattaci per informazioni su eventi, ritiri o sessioni individuali
           </p>
-          <Button size="lg" variant="outline" className="bg-white text-saffron-600 border-white hover:bg-saffron-50">
-            Contattaci
-          </Button>
+          <Link to="/contatti">
+            <Button size="lg" variant="outline" className="bg-white text-saffron-600 border-white hover:bg-saffron-50">
+              Contattaci
+            </Button>
+          </Link>
         </div>
       </section>
 
