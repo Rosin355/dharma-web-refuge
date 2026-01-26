@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -48,6 +48,8 @@ import {
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import type { Database } from '@/integrations/supabase/types';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 
 type Post = Database['public']['Tables']['posts']['Row'] & {
   profiles?: {
@@ -90,7 +92,9 @@ const PostsManager = () => {
   const [imageResults, setImageResults] = useState<any[]>([]);
   const [searchingImages, setSearchingImages] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
+  const [uploadingContentImages, setUploadingContentImages] = useState(false);
   const [unsplashKey, setUnsplashKey] = useState('');
+  const quillRef = useRef<ReactQuill>(null);
 
   // Load posts and settings
   useEffect(() => {
@@ -136,12 +140,15 @@ const PostsManager = () => {
       setSubmitting(true);
       setError(null);
 
+      // Converti link YouTube in embed
+      const processedContent = convertYouTubeLinks(formData.content);
+
       const { error: createError } = await supabase
         .from('posts')
         .insert({
           title: formData.title,
-          content: formData.content,
-          excerpt: formData.excerpt || `${formData.content.substring(0, 200)}...`,
+          content: processedContent,
+          excerpt: formData.excerpt || `${formData.content.replace(/<[^>]*>/g, '').substring(0, 200)}...`,
           status: formData.status,
           author_id: formData.author_id,
           image_url: formData.image_url || null,
@@ -173,10 +180,13 @@ const PostsManager = () => {
       setSubmitting(true);
       setError(null);
 
+      // Converti link YouTube in embed
+      const processedContent = convertYouTubeLinks(formData.content);
+
       const updateData: any = {
         title: formData.title,
-        content: formData.content,
-        excerpt: formData.excerpt || `${formData.content.substring(0, 200)}...`,
+        content: processedContent,
+        excerpt: formData.excerpt || `${formData.content.replace(/<[^>]*>/g, '').substring(0, 200)}...`,
         status: formData.status,
         author_id: formData.author_id,
         image_url: formData.image_url || null,
@@ -349,6 +359,113 @@ const PostsManager = () => {
       event.target.value = '';
     }
   };
+
+  // Handler per caricare immagini nel contenuto dell'editor
+  const handleContentImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
+
+    try {
+      setUploadingContentImages(true);
+      setError(null);
+
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      if (authError || !user) {
+        throw new Error('Devi essere autenticato per caricare immagini.');
+      }
+
+      const quill = quillRef.current?.getEditor();
+      if (!quill) return;
+
+      const range = quill.getSelection(true);
+      
+      // Carica tutte le immagini
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        if (!file.type.startsWith('image/')) continue;
+
+        const fileExt = file.name.split('.').pop();
+        const fileName = `post-content-${Date.now()}-${i}.${fileExt}`;
+        const filePath = `post-images/content/${fileName}`;
+
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('images')
+          .upload(filePath, file, {
+            contentType: file.type,
+            upsert: false
+          });
+
+        if (uploadError) throw uploadError;
+
+        const { data: urlData } = supabase.storage
+          .from('images')
+          .getPublicUrl(filePath);
+
+        // Inserisci l'immagine nell'editor
+        quill.insertEmbed(range.index + i, 'image', urlData.publicUrl);
+      }
+    } catch (err) {
+      console.error('❌ Errore upload immagini contenuto:', err);
+      setError(err instanceof Error ? err.message : 'Errore durante il caricamento delle immagini');
+    } finally {
+      setUploadingContentImages(false);
+      event.target.value = '';
+    }
+  };
+
+  // Funzione per convertire link YouTube in embed
+  const convertYouTubeLinks = (html: string): string => {
+    const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/g;
+    
+    return html.replace(youtubeRegex, (match, videoId) => {
+      return `<div class="youtube-embed" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; margin: 20px 0;">
+        <iframe style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" 
+                src="https://www.youtube.com/embed/${videoId}" 
+                frameborder="0" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                allowfullscreen>
+        </iframe>
+      </div>`;
+    });
+  };
+
+  // Configurazione toolbar per react-quill
+  const quillModules = {
+    toolbar: {
+      container: [
+        [{ 'header': [1, 2, 3, false] }],
+        ['bold', 'italic', 'underline', 'strike'],
+        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+        [{ 'color': [] }, { 'background': [] }],
+        ['link', 'image', 'video'],
+        ['clean']
+      ],
+      handlers: {
+        image: () => {
+          const input = document.createElement('input');
+          input.setAttribute('type', 'file');
+          input.setAttribute('accept', 'image/*');
+          input.setAttribute('multiple', 'true');
+          input.onchange = (e) => {
+            const target = e.target as HTMLInputElement;
+            if (target.files) {
+              handleContentImageUpload({ target } as React.ChangeEvent<HTMLInputElement>);
+            }
+          };
+          input.click();
+        }
+      }
+    },
+    clipboard: {
+      matchVisual: false,
+    }
+  };
+
+  const quillFormats = [
+    'header', 'bold', 'italic', 'underline', 'strike',
+    'list', 'bullet', 'color', 'background',
+    'link', 'image', 'video'
+  ];
 
   // Helper functions
   const resetForm = () => {
@@ -653,14 +770,52 @@ const PostsManager = () => {
               <Label htmlFor="content" className="text-sm font-medium">
                 Contenuto <span className="text-red-500">*</span>
               </Label>
-              <Textarea
-                id="content"
-                value={formData.content}
-                onChange={(e) => setFormData(prev => ({ ...prev, content: e.target.value }))}
-                placeholder="Scrivi il contenuto dell'articolo in formato testo o HTML"
-                rows={12}
-                className="min-h-[250px] text-base font-mono"
-              />
+              <div className="border rounded-md">
+                <ReactQuill
+                  ref={quillRef}
+                  theme="snow"
+                  value={formData.content}
+                  onChange={(value) => {
+                    const processed = convertYouTubeLinks(value);
+                    setFormData(prev => ({ ...prev, content: processed }));
+                  }}
+                  modules={quillModules}
+                  formats={quillFormats}
+                  placeholder="Scrivi il contenuto dell'articolo. Puoi inserire immagini, video YouTube e formattare il testo."
+                  style={{ minHeight: '300px' }}
+                />
+              </div>
+              <div className="flex items-center gap-2 mt-2">
+                <label className="text-xs text-gray-500">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    className="hidden"
+                    onChange={handleContentImageUpload}
+                    disabled={uploadingContentImages}
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    disabled={uploadingContentImages}
+                    asChild
+                  >
+                    <span className="cursor-pointer">
+                      {uploadingContentImages ? (
+                        <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                      ) : (
+                        <Image className="h-3 w-3 mr-1" />
+                      )}
+                      {uploadingContentImages ? 'Caricamento...' : 'Carica immagini nel contenuto'}
+                    </span>
+                  </Button>
+                </label>
+                <span className="text-xs text-gray-500">
+                  Puoi anche incollare link YouTube per convertirli automaticamente in video
+                </span>
+              </div>
             </div>
             
             <div className="grid gap-2">
@@ -880,14 +1035,52 @@ const PostsManager = () => {
               <Label htmlFor="edit-content" className="text-sm font-medium">
                 Contenuto <span className="text-red-500">*</span>
               </Label>
-              <Textarea
-                id="edit-content"
-                value={formData.content}
-                onChange={(e) => setFormData(prev => ({ ...prev, content: e.target.value }))}
-                placeholder="Scrivi il contenuto dell'articolo"
-                rows={12}
-                className="min-h-[250px] text-base font-mono"
-              />
+              <div className="border rounded-md">
+                <ReactQuill
+                  ref={quillRef}
+                  theme="snow"
+                  value={formData.content}
+                  onChange={(value) => {
+                    const processed = convertYouTubeLinks(value);
+                    setFormData(prev => ({ ...prev, content: processed }));
+                  }}
+                  modules={quillModules}
+                  formats={quillFormats}
+                  placeholder="Scrivi il contenuto dell'articolo. Puoi inserire immagini, video YouTube e formattare il testo."
+                  style={{ minHeight: '300px' }}
+                />
+              </div>
+              <div className="flex items-center gap-2 mt-2">
+                <label className="text-xs text-gray-500">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    className="hidden"
+                    onChange={handleContentImageUpload}
+                    disabled={uploadingContentImages}
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    disabled={uploadingContentImages}
+                    asChild
+                  >
+                    <span className="cursor-pointer">
+                      {uploadingContentImages ? (
+                        <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                      ) : (
+                        <Image className="h-3 w-3 mr-1" />
+                      )}
+                      {uploadingContentImages ? 'Caricamento...' : 'Carica immagini nel contenuto'}
+                    </span>
+                  </Button>
+                </label>
+                <span className="text-xs text-gray-500">
+                  Puoi anche incollare link YouTube per convertirli automaticamente in video
+                </span>
+              </div>
             </div>
             
             <div className="grid gap-2">

@@ -1,7 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from '@/components/ui/carousel';
 import { ArrowLeft, Calendar, User, Clock, Loader2, AlertCircle, Share2 } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { supabase } from '@/integrations/supabase/client';
@@ -154,28 +160,74 @@ const BlogDetail = () => {
     return `${minutes} min`;
   };
 
-  // Formatta il contenuto preservando la struttura HTML e markdown di base
+  // Estrae le immagini dal contenuto HTML
+  const extractImages = (html: string): string[] => {
+    const imgRegex = /<img[^>]+src="([^"]+)"[^>]*>/gi;
+    const images: string[] = [];
+    let match;
+    while ((match = imgRegex.exec(html)) !== null) {
+      images.push(match[1]);
+    }
+    return images;
+  };
+
+  // Formatta il contenuto preservando HTML, gestendo immagini e video YouTube
   const formatContent = (content: string) => {
-    return content
-      .split('\n\n')
-      .map((paragraph, index) => {
-        // Gestisce i titoli con **
-        if (paragraph.startsWith('**') && paragraph.endsWith('**')) {
-          const title = paragraph.slice(2, -2);
-          return <h3 key={index} className="font-serif text-xl font-semibold mt-6 mb-3 text-gray-100">{title}</h3>;
-        }
-        
-        // Gestisce i paragrafi normali con grassetto inline
-        const formattedParagraph = paragraph.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-        
-        return (
-          <p 
-            key={index} 
-            className="text-gray-400 leading-relaxed mb-4"
-            dangerouslySetInnerHTML={{ __html: formattedParagraph }}
-          />
-        );
-      });
+    // Estrai tutte le immagini
+    const images = extractImages(content);
+    
+    // Rimuovi le immagini dal contenuto per mostrarle separatamente
+    let processedContent = content.replace(/<img[^>]+>/gi, '');
+    
+    // Se ci sono immagini, crea un carosello
+    const imageCarousel = images.length > 0 ? (
+      <div className="my-8">
+        {images.length > 1 ? (
+          <Carousel className="w-full max-w-4xl mx-auto">
+            <CarouselContent>
+              {images.map((imgSrc, index) => (
+                <CarouselItem key={index}>
+                  <div className="flex items-center justify-center">
+                    <img
+                      src={imgSrc}
+                      alt={`Immagine ${index + 1}`}
+                      className="max-w-full h-auto rounded-lg shadow-lg"
+                    />
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <CarouselPrevious className="bg-gray-700/50 hover:bg-gray-700 text-white border-gray-600" />
+            <CarouselNext className="bg-gray-700/50 hover:bg-gray-700 text-white border-gray-600" />
+          </Carousel>
+        ) : (
+          <div className="flex items-center justify-center my-8">
+            <img
+              src={images[0]}
+              alt="Immagine articolo"
+              className="max-w-full h-auto rounded-lg shadow-lg"
+            />
+          </div>
+        )}
+      </div>
+    ) : null;
+
+    // Processa il contenuto HTML rimanente
+    // Il contenuto può già contenere video YouTube embed e altro HTML
+    return (
+      <>
+        {imageCarousel}
+        <div 
+          className="prose prose-lg max-w-none prose-invert text-gray-400"
+          dangerouslySetInnerHTML={{ __html: processedContent }}
+          style={{
+            // Stili per assicurarsi che i video YouTube siano responsive
+            '--tw-prose-body': '#9ca3af',
+            '--tw-prose-headings': '#f3f4f6',
+          } as React.CSSProperties}
+        />
+      </>
+    );
   };
 
   // Funzione per condividere l'articolo
@@ -279,7 +331,7 @@ const BlogDetail = () => {
               
               {/* Contenuto principale */}
               <div className="prose prose-lg max-w-none prose-invert">
-                {formatContent(post.content)}
+                {formatContent(post.content || '')}
               </div>
 
               {/* Condivisione e navigazione */}
