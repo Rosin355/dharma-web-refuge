@@ -26,14 +26,30 @@ const TestoScaricabileDetail = () => {
     }
   };
 
-  const formatDate = (dateString: string | null) => {
-    if (!dateString) return null;
-    return new Date(dateString).toLocaleDateString('it-IT', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
+  const formatDate = (dateString: string | null | undefined): string => {
+    if (!dateString) return '';
+    try {
+      return new Date(dateString).toLocaleDateString('it-IT', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      });
+    } catch {
+      return '';
+    }
   };
+
+  useEffect(() => {
+    if (text) {
+      document.title = `${text.title || 'Testo'} - Testi Scaricabili - Comunità Bodhidharma`;
+      const metaDescription = document.querySelector('meta[name="description"]');
+      if (metaDescription) {
+        metaDescription.setAttribute('content', text.description || `Scarica ${text.title || 'testo'} in formato ${text.file_format?.toUpperCase() || 'PDF'}`);
+      }
+    } else {
+      document.title = 'Testi Scaricabili - Comunità Bodhidharma';
+    }
+  }, [text]);
 
   if (isLoading) {
     return (
@@ -42,16 +58,6 @@ const TestoScaricabileDetail = () => {
       </div>
     );
   }
-
-  useEffect(() => {
-    if (text) {
-      document.title = `${text.title} - Testi Scaricabili - Comunità Bodhidharma`;
-      const metaDescription = document.querySelector('meta[name="description"]');
-      if (metaDescription) {
-        metaDescription.setAttribute('content', text.description || `Scarica ${text.title} in formato ${text.file_format?.toUpperCase()}`);
-      }
-    }
-  }, [text]);
 
   if (error || !text) {
     return (
@@ -97,7 +103,7 @@ const TestoScaricabileDetail = () => {
                   )}
                 </div>
                 <h1 className="font-serif text-4xl font-light mb-4">
-                  {text.title}
+                  {text.title || 'Titolo non disponibile'}
                 </h1>
                 {text.description && (
                   <p className="text-lg text-muted-foreground mb-4">
@@ -121,10 +127,10 @@ const TestoScaricabileDetail = () => {
               )}
 
               {/* Content */}
-              {text.content && (
+              {text.content && text.content.trim() && (
                 <div className="mb-6 prose prose-saffron max-w-none">
                   <div 
-                    dangerouslySetInnerHTML={{ __html: text.content || '' }} 
+                    dangerouslySetInnerHTML={{ __html: String(text.content) }} 
                   />
                 </div>
               )}
@@ -132,7 +138,7 @@ const TestoScaricabileDetail = () => {
               {/* Metadata */}
               <div className="border-t border-zen-sage pt-6 mb-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-muted-foreground">
-                  {text.published_at && (
+                  {text.published_at && formatDate(text.published_at) && (
                     <div className="flex items-center gap-2">
                       <Calendar className="h-4 w-4" />
                       <span>Pubblicato il {formatDate(text.published_at)}</span>

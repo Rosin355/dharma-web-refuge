@@ -108,21 +108,34 @@ export const useDownloadableText = (slug: string) => {
   const { data: text, isLoading, error } = useQuery({
     queryKey: ['downloadable-text', slug],
     queryFn: async () => {
+      if (!slug || slug.trim() === '') {
+        throw new Error('Slug non valido');
+      }
       const { data, error } = await supabase
         .from('downloadable_texts')
         .select('*')
         .eq('slug', slug)
         .eq('published', true)
         .single();
-      if (error) throw error;
+      if (error) {
+        if (error.code === 'PGRST116') {
+          // No rows returned
+          throw new Error('Testo non trovato');
+        }
+        throw error;
+      }
+      if (!data) {
+        throw new Error('Testo non trovato');
+      }
       return data as DownloadableText;
     },
-    enabled: !!slug,
+    enabled: !!slug && slug.trim() !== '',
+    retry: false,
   });
 
   return {
-    text,
+    text: text || null,
     isLoading,
-    error,
+    error: error as Error | null,
   };
 };
