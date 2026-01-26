@@ -15,6 +15,7 @@ import Cerimonie from "./pages/Cerimonie";
 import CeremonyForm from "./pages/CeremonyForm";
 import TestiScaricabili from "./pages/TestiScaricabili";
 import TestoScaricabileDetail from "./pages/TestoScaricabileDetail";
+import DownloadableTextForm from "./pages/DownloadableTextForm";
 import ChiSiamo from "./pages/ChiSiamo";
 import Contatti from "./pages/Contatti";
 import Dona from "./pages/Dona";
@@ -45,6 +46,8 @@ const App = () => (
               <Route path="/admin/ceremonies/:id/edit" element={<CeremonyForm />} />
               <Route path="/testi-scaricabili" element={<TestiScaricabili />} />
               <Route path="/testi-scaricabili/:slug" element={<TestoScaricabileDetail />} />
+              <Route path="/admin/downloadable-texts/new" element={<DownloadableTextForm />} />
+              <Route path="/admin/downloadable-texts/:id/edit" element={<DownloadableTextForm />} />
               <Route path="/chi-siamo" element={<ChiSiamo />} />
               <Route path="/contatti" element={<Contatti />} />
               <Route path="/dona" element={<Dona />} />
