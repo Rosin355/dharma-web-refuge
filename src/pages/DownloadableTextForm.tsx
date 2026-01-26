@@ -378,11 +378,23 @@ const DownloadableTextForm = () => {
               <div className="grid grid-cols-3 gap-4">
                 <div>
                   <Label htmlFor="category">Categoria</Label>
-                  <Input
-                    id="category"
-                    value={formData.category}
-                    onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value }))}
-                  />
+                  <Select 
+                    value={formData.category || ''} 
+                    onValueChange={(value) => setFormData(prev => ({ ...prev, category: value || '' }))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Seleziona categoria" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="">Nessuna categoria</SelectItem>
+                      <SelectItem value="sutra">Sutra</SelectItem>
+                      <SelectItem value="altro testo">Altro testo</SelectItem>
+                      <SelectItem value="testi consigliati">Testi consigliati</SelectItem>
+                      <SelectItem value="approfondimenti">Approfondimenti</SelectItem>
+                      <SelectItem value="insegnamenti della comunità">Insegnamenti della comunità</SelectItem>
+                      <SelectItem value="insegnamenti dei grandi maestri">Insegnamenti dei grandi maestri</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div>
                   <Label htmlFor="language">Lingua</Label>
