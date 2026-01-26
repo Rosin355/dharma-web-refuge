@@ -104,22 +104,17 @@ USING (
 );
 
 -- Trigger for updated_at (verifica che la funzione esista)
-DO $$
+-- Crea la funzione se non esiste già
+CREATE OR REPLACE FUNCTION public.update_updated_at_column()
+RETURNS TRIGGER AS $func$
 BEGIN
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_proc 
-    WHERE proname = 'update_updated_at_column'
-  ) THEN
-    CREATE OR REPLACE FUNCTION public.update_updated_at_column()
-    RETURNS TRIGGER AS $$
-    BEGIN
-      NEW.updated_at = now();
-      RETURN NEW;
-    END;
-    $$ LANGUAGE plpgsql;
-  END IF;
-END $$;
+  NEW.updated_at = now();
+  RETURN NEW;
+END;
+$func$ LANGUAGE plpgsql;
 
+-- Crea il trigger solo se non esiste già
+DROP TRIGGER IF EXISTS update_downloadable_texts_updated_at ON public.downloadable_texts;
 CREATE TRIGGER update_downloadable_texts_updated_at
 BEFORE UPDATE ON public.downloadable_texts
 FOR EACH ROW
@@ -127,7 +122,7 @@ EXECUTE FUNCTION public.update_updated_at_column();
 
 -- Function to generate slug from title
 CREATE OR REPLACE FUNCTION generate_slug(input_text TEXT)
-RETURNS TEXT AS $$
+RETURNS TEXT AS $func$
 BEGIN
   RETURN lower(
     regexp_replace(
@@ -139,7 +134,7 @@ BEGIN
     )
   );
 END;
-$$ LANGUAGE plpgsql IMMUTABLE;
+$func$ LANGUAGE plpgsql IMMUTABLE;
 
 -- Verifica che la tabella sia stata creata
 SELECT 
