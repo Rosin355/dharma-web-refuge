@@ -379,14 +379,14 @@ const DownloadableTextForm = () => {
                 <div>
                   <Label htmlFor="category">Categoria</Label>
                   <Select 
-                    value={formData.category || ''} 
-                    onValueChange={(value) => setFormData(prev => ({ ...prev, category: value || '' }))}
+                    value={formData.category || 'none'} 
+                    onValueChange={(value) => setFormData(prev => ({ ...prev, category: value === 'none' ? '' : value }))}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Seleziona categoria" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Nessuna categoria</SelectItem>
+                      <SelectItem value="none">Nessuna categoria</SelectItem>
                       <SelectItem value="sutra">Sutra</SelectItem>
                       <SelectItem value="altro testo">Altro testo</SelectItem>
                       <SelectItem value="testi consigliati">Testi consigliati</SelectItem>
