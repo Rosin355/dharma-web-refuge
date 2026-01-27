@@ -110,9 +110,17 @@ const PostForm = () => {
       }
 
       const quill = quillRef.current?.getEditor();
-      if (!quill) return;
+      if (!quill) {
+        throw new Error('Editor non disponibile. Clicca nell\'area di testo prima di caricare immagini.');
+      }
 
-      const range = quill.getSelection(true);
+      // Ottieni la selezione corrente o usa la fine del contenuto
+      let range = quill.getSelection();
+      if (!range) {
+        // Se non c'è selezione, inserisci alla fine
+        const length = quill.getLength();
+        range = { index: length - 1, length: 0 };
+      }
       
       // Carica tutte le immagini
       for (let i = 0; i < files.length; i++) {
@@ -136,8 +144,10 @@ const PostForm = () => {
           .from('images')
           .getPublicUrl(filePath);
 
-        // Inserisci l'immagine nell'editor
+        // Inserisci l'immagine nell'editor alla posizione corrente
         quill.insertEmbed(range.index + i, 'image', urlData.publicUrl);
+        // Aggiorna la posizione per la prossima immagine
+        range.index += 1;
       }
     } catch (err) {
       console.error('❌ Errore upload immagini contenuto:', err);
@@ -182,6 +192,22 @@ const PostForm = () => {
       ],
       handlers: {
         image: () => {
+          const quill = quillRef.current?.getEditor();
+          if (!quill) {
+            toast({
+              title: 'Errore',
+              description: 'Editor non disponibile',
+              variant: 'destructive',
+            });
+            return;
+          }
+          
+          // Assicura che l'editor abbia focus
+          const editorElement = quill.root;
+          if (editorElement) {
+            editorElement.focus();
+          }
+          
           const input = document.createElement('input');
           input.setAttribute('type', 'file');
           input.setAttribute('accept', 'image/*');
@@ -485,8 +511,7 @@ const PostForm = () => {
                     theme="snow"
                     value={formData.content}
                     onChange={(value) => {
-                      const processed = convertYouTubeLinks(value);
-                      setFormData(prev => ({ ...prev, content: processed }));
+                      setFormData(prev => ({ ...prev, content: value }));
                     }}
                     modules={quillModules}
                     formats={quillFormats}
@@ -503,22 +528,40 @@ const PostForm = () => {
                       className="hidden"
                       onChange={handleContentImageUpload}
                       disabled={uploadingContentImages}
+                      id="content-image-upload"
                     />
                     <Button
                       type="button"
                       variant="outline"
                       size="sm"
                       disabled={uploadingContentImages}
-                      asChild
+                      onClick={() => {
+                        // Assicura che l'editor abbia focus prima di aprire il file picker
+                        const quill = quillRef.current?.getEditor();
+                        if (quill) {
+                          const editorElement = quill.root;
+                          if (editorElement) {
+                            editorElement.focus();
+                            // Se non c'è selezione, posiziona il cursore alla fine
+                            const length = quill.getLength();
+                            quill.setSelection(length - 1, 0);
+                          }
+                        }
+                        // Triggera il click sull'input file
+                        document.getElementById('content-image-upload')?.click();
+                      }}
                     >
-                      <span className="cursor-pointer">
-                        {uploadingContentImages ? (
+                      {uploadingContentImages ? (
+                        <>
                           <Loader2 className="h-3 w-3 mr-1 animate-spin" />
-                        ) : (
+                          Caricamento...
+                        </>
+                      ) : (
+                        <>
                           <Image className="h-3 w-3 mr-1" />
-                        )}
-                        {uploadingContentImages ? 'Caricamento...' : 'Carica immagini nel contenuto'}
-                      </span>
+                          Carica immagini nel contenuto
+                        </>
+                      )}
                     </Button>
                   </label>
                   <span className="text-xs text-gray-500">
