@@ -91,15 +91,39 @@ const PostForm = () => {
       if (fetchError) throw fetchError;
       if (!data) throw new Error('Articolo non trovato');
 
+      // Assicurati che il contenuto HTML includa correttamente le immagini
+      let content = data.content || '';
+      
+      // Verifica che le immagini nel contenuto siano accessibili
+      if (content) {
+        // Estrai tutte le immagini dal contenuto
+        const imgRegex = /<img[^>]+src="([^"]+)"[^>]*>/gi;
+        const images = [];
+        let match;
+        while ((match = imgRegex.exec(content)) !== null) {
+          images.push(match[1]);
+        }
+        
+        console.log('🖼️ Immagini trovate nel contenuto:', images);
+      }
+
       setFormData({
         title: data.title || '',
-        content: data.content || '',
+        content: content,
         excerpt: data.excerpt || '',
         status: (data.status as 'draft' | 'published') || 'draft',
         author_id: data.author_id,
         image_url: data.image_url || '',
         image_alt: data.image_alt || ''
       });
+      
+      // Forza l'editor a ricaricare il contenuto dopo un breve delay
+      setTimeout(() => {
+        const quill = quillRef.current?.getEditor();
+        if (quill && content) {
+          quill.root.innerHTML = content;
+        }
+      }, 100);
     } catch (err) {
       console.error('❌ Errore caricamento post:', err);
       setError(err instanceof Error ? err.message : 'Errore caricamento articolo');
@@ -162,10 +186,24 @@ const PostForm = () => {
           .from('images')
           .getPublicUrl(filePath);
 
+        if (!urlData?.publicUrl) {
+          throw new Error('Impossibile ottenere l\'URL pubblico dell\'immagine');
+        }
+
         // Inserisci l'immagine nell'editor alla posizione corrente
+        // insertEmbed crea un elemento <img> nell'HTML
         quill.insertEmbed(range.index + i, 'image', urlData.publicUrl);
+        
+        // Aggiungi un break dopo l'immagine per migliorare la formattazione
+        quill.insertText(range.index + i + 1, '\n', 'user');
+        
+        // Sposta il cursore dopo l'immagine
+        quill.setSelection(range.index + i + 2, 0);
+        
         // Aggiorna la posizione per la prossima immagine
-        range.index += 1;
+        range.index += 2;
+        
+        console.log('✅ Immagine caricata:', urlData.publicUrl);
       }
     } catch (err) {
       console.error('❌ Errore upload immagini contenuto:', err);
@@ -234,8 +272,23 @@ const PostForm = () => {
       setSubmitting(true);
       setError(null);
 
+      // Ottieni il contenuto HTML direttamente dall'editor per assicurarsi che le immagini siano incluse
+      const quill = quillRef.current?.getEditor();
+      let contentToSave = formData.content;
+      
+      if (quill) {
+        // Ottieni l'HTML completo dall'editor, che include le immagini
+        const htmlContent = quill.root.innerHTML;
+        if (htmlContent && htmlContent.trim()) {
+          contentToSave = htmlContent;
+        }
+      }
+
       // Converti link YouTube in embed
-      const processedContent = convertYouTubeLinks(formData.content);
+      const processedContent = convertYouTubeLinks(contentToSave);
+      
+      // Log per debug (rimuovere in produzione)
+      console.log('📝 Contenuto da salvare:', processedContent.substring(0, 500));
 
       if (isEditMode && id) {
         const updateData: any = {
@@ -496,6 +549,7 @@ const PostForm = () => {
                     theme="snow"
                     value={formData.content}
                     onChange={(value) => {
+                      // Assicurati che le immagini siano incluse correttamente nell'HTML
                       setFormData(prev => ({ ...prev, content: value }));
                     }}
                     modules={quillModules}
@@ -503,6 +557,7 @@ const PostForm = () => {
                     placeholder="Scrivi il contenuto dell'articolo. Puoi inserire immagini, video YouTube e formattare il testo."
                     style={{ minHeight: '300px' }}
                     readOnly={false}
+                    preserveWhitespace={true}
                   />
                 </div>
                 <div className="flex items-center gap-2 mt-2">

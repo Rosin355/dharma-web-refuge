@@ -1,8 +1,15 @@
 
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Calendar, BookOpen, Users, Heart } from 'lucide-react';
+import { Calendar, BookOpen, Users, Heart, Loader2 } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useEvents } from '@/hooks/useEvents';
+import type { Database } from '@/integrations/supabase/types';
+
+type Post = Database['public']['Tables']['posts']['Row'];
+type Event = Database['public']['Tables']['events']['Row'];
 
 const Home = () => {
   const features = [
@@ -32,26 +39,49 @@ const Home = () => {
     }
   ];
 
-  const recentPosts = [
-    {
-      title: "Italia Buddhista - Tavole Rotonde Online",
-      excerpt: "Serie di incontri via Zoom con religiosi di diverse tradizioni buddhiste per approfondire temi fondamentali come la sofferenza, il karma e la natura di Buddha.",
-      date: "Marzo 2021",
-      image: "https://images.unsplash.com/photo-1515378791036-0648a814c963?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-    },
-    {
-      title: "Ritiro di Vesak 2021",
-      excerpt: "Celebrazione della nascita, illuminazione e parinirvana del Buddha con un ritiro speciale di tre giorni nel nostro centro con meditazioni e cerimonie.",
-      date: "Maggio 2021",
-      image: "https://images.unsplash.com/photo-1518709268805-4e9042af2176?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-    },
-    {
-      title: "Progetto Scuole: Mindfulness ed Educazione",
-      excerpt: "Il nostro impegno nell'introduzione della mindfulness nelle scuole italiane per supportare studenti e insegnanti nel percorso educativo.",
-      date: "Settembre 2020",
-      image: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-    }
-  ];
+  const [recentPosts, setRecentPosts] = useState<Post[]>([]);
+  const [loadingPosts, setLoadingPosts] = useState(true);
+  const { events, isLoading: loadingEvents } = useEvents('published');
+
+  // Fetch recent posts (news) from database
+  useEffect(() => {
+    const fetchRecentPosts = async () => {
+      try {
+        setLoadingPosts(true);
+        const { data, error } = await supabase
+          .from('posts')
+          .select('*')
+          .eq('status', 'published')
+          .order('published_at', { ascending: false })
+          .limit(3);
+
+        if (error) throw error;
+        setRecentPosts(data || []);
+      } catch (err) {
+        console.error('Errore caricamento news:', err);
+      } finally {
+        setLoadingPosts(false);
+      }
+    };
+
+    fetchRecentPosts();
+  }, []);
+
+  // Format date for display
+  const formatDate = (dateString: string | null) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('it-IT', {
+      year: 'numeric',
+      month: 'long',
+    });
+  };
+
+  // Get upcoming events (next 3)
+  const upcomingEvents = events
+    .filter(event => new Date(event.start_date) >= new Date())
+    .sort((a, b) => new Date(a.start_date).getTime() - new Date(b.start_date).getTime())
+    .slice(0, 3);
 
   return (
     <div className="min-h-screen">
@@ -120,48 +150,162 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Recent Blog Posts */}
+      {/* Recent News */}
       <section className="py-20">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="font-serif text-4xl font-light mb-4">
-              Ultime <span className="text-saffron-500">Attività</span>
+              Ultime <span className="text-saffron-500">News</span>
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               Riflessioni, insegnamenti e guide pratiche per approfondire la tua comprensione del Dharma.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-            {recentPosts.map((post, index) => (
-              <Card key={index} className="group overflow-hidden hover:shadow-lg transition-all duration-300 border-zen-sage">
-                <div className="aspect-video overflow-hidden">
-                  <img 
-                    src={post.image} 
-                    alt={post.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                </div>
-                <CardContent className="p-6">
-                  <p className="text-sm text-saffron-600 mb-2">{post.date}</p>
-                  <h3 className="font-serif text-xl font-semibold mb-3 group-hover:text-saffron-600 transition-colors">
-                    {post.title}
-                  </h3>
-                  <p className="text-muted-foreground text-sm leading-relaxed">
-                    {post.excerpt}
-                  </p>
-                </CardContent>
-              </Card>
-            ))}
+          {loadingPosts ? (
+            <div className="flex justify-center items-center py-12">
+              <Loader2 className="h-8 w-8 animate-spin text-saffron-600" />
+            </div>
+          ) : recentPosts.length > 0 ? (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+                {recentPosts.map((post) => (
+                  <Link key={post.id} to={`/blog/${post.id}`}>
+                    <Card className="group overflow-hidden hover:shadow-lg transition-all duration-300 border-zen-sage h-full">
+                      <div className="aspect-video overflow-hidden bg-gray-200">
+                        {post.image_url ? (
+                          <img 
+                            src={post.image_url} 
+                            alt={post.image_alt || post.title}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.src = 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';
+                            }}
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-gradient-to-br from-saffron-100 to-saffron-200 flex items-center justify-center">
+                            <BookOpen className="h-12 w-12 text-saffron-600 opacity-50" />
+                          </div>
+                        )}
+                      </div>
+                      <CardContent className="p-6">
+                        <p className="text-sm text-saffron-600 mb-2">
+                          {formatDate(post.published_at)}
+                        </p>
+                        <h3 className="font-serif text-xl font-semibold mb-3 group-hover:text-saffron-600 transition-colors">
+                          {post.title}
+                        </h3>
+                        <p className="text-muted-foreground text-sm leading-relaxed">
+                          {post.excerpt || post.content?.replace(/<[^>]*>/g, '').substring(0, 150) + '...'}
+                        </p>
+                      </CardContent>
+                    </Card>
+                  </Link>
+                ))}
+              </div>
+
+              <div className="text-center">
+                <Link to="/blog">
+                  <Button size="lg" className="bg-saffron-500 hover:bg-saffron-600 text-white">
+                    Scopri tutte le news
+                  </Button>
+                </Link>
+              </div>
+            </>
+          ) : (
+            <div className="text-center py-12">
+              <p className="text-muted-foreground">Nessuna news disponibile al momento.</p>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* Upcoming Events */}
+      <section className="py-20 bg-zen-cream">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="font-serif text-4xl font-light mb-4">
+              Prossimi <span className="text-saffron-500">Eventi</span>
+            </h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Partecipa ai nostri ritiri, conferenze e incontri di meditazione per crescere insieme nella comunità.
+            </p>
           </div>
 
-          <div className="text-center">
-            <Link to="/blog">
-              <Button size="lg" className="bg-saffron-500 hover:bg-saffron-600 text-white">
-                Scopri tutti le attività
-              </Button>
-            </Link>
-          </div>
+          {loadingEvents ? (
+            <div className="flex justify-center items-center py-12">
+              <Loader2 className="h-8 w-8 animate-spin text-saffron-600" />
+            </div>
+          ) : upcomingEvents.length > 0 ? (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+                {upcomingEvents.map((event) => {
+                  const eventDate = new Date(event.start_date);
+                  const formattedDate = eventDate.toLocaleDateString('it-IT', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                  });
+                  
+                  return (
+                    <Link key={event.id} to={`/eventi#${event.id}`}>
+                      <Card className="group overflow-hidden hover:shadow-lg transition-all duration-300 border-zen-sage h-full bg-white">
+                        <div className="aspect-video overflow-hidden bg-gray-200">
+                          {event.image_url ? (
+                            <img 
+                              src={event.image_url} 
+                              alt={event.title}
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                              onError={(e) => {
+                                const target = e.target as HTMLImageElement;
+                                target.src = 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';
+                              }}
+                            />
+                          ) : (
+                            <div className="w-full h-full bg-gradient-to-br from-saffron-100 to-saffron-200 flex items-center justify-center">
+                              <Calendar className="h-12 w-12 text-saffron-600 opacity-50" />
+                            </div>
+                          )}
+                        </div>
+                        <CardContent className="p-6">
+                          <p className="text-sm text-saffron-600 mb-2">{formattedDate}</p>
+                          {event.type && (
+                            <p className="text-xs text-muted-foreground mb-2 uppercase tracking-wide">
+                              {event.type}
+                            </p>
+                          )}
+                          <h3 className="font-serif text-xl font-semibold mb-3 group-hover:text-saffron-600 transition-colors">
+                            {event.title}
+                          </h3>
+                          <p className="text-muted-foreground text-sm leading-relaxed">
+                            {event.description?.replace(/<[^>]*>/g, '').substring(0, 120) + '...' || 'Scopri di più su questo evento.'}
+                          </p>
+                          {event.location && (
+                            <p className="text-xs text-muted-foreground mt-2">
+                              📍 {event.location}
+                            </p>
+                          )}
+                        </CardContent>
+                      </Card>
+                    </Link>
+                  );
+                })}
+              </div>
+
+              <div className="text-center">
+                <Link to="/eventi">
+                  <Button size="lg" className="bg-saffron-500 hover:bg-saffron-600 text-white">
+                    Vedi tutti gli eventi
+                  </Button>
+                </Link>
+              </div>
+            </>
+          ) : (
+            <div className="text-center py-12">
+              <p className="text-muted-foreground">Nessun evento in programma al momento.</p>
+            </div>
+          )}
         </div>
       </section>
 
