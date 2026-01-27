@@ -281,12 +281,15 @@ const BlogDetail = () => {
 
           {/* Immagine di copertina */}
           {post.image_url && (
-            <div className="mb-8 rounded-lg overflow-hidden">
-              <img
-                src={post.image_url}
-                alt={post.image_alt || post.title}
-                className="w-full h-80 md:h-96 object-cover"
-              />
+            <div className="mb-8 rounded-lg overflow-hidden bg-gray-900">
+              <div className="relative w-full" style={{ aspectRatio: '21/9', minHeight: '300px', maxHeight: '500px' }}>
+                <img
+                  src={post.image_url}
+                  alt={post.image_alt || post.title}
+                  className="w-full h-full object-contain"
+                  style={{ objectPosition: 'center center' }}
+                />
+              </div>
             </div>
           )}
 
