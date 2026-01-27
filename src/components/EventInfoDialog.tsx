@@ -37,6 +37,7 @@ export const EventInfoDialog = ({ event, open, onOpenChange }: EventInfoDialogPr
   };
 
   const handleShare = async () => {
+    // Genera URL pulito senza parametri aggiuntivi
     const url = `${window.location.origin}/eventi/${event.id}`;
     const shareData = {
       title: event.title,

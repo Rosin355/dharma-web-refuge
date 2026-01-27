@@ -10,6 +10,7 @@ import Insegnamenti from "./pages/Insegnamenti";
 import Blog from "./pages/Blog";
 import BlogDetail from "./pages/BlogDetail";
 import Eventi from "./pages/Eventi";
+import EventDetail from "./pages/EventDetail";
 import EventForm from "./pages/EventForm";
 import Cerimonie from "./pages/Cerimonie";
 import CeremonyForm from "./pages/CeremonyForm";
@@ -40,6 +41,7 @@ const App = () => (
               <Route path="/blog" element={<Blog />} />
               <Route path="/blog/:id" element={<BlogDetail />} />
               <Route path="/eventi" element={<Eventi />} />
+              <Route path="/eventi/:id" element={<EventDetail />} />
               <Route path="/admin/events/new" element={<EventForm />} />
               <Route path="/admin/events/:id/edit" element={<EventForm />} />
               <Route path="/cerimonie" element={<Cerimonie />} />

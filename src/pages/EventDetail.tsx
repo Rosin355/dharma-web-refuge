@@ -64,6 +64,58 @@ const EventDetail = () => {
     loadEventData();
   }, [id, loadEvent]);
 
+  // Aggiorna meta tags Open Graph per la condivisione
+  useEffect(() => {
+    if (event) {
+      const url = `${window.location.origin}/eventi/${event.id}`;
+      
+      // Aggiorna title
+      document.title = `${event.title} - Eventi - Comunità Bodhidharma`;
+      
+      // Aggiorna o crea meta tags
+      const updateMetaTag = (property: string, content: string) => {
+        let meta = document.querySelector(`meta[property="${property}"]`) || 
+                   document.querySelector(`meta[name="${property}"]`);
+        if (!meta) {
+          meta = document.createElement('meta');
+          meta.setAttribute('property', property);
+          document.head.appendChild(meta);
+        }
+        meta.setAttribute('content', content);
+      };
+
+      // Open Graph tags
+      updateMetaTag('og:title', event.title);
+      updateMetaTag('og:description', event.description?.replace(/<[^>]*>/g, '').substring(0, 200) || 'Evento della Comunità Bodhidharma');
+      updateMetaTag('og:type', 'website');
+      updateMetaTag('og:url', url);
+      if (event.image_url) {
+        updateMetaTag('og:image', event.image_url);
+        updateMetaTag('og:image:width', '1200');
+        updateMetaTag('og:image:height', '630');
+      }
+
+      // Twitter Card tags
+      updateMetaTag('twitter:card', 'summary_large_image');
+      updateMetaTag('twitter:title', event.title);
+      updateMetaTag('twitter:description', event.description?.replace(/<[^>]*>/g, '').substring(0, 200) || 'Evento della Comunità Bodhidharma');
+      if (event.image_url) {
+        updateMetaTag('twitter:image', event.image_url);
+      }
+
+      // Meta description standard
+      const metaDescription = document.querySelector('meta[name="description"]');
+      if (metaDescription) {
+        metaDescription.setAttribute('content', event.description?.replace(/<[^>]*>/g, '').substring(0, 160) || 'Evento della Comunità Bodhidharma');
+      }
+    }
+
+    // Cleanup: ripristina i meta tags di default quando il componente viene smontato
+    return () => {
+      document.title = 'Comunità Bodhidharma - Centro Monastico e Blog Spirituale';
+    };
+  }, [event]);
+
   const handleBookingSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
