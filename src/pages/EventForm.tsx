@@ -165,12 +165,23 @@ const EventForm = () => {
       }
 
       navigate('/admin');
-    } catch (error) {
+    } catch (error: any) {
+      console.error('❌ Errore salvataggio evento:', error);
+      
+      // Messaggio di errore più dettagliato per problemi di permessi
+      let errorMessage = isEditMode 
+        ? 'Errore durante l\'aggiornamento dell\'evento'
+        : 'Errore durante la creazione dell\'evento';
+      
+      if (error?.message?.includes('403') || error?.message?.includes('permission') || error?.message?.includes('policy')) {
+        errorMessage = 'Errore di permessi: verifica di avere i privilegi di amministratore. Se il problema persiste, contatta il supporto tecnico.';
+      } else if (error?.message) {
+        errorMessage = error.message;
+      }
+      
       toast({
         title: 'Errore',
-        description: isEditMode 
-          ? 'Errore durante l\'aggiornamento dell\'evento'
-          : 'Errore durante la creazione dell\'evento',
+        description: errorMessage,
         variant: 'destructive',
       });
     }
