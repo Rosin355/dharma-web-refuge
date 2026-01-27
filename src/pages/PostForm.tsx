@@ -61,6 +61,24 @@ const PostForm = () => {
     if (savedKey) setUnsplashKey(savedKey);
   }, [id, isEditMode]);
 
+  // Assicura che l'editor sia editabile dopo il mount
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const quill = quillRef.current?.getEditor();
+      if (quill) {
+        const editorElement = quill.root;
+        if (editorElement) {
+          // Rimuovi qualsiasi attributo che potrebbe impedire l'editing
+          editorElement.removeAttribute('contenteditable');
+          editorElement.setAttribute('contenteditable', 'true');
+          // Assicura che l'editor sia focusabile
+          editorElement.style.cursor = 'text';
+        }
+      }
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [formData.content]);
+
   const loadPost = async (postId: string) => {
     try {
       setLoading(true);
@@ -181,47 +199,14 @@ const PostForm = () => {
 
   // Configurazione toolbar per react-quill
   const quillModules = {
-    toolbar: {
-      container: [
-        [{ 'header': [1, 2, 3, false] }],
-        ['bold', 'italic', 'underline', 'strike'],
-        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-        [{ 'color': [] }, { 'background': [] }],
-        ['link', 'image', 'video'],
-        ['clean']
-      ],
-      handlers: {
-        image: () => {
-          const quill = quillRef.current?.getEditor();
-          if (!quill) {
-            toast({
-              title: 'Errore',
-              description: 'Editor non disponibile',
-              variant: 'destructive',
-            });
-            return;
-          }
-          
-          // Assicura che l'editor abbia focus
-          const editorElement = quill.root;
-          if (editorElement) {
-            editorElement.focus();
-          }
-          
-          const input = document.createElement('input');
-          input.setAttribute('type', 'file');
-          input.setAttribute('accept', 'image/*');
-          input.setAttribute('multiple', 'true');
-          input.onchange = (e) => {
-            const target = e.target as HTMLInputElement;
-            if (target.files) {
-              handleContentImageUpload({ target } as React.ChangeEvent<HTMLInputElement>);
-            }
-          };
-          input.click();
-        }
-      }
-    },
+    toolbar: [
+      [{ 'header': [1, 2, 3, false] }],
+      ['bold', 'italic', 'underline', 'strike'],
+      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+      [{ 'color': [] }, { 'background': [] }],
+      ['link', 'image', 'video'],
+      ['clean']
+    ],
     clipboard: {
       matchVisual: false,
     }
@@ -505,7 +490,7 @@ const PostForm = () => {
 
               <div>
                 <Label htmlFor="content">Contenuto *</Label>
-                <div className="border rounded-md">
+                <div className="border rounded-md" style={{ position: 'relative' }}>
                   <ReactQuill
                     ref={quillRef}
                     theme="snow"
@@ -517,6 +502,7 @@ const PostForm = () => {
                     formats={quillFormats}
                     placeholder="Scrivi il contenuto dell'articolo. Puoi inserire immagini, video YouTube e formattare il testo."
                     style={{ minHeight: '300px' }}
+                    readOnly={false}
                   />
                 </div>
                 <div className="flex items-center gap-2 mt-2">
