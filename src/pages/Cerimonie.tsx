@@ -1,24 +1,23 @@
 
-import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Calendar, Clock, MapPin, Info } from 'lucide-react';
 import { useCeremonies } from '@/hooks/useCeremonies';
-import { CeremonyInfoDialog } from '@/components/CeremonyInfoDialog';
 import { CeremonyRegistrationDialog } from '@/components/CeremonyRegistrationDialog';
+import { useState } from 'react';
 import type { Database } from '@/integrations/supabase/types';
 
 type Ceremony = Database['public']['Tables']['ceremonies']['Row'];
 
 const Cerimonie = () => {
+  const navigate = useNavigate();
   const { ceremonies, isLoading } = useCeremonies('published');
   const [selectedCeremony, setSelectedCeremony] = useState<Ceremony | null>(null);
-  const [showInfoDialog, setShowInfoDialog] = useState(false);
   const [showRegistrationDialog, setShowRegistrationDialog] = useState(false);
 
   const handleInfoClick = (ceremony: Ceremony) => {
-    setSelectedCeremony(ceremony);
-    setShowInfoDialog(true);
+    navigate(`/cerimonie/${ceremony.id}`);
   };
 
   const handlePartecipaClick = (ceremony: Ceremony) => {
@@ -119,11 +118,6 @@ const Cerimonie = () => {
       </section>
 
       {/* Dialogs */}
-      <CeremonyInfoDialog
-        ceremony={selectedCeremony}
-        open={showInfoDialog}
-        onOpenChange={setShowInfoDialog}
-      />
       <CeremonyRegistrationDialog
         ceremony={selectedCeremony}
         open={showRegistrationDialog}

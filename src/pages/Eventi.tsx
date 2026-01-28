@@ -1,20 +1,19 @@
 
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Calendar, Clock, MapPin, Users } from 'lucide-react';
 import { useEvents } from '@/hooks/useEvents';
-import { EventInfoDialog } from '@/components/EventInfoDialog';
 import { EventRegistrationDialog } from '@/components/EventRegistrationDialog';
 import type { Database } from '@/integrations/supabase/types';
 
 type Event = Database['public']['Tables']['events']['Row'];
 
 const Eventi = () => {
+  const navigate = useNavigate();
   const [filter, setFilter] = useState('Tutti');
-  const [selectedEventForInfo, setSelectedEventForInfo] = useState<Event | null>(null);
   const [selectedEventForBooking, setSelectedEventForBooking] = useState<Event | null>(null);
   
   const { events, isLoading } = useEvents('published');
@@ -168,7 +167,7 @@ const Eventi = () => {
                     <Button 
                       variant="outline" 
                       className="border-saffron-200 text-saffron-600 hover:bg-saffron-50 flex-[2] text-sm py-1.5"
-                      onClick={() => setSelectedEventForInfo(event)}
+                      onClick={() => navigate(`/eventi/${event.id}`)}
                     >
                       Info
                     </Button>
@@ -211,11 +210,6 @@ const Eventi = () => {
       </section>
 
       {/* Dialogs */}
-      <EventInfoDialog
-        event={selectedEventForInfo}
-        open={!!selectedEventForInfo}
-        onOpenChange={(open) => !open && setSelectedEventForInfo(null)}
-      />
       <EventRegistrationDialog
         event={selectedEventForBooking}
         open={!!selectedEventForBooking}

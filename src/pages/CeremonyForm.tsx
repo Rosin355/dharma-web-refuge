@@ -4,7 +4,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import {
   Select,
   SelectContent,
@@ -35,20 +34,13 @@ const CeremonyForm = () => {
 
   const [formData, setFormData] = useState({
     title: '',
-    description: '',
-    schedule: '',
-    time: '',
-    location: '',
     type: '',
-    price: '',
-    max_participants: '',
     meeting_url: '',
     image_url: '',
     audio_file_url: '',
     pdf_file_url: '',
     status: 'draft' as 'draft' | 'published',
     featured: false,
-    attendance_type: 'in_person' as 'in_person' | 'online' | 'hybrid',
   });
 
   const [showImageSearch, setShowImageSearch] = useState(false);
@@ -64,20 +56,13 @@ const CeremonyForm = () => {
       if (ceremony) {
         setFormData({
           title: ceremony.title,
-          description: ceremony.description || '',
-          schedule: ceremony.schedule || '',
-          time: ceremony.time || '',
-          location: ceremony.location || '',
           type: ceremony.type || '',
-          price: ceremony.price || '',
-          max_participants: ceremony.max_participants?.toString() || '',
           meeting_url: ceremony.meeting_url || '',
           image_url: ceremony.image_url || '',
           audio_file_url: ceremony.audio_file_url || '',
           pdf_file_url: ceremony.pdf_file_url || '',
           status: (ceremony.status as 'draft' | 'published') || 'draft',
           featured: ceremony.featured || false,
-          attendance_type: (ceremony.attendance_type as 'in_person' | 'online' | 'hybrid') || 'in_person',
         });
       }
     }
@@ -86,10 +71,10 @@ const CeremonyForm = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.title.trim() || !formData.description.trim()) {
+    if (!formData.title.trim()) {
       toast({
         title: 'Errore',
-        description: 'Titolo e descrizione sono obbligatori',
+        description: 'Titolo è obbligatorio',
         variant: 'destructive',
       });
       return;
@@ -101,20 +86,13 @@ const CeremonyForm = () => {
           id,
           updates: {
             title: formData.title,
-            description: formData.description,
-            schedule: formData.schedule || null,
-            time: formData.time || null,
-            location: formData.location || null,
             type: formData.type || null,
-            price: formData.price || null,
-            max_participants: formData.max_participants ? parseInt(formData.max_participants) : null,
             meeting_url: formData.meeting_url || null,
             image_url: formData.image_url || null,
             audio_file_url: formData.audio_file_url || null,
             pdf_file_url: formData.pdf_file_url || null,
             status: formData.status,
             featured: formData.featured,
-            attendance_type: formData.attendance_type,
           },
         });
 
@@ -125,20 +103,13 @@ const CeremonyForm = () => {
       } else {
         await createCeremony.mutateAsync({
           title: formData.title,
-          description: formData.description,
-          schedule: formData.schedule || null,
-          time: formData.time || null,
-          location: formData.location || null,
           type: formData.type || null,
-          price: formData.price || null,
-          max_participants: formData.max_participants ? parseInt(formData.max_participants) : null,
           meeting_url: formData.meeting_url || null,
           image_url: formData.image_url || null,
           audio_file_url: formData.audio_file_url || null,
           pdf_file_url: formData.pdf_file_url || null,
           status: formData.status,
           featured: formData.featured,
-          attendance_type: formData.attendance_type,
         });
 
         toast({
@@ -376,124 +347,26 @@ const CeremonyForm = () => {
             </div>
 
             <div>
-              <Label htmlFor="description">Descrizione *</Label>
-              <Textarea
-                id="description"
-                value={formData.description}
-                onChange={(e) =>
-                  setFormData((prev) => ({ ...prev, description: e.target.value }))
-                }
-                placeholder="Descrizione dettagliata della cerimonia"
-                rows={4}
-                required
+              <Label htmlFor="type">Tipo</Label>
+              <Input
+                id="type"
+                value={formData.type}
+                onChange={(e) => setFormData((prev) => ({ ...prev, type: e.target.value }))}
+                placeholder="Es. Meditazione, Rituale"
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="schedule">Frequenza</Label>
-                <Input
-                  id="schedule"
-                  value={formData.schedule}
-                  onChange={(e) =>
-                    setFormData((prev) => ({ ...prev, schedule: e.target.value }))
-                  }
-                  placeholder="Es. Ogni domenica, Luna piena"
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="time">Orario</Label>
-                <Input
-                  id="time"
-                  value={formData.time}
-                  onChange={(e) =>
-                    setFormData((prev) => ({ ...prev, time: e.target.value }))
-                  }
-                  placeholder="Es. 15:00 - 17:00"
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="location">Luogo</Label>
-                <Input
-                  id="location"
-                  value={formData.location}
-                  onChange={(e) =>
-                    setFormData((prev) => ({ ...prev, location: e.target.value }))
-                  }
-                  placeholder="Es. Sala del tè"
-                />
-              </div>
-              <div>
-                <Label htmlFor="type">Tipo</Label>
-                <Input
-                  id="type"
-                  value={formData.type}
-                  onChange={(e) => setFormData((prev) => ({ ...prev, type: e.target.value }))}
-                  placeholder="Es. Meditazione, Rituale"
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="price">Prezzo</Label>
-                <Input
-                  id="price"
-                  value={formData.price}
-                  onChange={(e) => setFormData((prev) => ({ ...prev, price: e.target.value }))}
-                  placeholder="Es. Offerta libera"
-                />
-              </div>
-              <div>
-                <Label htmlFor="max_participants">Max Partecipanti</Label>
-                <Input
-                  id="max_participants"
-                  type="number"
-                  value={formData.max_participants}
-                  onChange={(e) =>
-                    setFormData((prev) => ({ ...prev, max_participants: e.target.value }))
-                  }
-                  placeholder="20"
-                />
-              </div>
-            </div>
-
             <div>
-              <Label htmlFor="attendance_type">Modalità di Partecipazione *</Label>
-              <Select
-                value={formData.attendance_type}
-                onValueChange={(value: 'in_person' | 'online' | 'hybrid') =>
-                  setFormData((prev) => ({ ...prev, attendance_type: value }))
+              <Label htmlFor="meeting_url">Link Meeting Online (opzionale)</Label>
+              <Input
+                id="meeting_url"
+                value={formData.meeting_url}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, meeting_url: e.target.value }))
                 }
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="in_person">Solo in Presenza</SelectItem>
-                  <SelectItem value="online">Solo Online</SelectItem>
-                  <SelectItem value="hybrid">Ibrido (Presenza + Online)</SelectItem>
-                </SelectContent>
-              </Select>
+                placeholder="https://meet.example.com"
+              />
             </div>
-
-            {(formData.attendance_type === 'online' || formData.attendance_type === 'hybrid') && (
-              <div>
-                <Label htmlFor="meeting_url">Link Meeting Online *</Label>
-                <Input
-                  id="meeting_url"
-                  value={formData.meeting_url}
-                  onChange={(e) =>
-                    setFormData((prev) => ({ ...prev, meeting_url: e.target.value }))
-                  }
-                  placeholder="https://meet.example.com"
-                />
-              </div>
-            )}
 
             <div>
               <Label>Immagine</Label>
