@@ -183,7 +183,7 @@ const BlogDetail = () => {
     const imageCarousel = images.length > 0 ? (
       <div className="my-8">
         {images.length > 1 ? (
-          <Carousel className="w-full max-w-4xl mx-auto">
+          <Carousel className="w-full max-w-2xl mx-auto">
             <CarouselContent>
               {images.map((imgSrc, index) => (
                 <CarouselItem key={index}>
@@ -191,7 +191,7 @@ const BlogDetail = () => {
                     <img
                       src={imgSrc}
                       alt={`Immagine ${index + 1}`}
-                      className="max-w-full h-auto rounded-lg shadow-lg"
+                      className="max-w-full h-auto max-h-[600px] rounded-lg shadow-lg object-contain"
                     />
                   </div>
                 </CarouselItem>
@@ -205,7 +205,7 @@ const BlogDetail = () => {
             <img
               src={images[0]}
               alt="Immagine articolo"
-              className="max-w-full h-auto rounded-lg shadow-lg"
+              className="max-w-2xl w-full h-auto max-h-[600px] rounded-lg shadow-lg object-contain"
             />
           </div>
         )}
@@ -226,6 +226,17 @@ const BlogDetail = () => {
             '--tw-prose-headings': '#f3f4f6',
           } as React.CSSProperties}
         />
+        <style>{`
+          .prose img {
+            max-width: 42rem !important;
+            max-height: 600px !important;
+            width: auto !important;
+            height: auto !important;
+            object-fit: contain !important;
+            margin: 1.5rem auto !important;
+            display: block !important;
+          }
+        `}</style>
       </>
     );
   };
@@ -281,8 +292,8 @@ const BlogDetail = () => {
 
           {/* Immagine di copertina */}
           {post.image_url && (
-            <div className="mb-8 rounded-lg overflow-hidden bg-gray-900">
-              <div className="relative w-full" style={{ aspectRatio: '21/9', minHeight: '300px', maxHeight: '500px' }}>
+            <div className="mb-8 rounded-lg overflow-hidden bg-gray-900 max-w-4xl mx-auto">
+              <div className="relative w-full" style={{ aspectRatio: '21/9', minHeight: '300px', maxHeight: '400px' }}>
                 <img
                   src={post.image_url}
                   alt={post.image_alt || post.title}
