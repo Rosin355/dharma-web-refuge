@@ -87,11 +87,11 @@ const Eventi = () => {
       {/* Events Grid */}
       <section className="py-12">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredEvents.map((event) => (
               <Card key={event.id} className={`group overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 bg-white border-zen-sage ${event.featured ? 'ring-2 ring-saffron-200' : ''}`}>
                 {/* Horizontal Image Full Width */}
-                <div className="relative w-full h-48 overflow-hidden">
+                <div className="relative w-full h-32 overflow-hidden">
                   {event.image_url ? (
                     <img 
                       src={event.image_url} 
@@ -124,8 +124,8 @@ const Eventi = () => {
                   )}
                 </div>
                 
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between mb-2">
+                <CardContent className="p-3">
+                  <div className="flex items-center justify-between mb-1.5">
                     {event.type && (
                       <Badge variant="secondary" className="bg-saffron-100 text-saffron-700 text-xs">
                         {event.type}
@@ -133,15 +133,15 @@ const Eventi = () => {
                     )}
                   </div>
                   
-                  <h3 className="font-serif text-xl font-semibold mb-2 group-hover:text-saffron-600 transition-colors line-clamp-2">
+                  <h3 className="font-serif text-lg font-semibold mb-1.5 group-hover:text-saffron-600 transition-colors line-clamp-2">
                     {event.title}
                   </h3>
                   
-                  <p className="text-muted-foreground text-xs leading-relaxed mb-3 line-clamp-2">
+                  <p className="text-muted-foreground text-xs leading-relaxed mb-2 line-clamp-2">
                     {event.description}
                   </p>
                   
-                  <div className="space-y-1.5 mb-4">
+                  <div className="space-y-1 mb-3">
                     <div className="flex items-center space-x-2 text-xs text-muted-foreground">
                       <Calendar className="h-3 w-3 text-saffron-500" />
                       <span className="truncate">{formatDate(event.start_date)}</span>
@@ -167,13 +167,13 @@ const Eventi = () => {
                   <div className="flex gap-2">
                     <Button 
                       variant="outline" 
-                      className="border-saffron-200 text-saffron-600 hover:bg-saffron-50 flex-[2]"
+                      className="border-saffron-200 text-saffron-600 hover:bg-saffron-50 flex-[2] text-sm py-1.5"
                       onClick={() => setSelectedEventForInfo(event)}
                     >
                       Info
                     </Button>
                     <Button 
-                      className="bg-saffron-500 hover:bg-saffron-600 text-white flex-1"
+                      className="bg-saffron-500 hover:bg-saffron-600 text-white flex-1 text-sm py-1.5"
                       onClick={() => setSelectedEventForBooking(event)}
                       disabled={event.end_date ? isEventPast(event.end_date) : false}
                     >
