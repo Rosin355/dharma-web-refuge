@@ -197,12 +197,12 @@ const CeremonyDetail = () => {
       </section>
 
       {/* Main Content */}
-      <section className="py-12">
+      <section className="py-12 bg-white">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto space-y-6">
             {/* Image */}
             {ceremony.image_url && (
-              <Card className="overflow-hidden border-zen-sage">
+              <Card className="overflow-hidden border-zen-sage bg-white">
                 <div className="aspect-video">
                   <img 
                     src={ceremony.image_url} 
@@ -215,11 +215,11 @@ const CeremonyDetail = () => {
 
             {/* Description */}
             {ceremony.description && (
-              <Card className="border-zen-sage">
+              <Card className="border-zen-sage bg-white">
                 <CardContent className="p-6">
-                  <h2 className="font-serif text-2xl font-semibold mb-4">Descrizione</h2>
+                  <h2 className="font-serif text-2xl font-semibold mb-4 text-foreground">Descrizione</h2>
                   <div className="prose max-w-none">
-                    <p className="text-muted-foreground leading-relaxed whitespace-pre-wrap">
+                    <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
                       {ceremony.description}
                     </p>
                   </div>
@@ -229,11 +229,11 @@ const CeremonyDetail = () => {
 
             {/* Audio Player */}
             {ceremony.audio_file_url && (
-              <Card className="border-zen-sage">
+              <Card className="border-zen-sage bg-white">
                 <CardContent className="p-6">
                   <div className="flex items-center gap-3 mb-4">
                     <Music className="h-6 w-6 text-saffron-600" />
-                    <h2 className="font-serif text-2xl font-semibold">Ascolta</h2>
+                    <h2 className="font-serif text-2xl font-semibold text-foreground">Ascolta</h2>
                   </div>
                   <div className="space-y-4">
                     <audio controls className="w-full">
@@ -255,11 +255,11 @@ const CeremonyDetail = () => {
 
             {/* PDF/File Download */}
             {ceremony.pdf_file_url && (
-              <Card className="border-zen-sage">
+              <Card className="border-zen-sage bg-white">
                 <CardContent className="p-6">
                   <div className="flex items-center gap-3 mb-4">
                     <FileText className="h-6 w-6 text-saffron-600" />
-                    <h2 className="font-serif text-2xl font-semibold">File Scaricabile</h2>
+                    <h2 className="font-serif text-2xl font-semibold text-foreground">File Scaricabile</h2>
                   </div>
                   <Button
                     variant="outline"
@@ -274,9 +274,9 @@ const CeremonyDetail = () => {
             )}
 
             {/* Sharing */}
-            <Card className="border-zen-sage">
+            <Card className="border-zen-sage bg-white">
               <CardContent className="p-6">
-                <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
+                <h3 className="font-semibold text-lg mb-3 flex items-center gap-2 text-foreground">
                   <Share2 className="h-5 w-5 text-saffron-600" />
                   Condividi Cerimonia
                 </h3>

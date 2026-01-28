@@ -106,7 +106,7 @@ const TestoScaricabileDetail = () => {
                   {text.title || 'Titolo non disponibile'}
                 </h1>
                 {text.description && (
-                  <p className="text-lg text-muted-foreground mb-4">
+                  <p className="text-lg text-gray-700 mb-4">
                     {text.description}
                   </p>
                 )}
@@ -137,16 +137,16 @@ const TestoScaricabileDetail = () => {
 
               {/* Metadata */}
               <div className="border-t border-zen-sage pt-6 mb-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-muted-foreground">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-700">
                   {text.published_at && formatDate(text.published_at) && (
                     <div className="flex items-center gap-2">
-                      <Calendar className="h-4 w-4" />
+                      <Calendar className="h-4 w-4 text-gray-600" />
                       <span>Pubblicato il {formatDate(text.published_at)}</span>
                     </div>
                   )}
                   {text.file_format && (
                     <div className="flex items-center gap-2">
-                      <FileText className="h-4 w-4" />
+                      <FileText className="h-4 w-4 text-gray-600" />
                       <span>Formato: {text.file_format.toUpperCase()}</span>
                     </div>
                   )}

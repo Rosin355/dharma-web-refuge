@@ -40,7 +40,7 @@ const Cerimonie = () => {
       </section>
 
       {/* Cerimonie */}
-      <section className="py-12">
+      <section className="py-12 bg-white">
         <div className="container mx-auto px-4">
           {isLoading ? (
             <div className="text-center py-12">
@@ -48,7 +48,7 @@ const Cerimonie = () => {
             </div>
           ) : ceremonies.length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-muted-foreground">Nessuna cerimonia disponibile al momento.</p>
+              <p className="text-gray-700">Nessuna cerimonia disponibile al momento.</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -68,25 +68,25 @@ const Cerimonie = () => {
                       {ceremony.title}
                     </h3>
                     
-                    <p className="text-muted-foreground text-sm leading-relaxed mb-4 line-clamp-3">
+                    <p className="text-gray-700 text-sm leading-relaxed mb-4 line-clamp-3">
                       {ceremony.description}
                     </p>
                     
                     <div className="space-y-2 mb-6">
                       {ceremony.schedule && (
-                        <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+                        <div className="flex items-center space-x-2 text-sm text-gray-700">
                           <Calendar className="h-4 w-4 text-saffron-500" />
                           <span>{ceremony.schedule}</span>
                         </div>
                       )}
                       {ceremony.time && (
-                        <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+                        <div className="flex items-center space-x-2 text-sm text-gray-700">
                           <Clock className="h-4 w-4 text-saffron-500" />
                           <span>{ceremony.time}</span>
                         </div>
                       )}
                       {ceremony.location && (
-                        <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+                        <div className="flex items-center space-x-2 text-sm text-gray-700">
                           <MapPin className="h-4 w-4 text-saffron-500" />
                           <span>{ceremony.location}</span>
                         </div>

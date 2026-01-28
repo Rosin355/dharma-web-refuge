@@ -19,7 +19,7 @@ const Navigation = () => {
     name: 'Eventi',
     path: '/eventi'
   }, {
-    name: 'Cerimonie',
+    name: 'Audio Scaricabili',
     path: '/cerimonie'
   }, {
     name: 'Testi Scaricabili',

@@ -85,7 +85,7 @@ const Eventi = () => {
       </section>
 
       {/* Events Grid */}
-      <section className="py-12">
+      <section className="py-12 bg-white">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredEvents.map((event) => (
@@ -137,29 +137,29 @@ const Eventi = () => {
                     {event.title}
                   </h3>
                   
-                  <p className="text-muted-foreground text-xs leading-relaxed mb-2 line-clamp-2">
+                  <p className="text-gray-700 text-xs leading-relaxed mb-2 line-clamp-2">
                     {event.description 
                       ? event.description.replace(/<[^>]*>/g, '').substring(0, 120) + (event.description.replace(/<[^>]*>/g, '').length > 120 ? '...' : '')
                       : 'Nessuna descrizione disponibile.'}
                   </p>
                   
                   <div className="space-y-1 mb-3">
-                    <div className="flex items-center space-x-2 text-xs text-muted-foreground">
+                    <div className="flex items-center space-x-2 text-xs text-gray-700">
                       <Calendar className="h-3 w-3 text-saffron-500" />
                       <span className="truncate">{formatDate(event.start_date)}</span>
                     </div>
-                    <div className="flex items-center space-x-2 text-xs text-muted-foreground">
+                    <div className="flex items-center space-x-2 text-xs text-gray-700">
                       <Clock className="h-3 w-3 text-saffron-500" />
                       <span>{formatTime(event.start_date)}</span>
                     </div>
                     {event.location && (
-                      <div className="flex items-center space-x-2 text-xs text-muted-foreground">
+                      <div className="flex items-center space-x-2 text-xs text-gray-700">
                         <MapPin className="h-3 w-3 text-saffron-500" />
                         <span className="truncate">{event.location}</span>
                       </div>
                     )}
                     {event.max_participants && (
-                      <div className="flex items-center space-x-2 text-xs text-muted-foreground">
+                      <div className="flex items-center space-x-2 text-xs text-gray-700">
                         <Users className="h-3 w-3 text-saffron-500" />
                         <span>Max {event.max_participants} partecipanti</span>
                       </div>
@@ -189,7 +189,7 @@ const Eventi = () => {
 
           {filteredEvents.length === 0 && (
             <div className="text-center py-12">
-              <p className="text-lg text-muted-foreground">Nessun evento trovato per questa categoria.</p>
+              <p className="text-lg text-gray-700">Nessun evento trovato per questa categoria.</p>
             </div>
           )}
         </div>

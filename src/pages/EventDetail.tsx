@@ -281,7 +281,7 @@ const EventDetail = () => {
       )}
 
       {/* Main Content */}
-      <section className="py-12">
+      <section className="py-12 bg-white">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -289,7 +289,7 @@ const EventDetail = () => {
               <div className="lg:col-span-2 space-y-6">
                 {/* Event Image */}
                 {event.image_url && (
-                  <Card className="overflow-hidden border-zen-sage">
+                  <Card className="overflow-hidden border-zen-sage bg-white">
                     <div className="aspect-video">
                       <img 
                         src={event.image_url} 
@@ -301,11 +301,11 @@ const EventDetail = () => {
                 )}
 
                 {/* Description */}
-                <Card className="border-zen-sage">
+                <Card className="border-zen-sage bg-white">
                   <CardContent className="p-6">
-                    <h2 className="font-serif text-2xl font-semibold mb-4">Descrizione</h2>
+                    <h2 className="font-serif text-2xl font-semibold mb-4 text-foreground">Descrizione</h2>
                     <div className="prose max-w-none">
-                      <p className="text-muted-foreground leading-relaxed whitespace-pre-wrap">
+                      <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
                         {event.description || 'Nessuna descrizione disponibile per questo evento.'}
                       </p>
                     </div>
@@ -313,20 +313,20 @@ const EventDetail = () => {
                 </Card>
 
                 {/* Event Details */}
-                <Card className="border-zen-sage">
+                <Card className="border-zen-sage bg-white">
                   <CardContent className="p-6">
-                    <h2 className="font-serif text-2xl font-semibold mb-4">Dettagli dell'Evento</h2>
+                    <h2 className="font-serif text-2xl font-semibold mb-4 text-foreground">Dettagli dell'Evento</h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <h3 className="font-semibold mb-2">Data e Ora</h3>
-                        <div className="space-y-1 text-muted-foreground">
+                        <h3 className="font-semibold mb-2 text-foreground">Data e Ora</h3>
+                        <div className="space-y-1 text-gray-700">
                           <div className="flex items-center gap-2">
-                            <Calendar className="h-4 w-4" />
+                            <Calendar className="h-4 w-4 text-gray-600" />
                             <span>Inizio: {formatDate(event.start_date)} alle {formatTime(event.start_date)}</span>
                           </div>
                           {event.end_date && (
                             <div className="flex items-center gap-2">
-                              <Calendar className="h-4 w-4" />
+                              <Calendar className="h-4 w-4 text-gray-600" />
                               <span>Fine: {formatDate(event.end_date)} alle {formatTime(event.end_date)}</span>
                             </div>
                           )}
@@ -335,9 +335,9 @@ const EventDetail = () => {
                       
                       {event.location && (
                         <div>
-                          <h3 className="font-semibold mb-2">Luogo</h3>
-                          <div className="flex items-center gap-2 text-muted-foreground">
-                            <MapPin className="h-4 w-4" />
+                          <h3 className="font-semibold mb-2 text-foreground">Luogo</h3>
+                          <div className="flex items-center gap-2 text-gray-700">
+                            <MapPin className="h-4 w-4 text-gray-600" />
                             <span>{event.location}</span>
                           </div>
                         </div>
@@ -345,9 +345,9 @@ const EventDetail = () => {
                       
                       {event.max_participants && (
                         <div>
-                          <h3 className="font-semibold mb-2">Partecipanti</h3>
-                          <div className="flex items-center gap-2 text-muted-foreground">
-                            <Users className="h-4 w-4" />
+                          <h3 className="font-semibold mb-2 text-foreground">Partecipanti</h3>
+                          <div className="flex items-center gap-2 text-gray-700">
+                            <Users className="h-4 w-4 text-gray-600" />
                             <span>Massimo {event.max_participants} persone</span>
                           </div>
                         </div>
@@ -355,9 +355,9 @@ const EventDetail = () => {
                       
                       {event.price && (
                         <div>
-                          <h3 className="font-semibold mb-2">Prezzo</h3>
-                          <div className="flex items-center gap-2 text-muted-foreground">
-                            <Euro className="h-4 w-4" />
+                          <h3 className="font-semibold mb-2 text-foreground">Prezzo</h3>
+                          <div className="flex items-center gap-2 text-gray-700">
+                            <Euro className="h-4 w-4 text-gray-600" />
                             <span>{event.price}</span>
                           </div>
                         </div>
@@ -368,13 +368,13 @@ const EventDetail = () => {
 
                 {/* Meeting Link */}
                 {(event as any).meeting_url && (
-                  <Card className="border-zen-sage">
+                  <Card className="border-zen-sage bg-white">
                     <CardContent className="p-6">
-                      <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
+                      <h3 className="font-semibold text-lg mb-3 flex items-center gap-2 text-foreground">
                         <Link className="h-5 w-5 text-saffron-600" />
                         Partecipa Online
                       </h3>
-                      <p className="text-muted-foreground mb-4">
+                      <p className="text-gray-700 mb-4">
                         {event.location ? 
                           'Evento ibrido: puoi partecipare di persona o online' : 
                           'Evento online'
@@ -391,9 +391,9 @@ const EventDetail = () => {
                 )}
 
                 {/* Sharing */}
-                <Card className="border-zen-sage">
+                <Card className="border-zen-sage bg-white">
                   <CardContent className="p-6">
-                    <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
+                    <h3 className="font-semibold text-lg mb-3 flex items-center gap-2 text-foreground">
                       <Share2 className="h-5 w-5 text-saffron-600" />
                       Condividi Evento
                     </h3>
@@ -448,7 +448,7 @@ const EventDetail = () => {
               {/* Sidebar */}
               <div className="space-y-6">
                 {/* Booking Card */}
-                <Card className="border-zen-sage sticky top-4">
+                <Card className="border-zen-sage sticky top-4 bg-white">
                   <CardContent className="p-6">
                     <div className="text-center mb-6">
                       {event.price && (
@@ -456,7 +456,7 @@ const EventDetail = () => {
                           {event.price}
                         </div>
                       )}
-                      <p className="text-muted-foreground text-sm">
+                      <p className="text-gray-600 text-sm">
                         Prenotazione richiesta
                       </p>
                     </div>
@@ -516,8 +516,8 @@ const EventDetail = () => {
                           </div>
                           
                           <div className="bg-saffron-50 p-4 rounded-lg">
-                            <h4 className="font-semibold mb-2">Procedura di Prenotazione:</h4>
-                            <ol className="text-sm space-y-1 text-muted-foreground">
+                            <h4 className="font-semibold mb-2 text-foreground">Procedura di Prenotazione:</h4>
+                            <ol className="text-sm space-y-1 text-gray-700">
                               <li>1. Invia la richiesta di prenotazione</li>
                               <li>2. Riceverai conferma via email entro 24 ore</li>
                               <li>3. Dopo la conferma, ti verranno inviati i dettagli per il pagamento via bonifico</li>
@@ -545,12 +545,12 @@ const EventDetail = () => {
                     </Dialog>
                     
                     <div className="mt-4 space-y-2">
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Mail className="h-4 w-4" />
+                      <div className="flex items-center gap-2 text-sm text-gray-700">
+                        <Mail className="h-4 w-4 text-gray-600" />
                         <span>Conferma via email</span>
                       </div>
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Euro className="h-4 w-4" />
+                      <div className="flex items-center gap-2 text-sm text-gray-700">
+                        <Euro className="h-4 w-4 text-gray-600" />
                         <span>Pagamento via bonifico</span>
                       </div>
                     </div>
@@ -558,19 +558,19 @@ const EventDetail = () => {
                 </Card>
 
                 {/* Contact Info */}
-                <Card className="border-zen-sage">
+                <Card className="border-zen-sage bg-white">
                   <CardContent className="p-6">
-                    <h3 className="font-semibold mb-4">Informazioni</h3>
+                    <h3 className="font-semibold mb-4 text-foreground">Informazioni</h3>
                     <div className="space-y-3 text-sm">
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 text-gray-700">
                         <Phone className="h-4 w-4 text-saffron-500" />
                         <span>+39 123 456 789</span>
                       </div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 text-gray-700">
                         <Mail className="h-4 w-4 text-saffron-500" />
                         <span>eventi@bodhidharma.info</span>
                       </div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 text-gray-700">
                         <MessageSquare className="h-4 w-4 text-saffron-500" />
                         <span>Rispondiamo entro 24 ore</span>
                       </div>

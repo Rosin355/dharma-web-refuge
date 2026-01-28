@@ -45,7 +45,7 @@ const Footer = () => {
               </li>
               <li>
                 <Link to="/cerimonie" className="text-muted-foreground hover:text-saffron-500 transition-colors">
-                  Cerimonie
+                  Audio Scaricabili
                 </Link>
               </li>
               <li>

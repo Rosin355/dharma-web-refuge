@@ -69,7 +69,7 @@ const TestiScaricabili = () => {
     return (
       <div className="min-h-screen bg-zen-cream flex items-center justify-center">
         <div className="text-center">
-          <p className="text-xl text-muted-foreground">Errore nel caricamento dei testi</p>
+          <p className="text-xl text-gray-700">Errore nel caricamento dei testi</p>
         </div>
       </div>
     );
@@ -135,12 +135,12 @@ const TestiScaricabili = () => {
         </section>
 
         {/* Texts Grid */}
-        <section className="py-12">
+        <section className="py-12 bg-white">
           <div className="container mx-auto px-4">
             {filteredTexts.length === 0 ? (
               <div className="text-center py-16">
                 <FileText className="h-16 w-16 mx-auto text-gray-400 mb-4" />
-                <p className="text-xl text-muted-foreground">Nessun testo trovato</p>
+                <p className="text-xl text-gray-700">Nessun testo trovato</p>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -173,12 +173,12 @@ const TestiScaricabili = () => {
                         {text.title}
                       </h3>
                       {text.description && (
-                        <p className="text-sm text-muted-foreground mb-4 line-clamp-3">
+                        <p className="text-sm text-gray-700 mb-4 line-clamp-3">
                           {text.description}
                         </p>
                       )}
                       {text.category && (
-                        <p className="text-xs text-muted-foreground mb-4">
+                        <p className="text-xs text-gray-700 mb-4">
                           Categoria: {text.category}
                         </p>
                       )}
