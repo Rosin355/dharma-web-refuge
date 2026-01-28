@@ -41,6 +41,7 @@ import {
   CheckCircle2,
   XCircle,
   Clock,
+  Mail,
 } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -213,6 +214,51 @@ const RegistrationsManager = () => {
     updateStatus.mutate({ id, status: newStatus });
   };
 
+  const handleSendEmail = (registration: Registration) => {
+    const eventTitle = registration.events?.title || 'Evento';
+    let eventDate = 'Data da confermare';
+    if (registration.events?.start_date) {
+      const date = new Date(registration.events.start_date);
+      eventDate = date.toLocaleDateString('it-IT', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+    }
+    
+    const subject = encodeURIComponent(`Conferma prenotazione - ${eventTitle}`);
+    
+    const statusText = registration.status === 'confirmed' 
+      ? 'Confermata' 
+      : registration.status === 'pending' 
+        ? 'In attesa di conferma' 
+        : 'Cancellata';
+    
+    const body = encodeURIComponent(`Gentile ${registration.full_name},
+
+La sua prenotazione per l'evento "${eventTitle}" è stata ricevuta.
+
+Dettagli prenotazione:
+- Evento: ${eventTitle}
+- Data: ${eventDate}
+- Nome: ${registration.full_name}
+- Email: ${registration.email}
+${registration.phone ? `- Telefono: ${registration.phone}` : ''}
+${registration.notes ? `- Note: ${registration.notes}` : ''}
+- Stato: ${statusText}
+
+${registration.status === 'pending' ? 'Riceverà una conferma via email entro 24 ore. Il pagamento verrà richiesto solo dopo la conferma.' : registration.status === 'confirmed' ? 'La sua prenotazione è stata confermata. A breve riceverà i dettagli per il pagamento.' : ''}
+
+Cordiali saluti,
+Comunità Bodhidharma`);
+
+    const mailtoLink = `mailto:${registration.email}?subject=${subject}&body=${body}`;
+    window.location.href = mailtoLink;
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -318,6 +364,10 @@ const RegistrationsManager = () => {
                             <Eye className="h-4 w-4 mr-2" />
                             Dettagli
                           </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleSendEmail(registration)}>
+                            <Mail className="h-4 w-4 mr-2" />
+                            Invia Email
+                          </DropdownMenuItem>
                           {registration.status !== 'confirmed' && (
                             <DropdownMenuItem
                               onClick={() => handleUpdateStatus(registration.id, 'confirmed')}
@@ -420,6 +470,13 @@ const RegistrationsManager = () => {
             </div>
           )}
           <DialogFooter>
+            <Button 
+              variant="outline" 
+              onClick={() => selectedRegistration && handleSendEmail(selectedRegistration)}
+            >
+              <Mail className="h-4 w-4 mr-2" />
+              Invia Email
+            </Button>
             <Button variant="outline" onClick={() => setShowDetailModal(false)}>
               Chiudi
             </Button>
