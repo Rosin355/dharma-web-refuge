@@ -99,19 +99,18 @@ const EventDetail = () => {
       updateMetaTag('og:description', event.description?.replace(/<[^>]*>/g, '').substring(0, 200) || 'Evento della Comunità Bodhidharma');
       updateMetaTag('og:type', 'website');
       updateMetaTag('og:url', url);
-      if (event.image_url) {
-        updateMetaTag('og:image', event.image_url);
-        updateMetaTag('og:image:width', '1200');
-        updateMetaTag('og:image:height', '630');
-      }
+      // Imposta sempre l'immagine dell'evento, o usa il logo come fallback
+      const ogImage = event.image_url || `${window.location.origin}/logo.png`;
+      updateMetaTag('og:image', ogImage);
+      updateMetaTag('og:image:width', '1200');
+      updateMetaTag('og:image:height', '630');
+      updateMetaTag('og:image:alt', event.title);
 
       // Twitter Card tags
       updateMetaTag('twitter:card', 'summary_large_image');
       updateMetaTag('twitter:title', event.title);
       updateMetaTag('twitter:description', event.description?.replace(/<[^>]*>/g, '').substring(0, 200) || 'Evento della Comunità Bodhidharma');
-      if (event.image_url) {
-        updateMetaTag('twitter:image', event.image_url);
-      }
+      updateMetaTag('twitter:image', ogImage);
 
       // Meta description standard
       const metaDescription = document.querySelector('meta[name="description"]');
