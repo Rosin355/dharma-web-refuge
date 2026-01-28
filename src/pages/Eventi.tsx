@@ -24,7 +24,8 @@ const Eventi = () => {
     ? events 
     : events.filter(event => event.type === filter);
 
-  const isEventPast = (endDate: string) => {
+  const isEventPast = (endDate: string | null | undefined) => {
+    if (!endDate) return false;
     return new Date(endDate) < new Date();
   };
 
@@ -137,7 +138,9 @@ const Eventi = () => {
                   </h3>
                   
                   <p className="text-muted-foreground text-xs leading-relaxed mb-2 line-clamp-2">
-                    {event.description}
+                    {event.description 
+                      ? event.description.replace(/<[^>]*>/g, '').substring(0, 120) + (event.description.replace(/<[^>]*>/g, '').length > 120 ? '...' : '')
+                      : 'Nessuna descrizione disponibile.'}
                   </p>
                   
                   <div className="space-y-1 mb-3">
