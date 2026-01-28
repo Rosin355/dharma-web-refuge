@@ -22,26 +22,27 @@ import {
   Link,
   Share2
 } from 'lucide-react';
-import { useEvents, Event, EventBookingInsert } from '@/hooks/useEvents';
+import { supabase } from '@/integrations/supabase/client';
+import type { Database } from '@/integrations/supabase/types';
+import { useEventRegistrations } from '@/hooks/useEvents';
+
+type Event = Database['public']['Tables']['events']['Row'];
 
 const EventDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { loadEvent, createBooking } = useEvents();
+  const { createRegistration } = useEventRegistrations(id);
   
   const [event, setEvent] = useState<Event | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
   const [bookingSuccess, setBookingSuccess] = useState(false);
-  const [bookingFormData, setBookingFormData] = useState<EventBookingInsert>({
-    event_id: id || '',
+  const [bookingFormData, setBookingFormData] = useState({
     user_name: '',
     user_email: '',
     user_phone: '',
-    participants_count: 1,
     message: '',
-    status: 'pending'
   });
 
   useEffect(() => {
@@ -52,17 +53,26 @@ const EventDetail = () => {
         return;
       }
 
-      const result = await loadEvent(id);
-      if (result.success) {
-        setEvent(result.data);
-      } else {
-        setError(result.error || 'Evento non trovato');
+      try {
+        const { data, error: fetchError } = await supabase
+          .from('events')
+          .select('*')
+          .eq('id', id)
+          .single();
+
+        if (fetchError) throw fetchError;
+        if (!data) throw new Error('Evento non trovato');
+
+        setEvent(data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Errore nel caricamento dell\'evento');
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
 
     loadEventData();
-  }, [id, loadEvent]);
+  }, [id]);
 
   // Aggiorna meta tags Open Graph per la condivisione
   useEffect(() => {
@@ -119,22 +129,31 @@ const EventDetail = () => {
   const handleBookingSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    const result = await createBooking(bookingFormData);
-    if (result.success) {
+    if (!id) {
+      setError('ID evento non valido');
+      return;
+    }
+
+    try {
+      await createRegistration.mutateAsync({
+        event_id: id,
+        full_name: bookingFormData.user_name,
+        email: bookingFormData.user_email,
+        phone: bookingFormData.user_phone || undefined,
+        notes: bookingFormData.message || undefined,
+      });
+
       setBookingSuccess(true);
       setIsBookingModalOpen(false);
       // Reset form
       setBookingFormData({
-        event_id: id || '',
         user_name: '',
         user_email: '',
         user_phone: '',
-        participants_count: 1,
         message: '',
-        status: 'pending'
       });
-    } else {
-      setError(result.error || 'Errore nella prenotazione');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Errore nella prenotazione');
     }
   };
 
@@ -483,18 +502,6 @@ const EventDetail = () => {
                               type="tel"
                               value={bookingFormData.user_phone || ''}
                               onChange={(e) => setBookingFormData(prev => ({ ...prev, user_phone: e.target.value }))}
-                            />
-                          </div>
-                          
-                          <div>
-                            <Label htmlFor="participants_count">Numero Partecipanti</Label>
-                            <Input
-                              id="participants_count"
-                              type="number"
-                              min="1"
-                              max={event.max_participants || 50}
-                              value={bookingFormData.participants_count || 1}
-                              onChange={(e) => setBookingFormData(prev => ({ ...prev, participants_count: parseInt(e.target.value) }))}
                             />
                           </div>
                           
