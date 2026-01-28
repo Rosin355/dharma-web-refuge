@@ -102,7 +102,7 @@ export const EventRegistrationDialog = ({
   if (!event) return null;
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={onOpenChange} modal={true}>
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle className="text-xl font-serif">

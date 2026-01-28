@@ -443,7 +443,7 @@ const EventDetail = () => {
                       </p>
                     </div>
                     
-                    <Dialog open={isBookingModalOpen} onOpenChange={setIsBookingModalOpen}>
+                    <Dialog open={isBookingModalOpen} onOpenChange={setIsBookingModalOpen} modal={true}>
                       <DialogTrigger asChild>
                         <Button className="w-full bg-saffron-600 hover:bg-saffron-700 text-white">
                           Prenota Posto

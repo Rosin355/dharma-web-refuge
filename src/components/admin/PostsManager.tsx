@@ -356,7 +356,7 @@ const PostsManager = () => {
       </Card>
 
       {/* Delete Modal */}
-      <Dialog open={showDeleteModal} onOpenChange={setShowDeleteModal}>
+      <Dialog open={showDeleteModal} onOpenChange={setShowDeleteModal} modal={true}>
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle className="text-xl font-semibold flex items-center gap-2 text-red-600">

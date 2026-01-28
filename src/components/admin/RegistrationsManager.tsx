@@ -361,7 +361,7 @@ const RegistrationsManager = () => {
       </Card>
 
       {/* Detail Modal */}
-      <Dialog open={showDetailModal} onOpenChange={setShowDetailModal}>
+      <Dialog open={showDetailModal} onOpenChange={setShowDetailModal} modal={true}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>Dettagli Prenotazione</DialogTitle>
@@ -428,7 +428,7 @@ const RegistrationsManager = () => {
       </Dialog>
 
       {/* Delete Modal */}
-      <Dialog open={showDeleteModal} onOpenChange={setShowDeleteModal}>
+      <Dialog open={showDeleteModal} onOpenChange={setShowDeleteModal} modal={true}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Conferma Eliminazione</DialogTitle>

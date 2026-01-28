@@ -102,7 +102,7 @@ export const CeremonyRegistrationDialog = ({
   if (!ceremony) return null;
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={onOpenChange} modal={true}>
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle className="text-xl font-serif">

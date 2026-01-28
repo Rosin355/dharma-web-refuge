@@ -452,7 +452,7 @@ const ContentManager = () => {
       </Card>
 
       {/* Modal di modifica */}
-      <Dialog open={showEditModal} onOpenChange={setShowEditModal}>
+      <Dialog open={showEditModal} onOpenChange={setShowEditModal} modal={true}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-xl font-semibold flex items-center gap-2">
@@ -543,7 +543,7 @@ const ContentManager = () => {
       </Dialog>
 
       {/* Modal di creazione */}
-      <Dialog open={showCreateModal} onOpenChange={setShowCreateModal}>
+      <Dialog open={showCreateModal} onOpenChange={setShowCreateModal} modal={true}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle className="text-xl font-semibold flex items-center gap-2">

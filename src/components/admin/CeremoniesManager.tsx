@@ -227,7 +227,7 @@ const CeremoniesManager = () => {
       </Card>
 
       {/* Delete Modal */}
-      <Dialog open={showDeleteModal} onOpenChange={setShowDeleteModal}>
+      <Dialog open={showDeleteModal} onOpenChange={setShowDeleteModal} modal={true}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Conferma Eliminazione</DialogTitle>

@@ -87,11 +87,11 @@ const Eventi = () => {
       {/* Events Grid */}
       <section className="py-12">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredEvents.map((event) => (
               <Card key={event.id} className={`group overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 bg-white border-zen-sage ${event.featured ? 'ring-2 ring-saffron-200' : ''}`}>
                 {/* Horizontal Image Full Width */}
-                <div className="relative w-full h-64 overflow-hidden">
+                <div className="relative w-full h-48 overflow-hidden">
                   {event.image_url ? (
                     <img 
                       src={event.image_url} 
@@ -100,84 +100,84 @@ const Eventi = () => {
                     />
                   ) : (
                     <div className="w-full h-full bg-gradient-to-br from-saffron-100 to-saffron-200 flex items-center justify-center">
-                      <Calendar className="h-16 w-16 text-saffron-400" />
+                      <Calendar className="h-12 w-12 text-saffron-400" />
                     </div>
                   )}
                   <div className="absolute top-3 left-3 flex gap-2">
                     {event.featured && (
-                      <Badge className="bg-saffron-500 text-white">
+                      <Badge className="bg-saffron-500 text-white text-xs">
                         In Evidenza
                       </Badge>
                     )}
                     {event.end_date && isEventPast(event.end_date) && (
-                      <Badge className="bg-gray-500 text-white">
+                      <Badge className="bg-gray-500 text-white text-xs">
                         Passato
                       </Badge>
                     )}
                   </div>
                   {event.price && (
                     <div className="absolute top-3 right-3">
-                      <span className="bg-white/95 backdrop-blur-sm px-4 py-2 rounded-full text-lg font-semibold text-saffron-600 shadow-lg">
+                      <span className="bg-white/95 backdrop-blur-sm px-3 py-1.5 rounded-full text-sm font-semibold text-saffron-600 shadow-lg">
                         {event.price}
                       </span>
                     </div>
                   )}
                 </div>
                 
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between mb-3">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between mb-2">
                     {event.type && (
-                      <Badge variant="secondary" className="bg-saffron-100 text-saffron-700">
+                      <Badge variant="secondary" className="bg-saffron-100 text-saffron-700 text-xs">
                         {event.type}
                       </Badge>
                     )}
                   </div>
                   
-                  <h3 className="font-serif text-2xl font-semibold mb-3 group-hover:text-saffron-600 transition-colors">
+                  <h3 className="font-serif text-xl font-semibold mb-2 group-hover:text-saffron-600 transition-colors line-clamp-2">
                     {event.title}
                   </h3>
                   
-                  <p className="text-muted-foreground text-sm leading-relaxed mb-4 line-clamp-3">
+                  <p className="text-muted-foreground text-xs leading-relaxed mb-3 line-clamp-2">
                     {event.description}
                   </p>
                   
-                  <div className="space-y-2 mb-6">
-                    <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-                      <Calendar className="h-4 w-4 text-saffron-500" />
-                      <span>{formatDate(event.start_date)}</span>
+                  <div className="space-y-1.5 mb-4">
+                    <div className="flex items-center space-x-2 text-xs text-muted-foreground">
+                      <Calendar className="h-3 w-3 text-saffron-500" />
+                      <span className="truncate">{formatDate(event.start_date)}</span>
                     </div>
-                    <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-                      <Clock className="h-4 w-4 text-saffron-500" />
+                    <div className="flex items-center space-x-2 text-xs text-muted-foreground">
+                      <Clock className="h-3 w-3 text-saffron-500" />
                       <span>{formatTime(event.start_date)}</span>
                     </div>
                     {event.location && (
-                      <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-                        <MapPin className="h-4 w-4 text-saffron-500" />
-                        <span>{event.location}</span>
+                      <div className="flex items-center space-x-2 text-xs text-muted-foreground">
+                        <MapPin className="h-3 w-3 text-saffron-500" />
+                        <span className="truncate">{event.location}</span>
                       </div>
                     )}
                     {event.max_participants && (
-                      <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-                        <Users className="h-4 w-4 text-saffron-500" />
+                      <div className="flex items-center space-x-2 text-xs text-muted-foreground">
+                        <Users className="h-3 w-3 text-saffron-500" />
                         <span>Max {event.max_participants} partecipanti</span>
                       </div>
                     )}
                   </div>
                   
-                  <div className="flex gap-3">
+                  <div className="flex gap-2">
+                    <Button 
+                      variant="outline" 
+                      className="border-saffron-200 text-saffron-600 hover:bg-saffron-50 flex-[2]"
+                      onClick={() => setSelectedEventForInfo(event)}
+                    >
+                      Info
+                    </Button>
                     <Button 
                       className="bg-saffron-500 hover:bg-saffron-600 text-white flex-1"
                       onClick={() => setSelectedEventForBooking(event)}
                       disabled={event.end_date ? isEventPast(event.end_date) : false}
                     >
-                      {event.end_date && isEventPast(event.end_date) ? 'Evento Passato' : 'Prenota Posto'}
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      className="border-saffron-200 text-saffron-600 hover:bg-saffron-50"
-                      onClick={() => setSelectedEventForInfo(event)}
-                    >
-                      Info
+                      {event.end_date && isEventPast(event.end_date) ? 'Passato' : 'Prenota'}
                     </Button>
                   </div>
                 </CardContent>
