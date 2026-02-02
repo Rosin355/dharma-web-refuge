@@ -4,8 +4,6 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Calendar, Clock, MapPin, Info } from 'lucide-react';
 import { useCeremonies } from '@/hooks/useCeremonies';
-import { CeremonyRegistrationDialog } from '@/components/CeremonyRegistrationDialog';
-import { useState } from 'react';
 import type { Database } from '@/integrations/supabase/types';
 
 type Ceremony = Database['public']['Tables']['ceremonies']['Row'];
@@ -13,16 +11,9 @@ type Ceremony = Database['public']['Tables']['ceremonies']['Row'];
 const Cerimonie = () => {
   const navigate = useNavigate();
   const { ceremonies, isLoading } = useCeremonies('published');
-  const [selectedCeremony, setSelectedCeremony] = useState<Ceremony | null>(null);
-  const [showRegistrationDialog, setShowRegistrationDialog] = useState(false);
 
   const handleInfoClick = (ceremony: Ceremony) => {
     navigate(`/cerimonie/${ceremony.id}`);
-  };
-
-  const handlePartecipaClick = (ceremony: Ceremony) => {
-    setSelectedCeremony(ceremony);
-    setShowRegistrationDialog(true);
   };
 
   return (
@@ -96,17 +87,11 @@ const Cerimonie = () => {
                     <div className="flex gap-2">
                       <Button 
                         variant="outline"
-                        className="flex-1 border-saffron-200 text-saffron-600 hover:bg-saffron-50"
+                        className="w-full border-saffron-200 text-saffron-600 hover:bg-saffron-50"
                         onClick={() => handleInfoClick(ceremony)}
                       >
                         <Info className="h-4 w-4 mr-2" />
                         Info
-                      </Button>
-                      <Button 
-                        className="flex-1 bg-saffron-500 hover:bg-saffron-600 text-white"
-                        onClick={() => handlePartecipaClick(ceremony)}
-                      >
-                        Partecipa
                       </Button>
                     </div>
                   </CardContent>
@@ -117,12 +102,6 @@ const Cerimonie = () => {
         </div>
       </section>
 
-      {/* Dialogs */}
-      <CeremonyRegistrationDialog
-        ceremony={selectedCeremony}
-        open={showRegistrationDialog}
-        onOpenChange={setShowRegistrationDialog}
-      />
     </div>
   );
 };
