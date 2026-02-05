@@ -564,11 +564,11 @@ const EventDetail = () => {
                     <div className="space-y-3 text-sm">
                       <div className="flex items-center gap-2 text-gray-700">
                         <Phone className="h-4 w-4 text-saffron-500" />
-                        <span>+39 123 456 789</span>
+                        <span>+39 392 7498954</span>
                       </div>
                       <div className="flex items-center gap-2 text-gray-700">
                         <Mail className="h-4 w-4 text-saffron-500" />
-                        <span>eventi@bodhidharma.info</span>
+                        <span>bodhidharmait@gmail.com</span>
                       </div>
                       <div className="flex items-center gap-2 text-gray-700">
                         <MessageSquare className="h-4 w-4 text-saffron-500" />
