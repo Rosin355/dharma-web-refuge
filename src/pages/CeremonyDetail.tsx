@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import type { Database } from '@/integrations/supabase/types';
+import { applyPageMetadata, buildContentUrl, normalizeDescription } from '@/lib/page-metadata';
 
 type Ceremony = Database['public']['Tables']['ceremonies']['Row'];
 
@@ -52,65 +53,24 @@ const CeremonyDetail = () => {
     loadCeremony();
   }, [id]);
 
-  // Aggiorna meta tags Open Graph per la condivisione
   useEffect(() => {
-    if (ceremony) {
-      const url = `${window.location.origin}/cerimonie/${ceremony.id}`;
-      
-      // Aggiorna title
-      document.title = `${ceremony.title} - Cerimonie - Comunità Bodhidharma`;
-      
-      // Aggiorna o crea meta tags
-      const updateMetaTag = (property: string, content: string) => {
-        let meta = document.querySelector(`meta[property="${property}"]`) || 
-                   document.querySelector(`meta[name="${property}"]`);
-        if (!meta) {
-          meta = document.createElement('meta');
-          meta.setAttribute('property', property);
-          document.head.appendChild(meta);
-        }
-        meta.setAttribute('content', content);
-      };
+    if (!ceremony) return;
 
-      // Open Graph tags
-      updateMetaTag('og:title', ceremony.title);
-      updateMetaTag('og:description', ceremony.description?.substring(0, 200) || 'Cerimonia della Comunità Bodhidharma');
-      updateMetaTag('og:type', 'website');
-      updateMetaTag('og:url', url);
-      if (ceremony.image_url) {
-        updateMetaTag('og:image', ceremony.image_url);
-        updateMetaTag('og:image:width', '1200');
-        updateMetaTag('og:image:height', '630');
-      }
-
-      // Twitter Card tags
-      updateMetaTag('twitter:card', 'summary_large_image');
-      updateMetaTag('twitter:title', ceremony.title);
-      updateMetaTag('twitter:description', ceremony.description?.substring(0, 200) || 'Cerimonia della Comunità Bodhidharma');
-      if (ceremony.image_url) {
-        updateMetaTag('twitter:image', ceremony.image_url);
-      }
-
-      // Meta description standard
-      const metaDescription = document.querySelector('meta[name="description"]');
-      if (metaDescription) {
-        metaDescription.setAttribute('content', ceremony.description?.substring(0, 160) || 'Cerimonia della Comunità Bodhidharma');
-      }
-    }
-
-    // Cleanup: ripristina i meta tags di default quando il componente viene smontato
-    return () => {
-      document.title = 'Comunità Bodhidharma - Centro Monastico e Blog Spirituale';
-    };
+    return applyPageMetadata({
+      title: ceremony.title,
+      description: ceremony.description || 'Cerimonia della Comunità Bodhidharma',
+      pathname: `/cerimonie/${ceremony.id}`,
+      image: ceremony.image_url,
+    });
   }, [ceremony]);
 
   const handleShare = async () => {
     if (!ceremony) return;
     
-    const url = `${window.location.origin}/cerimonie/${ceremony.id}`;
+    const url = buildContentUrl(`/cerimonie/${ceremony.id}`);
     const shareData = {
       title: ceremony.title,
-      text: ceremony.description?.substring(0, 200) || '',
+      text: normalizeDescription(ceremony.description, ''),
       url: url,
     };
 
@@ -160,6 +120,8 @@ const CeremonyDetail = () => {
       </div>
     );
   }
+
+  const ceremonyUrl = buildContentUrl(`/cerimonie/${ceremony.id}`);
 
   return (
     <div className="min-h-screen bg-zen-cream">
@@ -284,7 +246,7 @@ const CeremonyDetail = () => {
                   <Button
                     variant="outline"
                     onClick={() => {
-                      const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`;
+                      const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(ceremonyUrl)}`;
                       window.open(url, '_blank');
                     }}
                     className="flex items-center gap-2"
@@ -295,7 +257,7 @@ const CeremonyDetail = () => {
                     variant="outline"
                     onClick={() => {
                       const text = `Partecipa a: ${ceremony.title}`;
-                      const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(window.location.href)}`;
+                      const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(ceremonyUrl)}`;
                       window.open(url, '_blank');
                     }}
                     className="flex items-center gap-2"
@@ -305,7 +267,7 @@ const CeremonyDetail = () => {
                   <Button
                     variant="outline"
                     onClick={() => {
-                      const text = `Ciao! Ti segnalo questa cerimonia: ${ceremony.title} - ${window.location.href}`;
+                      const text = `Ciao! Ti segnalo questa cerimonia: ${ceremony.title} - ${ceremonyUrl}`;
                       const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
                       window.open(url, '_blank');
                     }}

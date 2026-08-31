@@ -18,9 +18,26 @@ import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-import type { Database } from '@/integrations/supabase/types';
 
-type Post = Database['public']['Tables']['posts']['Row'];
+const QUILL_MODULES = {
+  toolbar: [
+    [{ header: [1, 2, 3, false] }],
+    ['bold', 'italic', 'underline', 'strike'],
+    [{ list: 'ordered' }, { list: 'bullet' }],
+    [{ color: [] }, { background: [] }],
+    ['link', 'image', 'video'],
+    ['clean']
+  ],
+  clipboard: {
+    matchVisual: false,
+  }
+};
+
+const QUILL_FORMATS = [
+  'header', 'bold', 'italic', 'underline', 'strike',
+  'list', 'bullet', 'color', 'background',
+  'link', 'image', 'video'
+];
 
 const PostForm = () => {
   const navigate = useNavigate();
@@ -61,24 +78,6 @@ const PostForm = () => {
     if (savedKey) setUnsplashKey(savedKey);
   }, [id, isEditMode]);
 
-  // Assicura che l'editor sia editabile dopo il mount
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      const quill = quillRef.current?.getEditor();
-      if (quill) {
-        const editorElement = quill.root;
-        if (editorElement) {
-          // Rimuovi qualsiasi attributo che potrebbe impedire l'editing
-          editorElement.removeAttribute('contenteditable');
-          editorElement.setAttribute('contenteditable', 'true');
-          // Assicura che l'editor sia focusabile
-          editorElement.style.cursor = 'text';
-        }
-      }
-    }, 100);
-    return () => clearTimeout(timer);
-  }, [formData.content]);
-
   const loadPost = async (postId: string) => {
     try {
       setLoading(true);
@@ -91,8 +90,8 @@ const PostForm = () => {
       if (fetchError) throw fetchError;
       if (!data) throw new Error('Articolo non trovato');
 
-      // Assicurati che il contenuto HTML includa correttamente le immagini
-      let content = data.content || '';
+      // Il valore controllato di ReactQuill e lo stato React sono l'unica fonte di verità.
+      const content = data.content || '';
       
       // Verifica che le immagini nel contenuto siano accessibili
       if (content) {
@@ -116,14 +115,6 @@ const PostForm = () => {
         image_url: data.image_url || '',
         image_alt: data.image_alt || ''
       });
-      
-      // Forza l'editor a ricaricare il contenuto dopo un breve delay
-      setTimeout(() => {
-        const quill = quillRef.current?.getEditor();
-        if (quill && content) {
-          quill.root.innerHTML = content;
-        }
-      }, 100);
     } catch (err) {
       console.error('❌ Errore caricamento post:', err);
       setError(err instanceof Error ? err.message : 'Errore caricamento articolo');
@@ -234,27 +225,6 @@ const PostForm = () => {
       </div>`;
     });
   };
-
-  // Configurazione toolbar per react-quill
-  const quillModules = {
-    toolbar: [
-      [{ 'header': [1, 2, 3, false] }],
-      ['bold', 'italic', 'underline', 'strike'],
-      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-      [{ 'color': [] }, { 'background': [] }],
-      ['link', 'image', 'video'],
-      ['clean']
-    ],
-    clipboard: {
-      matchVisual: false,
-    }
-  };
-
-  const quillFormats = [
-    'header', 'bold', 'italic', 'underline', 'strike',
-    'list', 'bullet', 'color', 'background',
-    'link', 'image', 'video'
-  ];
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -552,8 +522,8 @@ const PostForm = () => {
                       // Assicurati che le immagini siano incluse correttamente nell'HTML
                       setFormData(prev => ({ ...prev, content: value }));
                     }}
-                    modules={quillModules}
-                    formats={quillFormats}
+                    modules={QUILL_MODULES}
+                    formats={QUILL_FORMATS}
                     placeholder="Scrivi il contenuto dell'articolo. Puoi inserire immagini, video YouTube e formattare il testo."
                     style={{ minHeight: '300px' }}
                     readOnly={false}

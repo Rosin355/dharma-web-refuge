@@ -11,6 +11,7 @@ import {
 import { ArrowLeft, Calendar, User, Clock, Loader2, AlertCircle, Share2 } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { supabase } from '@/integrations/supabase/client';
+import { applyPageMetadata, buildContentUrl, normalizeDescription } from '@/lib/page-metadata';
 import type { Database } from '@/integrations/supabase/types';
 
 type Post = Database['public']['Tables']['posts']['Row'] & {
@@ -37,6 +38,18 @@ const BlogDetail = () => {
 
     fetchPost(id);
   }, [id]);
+
+  useEffect(() => {
+    if (!post) return;
+
+    return applyPageMetadata({
+      title: post.title,
+      description: post.excerpt || post.content,
+      pathname: `/blog/${post.id}`,
+      image: post.image_url,
+      type: 'article',
+    });
+  }, [post]);
 
   const fetchPost = async (postId: string) => {
     try {
@@ -243,10 +256,10 @@ const BlogDetail = () => {
 
   // Funzione per condividere l'articolo
   const handleShare = async () => {
-    const url = `${window.location.origin}/blog/${post.id}`;
+    const url = buildContentUrl(`/blog/${post.id}`);
     const shareData = {
       title: post.title,
-      text: post.excerpt || post.content.substring(0, 200) || '',
+      text: normalizeDescription(post.excerpt || post.content, ''),
       url: url,
     };
 

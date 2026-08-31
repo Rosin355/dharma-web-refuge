@@ -25,6 +25,7 @@ import {
 import { supabase } from '@/integrations/supabase/client';
 import type { Database } from '@/integrations/supabase/types';
 import { useEventRegistrations } from '@/hooks/useEvents';
+import { applyPageMetadata, buildContentUrl } from '@/lib/page-metadata';
 
 type Event = Database['public']['Tables']['events']['Row'];
 
@@ -74,55 +75,15 @@ const EventDetail = () => {
     loadEventData();
   }, [id]);
 
-  // Aggiorna meta tags Open Graph per la condivisione
   useEffect(() => {
-    if (event) {
-      const url = `${window.location.origin}/eventi/${event.id}`;
-      
-      // Aggiorna title
-      document.title = `${event.title} - Eventi - Comunità Bodhidharma`;
-      
-      // Aggiorna o crea meta tags
-      const updateMetaTag = (property: string, content: string) => {
-        let meta = document.querySelector(`meta[property="${property}"]`) || 
-                   document.querySelector(`meta[name="${property}"]`);
-        if (!meta) {
-          meta = document.createElement('meta');
-          meta.setAttribute('property', property);
-          document.head.appendChild(meta);
-        }
-        meta.setAttribute('content', content);
-      };
+    if (!event) return;
 
-      // Open Graph tags
-      updateMetaTag('og:title', event.title);
-      updateMetaTag('og:description', event.description?.replace(/<[^>]*>/g, '').substring(0, 200) || 'Evento della Comunità Bodhidharma');
-      updateMetaTag('og:type', 'website');
-      updateMetaTag('og:url', url);
-      // Imposta sempre l'immagine dell'evento, o usa il logo come fallback
-      const ogImage = event.image_url || `${window.location.origin}/logo.png`;
-      updateMetaTag('og:image', ogImage);
-      updateMetaTag('og:image:width', '1200');
-      updateMetaTag('og:image:height', '630');
-      updateMetaTag('og:image:alt', event.title);
-
-      // Twitter Card tags
-      updateMetaTag('twitter:card', 'summary_large_image');
-      updateMetaTag('twitter:title', event.title);
-      updateMetaTag('twitter:description', event.description?.replace(/<[^>]*>/g, '').substring(0, 200) || 'Evento della Comunità Bodhidharma');
-      updateMetaTag('twitter:image', ogImage);
-
-      // Meta description standard
-      const metaDescription = document.querySelector('meta[name="description"]');
-      if (metaDescription) {
-        metaDescription.setAttribute('content', event.description?.replace(/<[^>]*>/g, '').substring(0, 160) || 'Evento della Comunità Bodhidharma');
-      }
-    }
-
-    // Cleanup: ripristina i meta tags di default quando il componente viene smontato
-    return () => {
-      document.title = 'Comunità Bodhidharma - Centro Monastico e Blog Spirituale';
-    };
+    return applyPageMetadata({
+      title: event.title,
+      description: event.description || 'Evento della Comunità Bodhidharma',
+      pathname: `/eventi/${event.id}`,
+      image: event.image_url,
+    });
   }, [event]);
 
   const handleBookingSubmit = async (e: React.FormEvent) => {
@@ -209,6 +170,8 @@ const EventDetail = () => {
       </div>
     );
   }
+
+  const eventUrl = buildContentUrl(`/eventi/${event.id}`);
 
   return (
     <div className="min-h-screen bg-zen-cream">
@@ -401,7 +364,7 @@ const EventDetail = () => {
                       <Button
                         variant="outline"
                         onClick={() => {
-                          const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`;
+                          const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(eventUrl)}`;
                           window.open(url, '_blank');
                         }}
                         className="flex items-center gap-2"
@@ -412,7 +375,7 @@ const EventDetail = () => {
                         variant="outline"
                         onClick={() => {
                           const text = `Partecipa a: ${event.title}`;
-                          const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(window.location.href)}`;
+                          const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(eventUrl)}`;
                           window.open(url, '_blank');
                         }}
                         className="flex items-center gap-2"
@@ -422,7 +385,7 @@ const EventDetail = () => {
                       <Button
                         variant="outline"
                         onClick={() => {
-                          const text = `Ciao! Ti segnalo questo evento: ${event.title} - ${window.location.href}`;
+                          const text = `Ciao! Ti segnalo questo evento: ${event.title} - ${eventUrl}`;
                           const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
                           window.open(url, '_blank');
                         }}
@@ -433,7 +396,7 @@ const EventDetail = () => {
                       <Button
                         variant="outline"
                         onClick={() => {
-                          navigator.clipboard.writeText(window.location.href);
+                          navigator.clipboard.writeText(eventUrl);
                           alert('Link copiato!');
                         }}
                         className="flex items-center gap-2"
@@ -586,4 +549,4 @@ const EventDetail = () => {
   );
 };
 
-export default EventDetail; 
+export default EventDetail;
